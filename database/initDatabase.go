@@ -20,7 +20,6 @@ func InitDB() {
 }
 
 func createTables(db *sql.DB) {
-
 	usersTable := `
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
