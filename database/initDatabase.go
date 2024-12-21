@@ -1,15 +1,13 @@
-package db
+package forum
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func InitDB() {
-
 	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
 		log.Fatal(err)
@@ -74,6 +72,4 @@ func createTables(db *sql.DB) {
 			log.Fatalf("Error creating table: %v", err)
 		}
 	}
-
-	fmt.Println("Database and tables created successfully!")
 }
