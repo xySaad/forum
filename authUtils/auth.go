@@ -2,6 +2,7 @@ package forum
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,46 +12,94 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type User struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func Auth(jwt string) (is_auth bool) {
+	if jwt == "" {
+		return
+	}
+
+	db, err := sql.Open("sqlite3", "./forum.db")
+	if err != nil {
+		return
+	}
+	query := "SELECT  ( password) FROM users WHERE password= ( ?)"
+	_, err = db.Exec(query, jwt)
+	if err != nil {
+		return
+	}
+	is_auth = true
+	return
+}
+
 func Hand_register_get(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "templates/register.html")
 }
 
+func VerifyPassword(password string) (verified bool) {
+	if 8 <= len(password) || len(password) <= 64 {
+		verified = true
+	}
+	return
+}
+func VerifyName(name string) (verified bool) {
+	for _, char := range name {
+		if char<32 {
+			
+		}
+	}
+	return
+}
+func Verify(user User) (verified bool) {
+
+	return
+}
+
 func Hand_register_post(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		fmt.Println("Error parsing form data: ", err)
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	username := r.Form.Get("username")
-	if username=="" {
-		w.Write([]byte("username cant be empty"))
+	jwt, err := r.Cookie("token")
+	if err == nil {
+		if Auth(string(jwt.Value)) {
+			fmt.Println("user")
+			return
+		}
+	}
+	var user User
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, "invalid form", http.StatusNotAcceptable)
 		return
 	}
-	email := r.Form.Get("email")
-	if email=="" {
-		w.Write([]byte("email cant be empty"))
-		return
+	if user.Email == "" || user.Password == "" || user.Username == "" {
 	}
-	password := r.Form.Get("password")
-	if password=="" {
-		w.Write([]byte("password cant be empty"))
-		return
-	}
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	if err != nil {
 		fmt.Println("Error creating user: ", err)
 	}
-	// Create the user
-	err = database.CreateUser(username, email, string(hashedPassword))
+
+	err = database.CreateUser(user.Username, user.Email, string(hashedPassword))
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-	w.Write([]byte("FFFF"))
-	http.Redirect(w, r, "/", 200)
+	Cookie := http.Cookie{
+		Name:  "token",
+		Value: string(hashedPassword),
+	}
+	http.SetCookie(w, &Cookie)
 }
 
 func Hand_login_get(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	http.ServeFile(w, r, "templates/login.html")
 }
 
