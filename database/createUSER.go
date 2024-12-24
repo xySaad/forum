@@ -3,6 +3,7 @@ package forum
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 func CreateUser(username, email, password string) error {
@@ -14,7 +15,9 @@ func CreateUser(username, email, password string) error {
 	query := "INSERT INTO users (username, email, password) VALUES (?, ?, ?)"
 	_, err = db.Exec(query, username, email, password)
 	if err != nil {
+		fmt.Println(err)
 		return errors.New("user already exists")
 	}
+
 	return nil
 }
