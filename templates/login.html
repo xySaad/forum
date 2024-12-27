@@ -6,11 +6,28 @@
     <title>Register</title>
 </head>
 <body>
-    <form action="/api/login" method="POST">
+    <form action="/api/login" method="POST" id="lform">
     <input type="text" name="username" id="username" placeholder="Username">
     <input type="email" name="email" id="email" placeholder="Email">
     <input type="password" name="password" id="password" placeholder="Password">
-    <input type="submit" value="Register">
+    <input type="submit" value="login">
     </form>
 </body>
+<script>
+    let form = document.querySelector("#lform")
+form.addEventListener("submit",async(e)=>{
+    e.preventDefault()
+let password = document.querySelector('input[name="password"]')
+let email =  document.querySelector('input[name="email"]')
+let username =   document.querySelector('input[name="username"]')
+await fetch("/api/login",{
+    method:"post",
+    body: JSON.stringify({
+        password:password.value,
+        email:email.value,
+        username:username.value,
+    })
+})
+})
+</script>
 </html>
