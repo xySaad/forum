@@ -13,6 +13,8 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	db.InitDB()
+	fs := http.FileServer(http.Dir("css"))
+	http.Handle("/css/", http.StripPrefix("/css", fs))
 	http.HandleFunc("GET /login", authUtils.Hand_login_get)
 	http.HandleFunc("POST /api/login", authUtils.Hand_login_post)
 	http.HandleFunc("GET /register", authUtils.Hand_register_get)
