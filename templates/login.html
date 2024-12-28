@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link rel="stylesheet" href="./css/style.css">
-    <title>Register</title>
+   <link rel="stylesheet" href="/css/style.css">
+    <title>login</title>
 </head>
 <body>  
 <form class="form" id="lform" al>
@@ -23,7 +23,7 @@
         <input class="input" type="password" name="password" required="">
         <span>Password</span>
     </label>
-    <button class="submit">login</button>
+    <button class="submit" >login</button>
     <p class="signin">create new account ? <a href="/register">register</a> </p>
 </form>
 <script>
@@ -33,15 +33,28 @@ form.addEventListener("submit",async(e)=>{
 let password = document.querySelector('input[name="password"]')
 let email =  document.querySelector('input[name="email"]')
 let username =   document.querySelector('input[name="username"]')
-await fetch("/api/login",{
-    method:"post",
-    body: JSON.stringify({
-        password:password.value,
-        email:email.value,
-        username:username.value,
-    })
+
+
+            let response = await fetch("/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    password: password.value,
+                    email: email.value,
+                    username: username.value,
+                }),
+            });
+                let data = await response.json();
+                console.log(data); 
+                    window.location.href = data.url;
+                if (response.status!=200) {
+                    alert(data.message)
+                }
+  
 })
-})
+
 </script>
 </body>
 
