@@ -50,6 +50,7 @@ func Hand_register_get(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
 	http.ServeFile(w, r, "templates/register.html")
 }
 
@@ -186,12 +187,11 @@ func Hand_login_post(w http.ResponseWriter, r *http.Request) {
 	var password string
 	err = db.QueryRow(query, user.Username, user.Email).Scan(&password)
 	if err != nil {
-
 		if err == sql.ErrNoRows {
 			fmt.Println("No user found")
 		}
 	}
-	err = bcrypt.CompareHashAndPassword( []byte(user.Password),[]byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		w.Write([]byte("oh snap"))
 	} else {
