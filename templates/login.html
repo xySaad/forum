@@ -3,16 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="stylesheet" href="./css/style.css">
     <title>Register</title>
 </head>
-<body>
-    <form action="/api/login" method="POST" id="lform">
-    <input type="text" name="username" id="username" placeholder="Username">
-    <input type="email" name="email" id="email" placeholder="Email">
-    <input type="password" name="password" id="password" placeholder="Password">
-    <input type="submit" value="login">
-    </form>
-</body>
+<body>  
+<form class="form" id="lform" al>
+    <p class="title">Login </p>
+    <p class="message">login into your existent account. </p>
+        <label>
+            <input class="input" type="text" name="username" required="">
+            <span>Firstname</span>
+        </label>            
+    <label>
+        <input class="input" type="email" name="email" required="">
+        <span>Email</span>
+    </label> 
+        
+    <label>
+        <input class="input" type="password" name="password" required="">
+        <span>Password</span>
+    </label>
+    <button class="submit">login</button>
+    <p class="signin">create new account ? <a href="/register">register</a> </p>
+</form>
 <script>
     let form = document.querySelector("#lform")
 form.addEventListener("submit",async(e)=>{
@@ -30,4 +43,6 @@ await fetch("/api/login",{
 })
 })
 </script>
+</body>
+
 </html>
