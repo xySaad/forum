@@ -1,4 +1,4 @@
-package forum
+package database
 
 import (
 	"database/sql"
