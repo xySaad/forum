@@ -1,0 +1,40 @@
+@import url("./header.css");
+
+:root[data-theme="light"] {
+    --text: #091b0a;
+    --background: #fbfefb;
+    --primary: #4bc045;
+    --secondary: #d98fd9;
+    --accent: #cd6973;
+}
+
+:root {
+    --text: #e4f6e5;
+    --background: #010401;
+    --primary: #46ba40;
+    --secondary: #6e266e;
+    --accent: #95323c;
+}
+
+h1 {
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    color: var(--text);
+
+}
+
+body {
+    background: var(--background);
+    border-bottom: var(--text) solid 1px;
+}
+
+a {
+    text-decoration: none;
+}
+
+.glow:hover {
+    filter: drop-shadow(0px 0px 10px var(--text)) brightness(130%);
+}
