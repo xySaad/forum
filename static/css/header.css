@@ -1,8 +1,13 @@
 @import url("./menu.css");
 
 header {
+
+    font-family: "Ysabeau SC", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .MuiSvgIcon {
@@ -11,21 +16,15 @@ header {
     width: 1em;
     height: 1em;
     display: inline-block;
-    fill: var(--text);
     flex-shrink: 0;
     transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     font-size: 1.5rem;
 }
 
 .themeSwitcher {
-    height: max-content;
     overflow: hidden;
     position: relative;
-    border-radius: 12px;
     padding: 5px 10px;
-    border-style: none none solid none;
-    border-width: 1px;
-    border-color: var(--border-color);
     z-index: 1;
 }
 
