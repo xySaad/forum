@@ -1,7 +1,7 @@
 @import url("./menu.css");
 
 header {
-
+    border-bottom: var(--text) solid 1px;
     font-family: "Ysabeau SC", serif;
     font-optical-sizing: auto;
     font-style: normal;

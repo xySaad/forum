@@ -28,7 +28,6 @@ h1 {
 
 body {
     background: var(--background);
-    border-bottom: var(--text) solid 1px;
 }
 
 a {
