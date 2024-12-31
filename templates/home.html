@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
-  {{template "head"}}
+  {{template "head" "home.css"}}
   <body>
     {{template "header"}}
+    <div class="posts">{{ range .}} {{template "post" .}} {{end}}</div>
     <script src="../static/js/index.js"></script>
   </body>
 </html>
