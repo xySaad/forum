@@ -1,20 +1,23 @@
 @import url("./header.css");
+@import url('https://fonts.googleapis.com/css?family=Patua%20One:700|Patua%20One:400');
+@import url('https://fonts.googleapis.com/css?family=Inter:700|Inter:400');
 
 :root[data-theme="light"] {
-    --text: #091b0a;
-    --background: #fbfefb;
-    --primary: #4bc045;
-    --secondary: #d98fd9;
-    --accent: #cd6973;
+    --text: #050316;
+    --background: #fbfbfe;
+    --primary: #2f27ce;
+    --secondary: #dddbff;
+    --accent: #443dff;
 }
 
-:root {
-    --text: #e4f6e5;
-    --background: #010401;
-    --primary: #46ba40;
-    --secondary: #6e266e;
-    --accent: #95323c;
+:root[data-theme="dark"] {
+    --text: #ebe9fc;
+    --background: #010104;
+    --primary: #3a31d8;
+    --secondary: #020024;
+    --accent: #0600c2;
 }
+
 
 h1 {
     margin: 0;
@@ -23,10 +26,11 @@ h1 {
 
 * {
     color: var(--text);
-
 }
 
 body {
+    font-family: 'Inter';
+    font-weight: 400;
     background: var(--background);
 }
 
@@ -39,5 +43,6 @@ a {
 }
 
 svg {
+    cursor: pointer;
     fill: var(--text);
 }

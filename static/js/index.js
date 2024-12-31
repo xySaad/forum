@@ -13,3 +13,13 @@ themeSwitcher.addEventListener("click", () => {
   theme.value = theme.value == "dark" ? "light" : "dark";
   localStorage.setItem("theme", theme.value);
 });
+
+const addPostIcon = document.querySelector(".addPost");
+addPostIcon.addEventListener("click", () => {
+  if (!addPostIcon.classList.contains("active")) {
+    addPostIcon.classList.add("active");
+    setTimeout(() => {
+      addPostIcon.classList.remove("active");
+    }, 1000);
+  }
+});

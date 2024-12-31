@@ -1,4 +1,5 @@
 @import url("./menu.css");
+@import url("https://fonts.googleapis.com/css2?family=Ysabeau+SC:wght@1..1000&display=swap");
 
 header {
     border-bottom: var(--text) solid 1px;
@@ -8,6 +9,11 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky;
+    top: 0;
+    left: 0;
+    background: var(--background);
+    padding: 0.5rem 1rem;
 }
 
 .MuiSvgIcon {
@@ -47,9 +53,15 @@ header {
     transition: all 0.7s;
 }
 
-.leftSection {
+.leftSection,
+.rightSection {
     display: flex;
     gap: 1rem;
+}
+
+.leftSection {
+    align-items: center;
+
 }
 
 @keyframes slideToRight {
@@ -66,4 +78,12 @@ header {
     }
 
     to {}
+}
+
+.addPost {
+    transition: all 0.6s;
+}
+
+.addPost.active {
+    transform: rotate(180deg) scale(1.2);
 }
