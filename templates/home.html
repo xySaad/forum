@@ -3,7 +3,8 @@
   {{template "head" "home.css"}}
   <body>
     {{template "header"}}
-    <div class="posts">{{ range .}} {{template "post" .}} {{end}}</div>
-    <script src="../static/js/index.js"></script>
+    <div class="filter"></div>
+    <div class="posts"></div>
+    <script type="module" src="../static/js/index.js"></script>
   </body>
 </html>
