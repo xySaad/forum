@@ -1,10 +1,8 @@
-package usermangment
+package modules
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 	"time"
 
@@ -12,23 +10,27 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func RegisterUSer(dataReader io.ReadCloser, resp http.ResponseWriter) error {
-	var potentialuser User
-	err := json.NewDecoder(dataReader).Decode(&potentialuser)
+type User struct {
+	Username        string `json:"Username"`
+	Email           string `json:"Email"`
+	Password        string `json:"Password"`
+	PasswordConfirm string ` json:"ConfirmPassword"`
+}
+
+func (User *User) CheckAccount(db *sql.DB) error {
+	hashedPassWord := ""
+	err := db.QueryRow("SELECT (password) FROM users WHERE username=? AND email=? VALUES (?,?)", User.Username, User.Email).Scan(&hashedPassWord)
 	if err != nil {
-		return errors.New("invalid format")
-	}
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
+		if err == sql.ErrNoRows {
+			// need to change
+			return errors.New("invalid dkxi rak tem")
+		}
 		return errors.New("internal server error")
 	}
-	defer db.Close()
-	if err := potentialuser.ValidInfo(db); err != nil {
-		return err
-	}
-
-	if err := potentialuser.CreateUser(db, resp); err != nil {
-		return err
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPassWord), []byte(User.Password))
+	if err != nil {
+		// ........
+		return errors.New("invalid okda")
 	}
 	return nil
 }

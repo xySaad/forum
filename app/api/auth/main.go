@@ -1,10 +1,8 @@
-package api
+package auth
 
 import (
 	"net/http"
 	"time"
-
-	"forum/app/logic/usermangment"
 )
 
 func Entry(resp http.ResponseWriter, req *http.Request) {
@@ -13,7 +11,7 @@ func Entry(resp http.ResponseWriter, req *http.Request) {
 		if req.Method != http.MethodPost {
 			return
 		}
-		err := usermangment.RegisterUSer(req.Body, resp)
+		err := Register(req.Body, resp)
 		if err != nil {
 			// send the err message to front
 			return
@@ -22,7 +20,7 @@ func Entry(resp http.ResponseWriter, req *http.Request) {
 		if req.Method != http.MethodGet {
 			return
 		}
-		err := usermangment.LogIn(req.Body, resp)
+		err := LogIn(req.Body, resp)
 		if err != nil {
 			// send the err message to front
 			return
@@ -46,9 +44,10 @@ func Entry(resp http.ResponseWriter, req *http.Request) {
 			// unothorized
 			return
 		}
-		if err := usermangment.CheckAuth(cookie.Value); err != nil {
+		if err := CheckAuth(cookie.Value); err != nil {
 			// unothorized
 			return
 		}
 	}
+
 }

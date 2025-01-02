@@ -1,19 +1,19 @@
-package usermangment
+package auth
 
 import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"forum/app/modules"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func LogIn(dataReader io.ReadCloser, resp http.ResponseWriter) error {
-	var potentialuser User
+	var potentialuser modules.User
 	err := json.NewDecoder(dataReader).Decode(&potentialuser)
 	if err != nil {
 		return errors.New("invalid format")
@@ -38,23 +38,5 @@ func LogIn(dataReader io.ReadCloser, resp http.ResponseWriter) error {
 		Path:     "/",
 	}
 	http.SetCookie(resp, &cookie)
-	return nil
-}
-
-func (User *User) CheckAccount(db *sql.DB) error {
-	hashedPassWord := ""
-	err := db.QueryRow("SELECT (password) FROM users WHERE username=? AND email=? VALUES (?,?)", User.Username, User.Email).Scan(&hashedPassWord)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			// need to change
-			return errors.New("invalid dkxi rak tem")
-		}
-		return errors.New("internal server error")
-	}
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPassWord), []byte(User.Password))
-	if err != nil {
-		// ........
-		return errors.New("invalid okda")
-	}
 	return nil
 }

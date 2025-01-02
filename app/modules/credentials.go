@@ -1,4 +1,4 @@
-package usermangment
+package modules
 
 import (
 	"errors"

@@ -1,4 +1,4 @@
-package usermangment
+package auth
 
 import (
 	"database/sql"
@@ -12,8 +12,8 @@ func CheckAuth(cookieValue string) error {
 	}
 	defer db.Close()
 	err = db.QueryRow("SELECT (*) FROM users WHERE uuid=?", cookieValue).Scan()
-	if err!=nil {
-		
+	if err != nil {
+
 	}
 	return nil
 }
