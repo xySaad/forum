@@ -9,17 +9,18 @@
 }
 
 .post .text {
-    font-size: 1rem;
+    font-size: clamp(0.5rem, 3vw, 1rem);
 }
 
 .post .title {
+    margin: auto;
     font-family: 'Patua One';
     font-weight: 400;
     color: var(--primary);
     overflow: hidden;
     text-wrap: nowrap;
     text-overflow: ellipsis;
-    font-size: 1.5rem;
+    font-size: clamp(0.5rem, 5vw, 1.5rem);
 }
 
 .categories {
@@ -34,4 +35,5 @@
     padding: 0.4rem;
     border-radius: 10px;
     background: var(--secondary);
+    font-size: clamp(0.5rem, 3vw, 1rem);
 }
