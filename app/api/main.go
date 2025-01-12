@@ -19,6 +19,7 @@ func Router(resp http.ResponseWriter, req *http.Request) {
 				http.Error(resp, "500 - internal server error", 500)
 				return
 			}
+			resp.Header().Set("Content-Type", "application/json")
 			resp.Write(data)
 		}
 	}
