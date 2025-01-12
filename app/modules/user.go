@@ -2,7 +2,8 @@ package modules
 
 import (
 	"database/sql"
-	"errors"
+	"fmt"
+	"forum/app/modules/errors"
 	"net/http"
 	"time"
 
@@ -11,10 +12,10 @@ import (
 )
 
 type User struct {
-	Username        string `json:"Username"`
-	Email           string `json:"Email"`
-	Password        string `json:"Password"`
-	PasswordConfirm string ` json:"ConfirmPassword"`
+	Username        string
+	Email           string
+	Password        string
+	PasswordConfirm string
 }
 
 func (User *User) CheckAccount(db *sql.DB) error {
@@ -23,14 +24,14 @@ func (User *User) CheckAccount(db *sql.DB) error {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// need to change
-			return errors.New("invalid dkxi rak tem")
+			// return errors.New("invalid dkxi rak tem")
 		}
-		return errors.New("internal server error")
+		// return errors.New("internal server error")
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassWord), []byte(User.Password))
 	if err != nil {
 		// ........
-		return errors.New("invalid okda")
+		// return errors.New("invalid okda")
 	}
 	return nil
 }
@@ -38,15 +39,15 @@ func (User *User) CheckAccount(db *sql.DB) error {
 func (User *User) CreateUser(db *sql.DB, resp http.ResponseWriter) error {
 	hashedPassWord, err := bcrypt.GenerateFromPassword([]byte(User.Password), 12)
 	if err != nil {
-		return errors.New("internal server error")
+		return err
 	}
 	uuid, err := uuid.NewV7()
 	if err != nil {
-		return errors.New("internal server error")
+		return err
 	}
 	_, err = db.Exec("INSERT INTO users (username,uuid,password,email) VALUES (? ,? ,? ,?)", User.Username, uuid, hashedPassWord, User.Email)
 	if err != nil {
-		return errors.New("internal server error")
+		return err
 	}
 	cookie := http.Cookie{
 		Name:     "ticket",
@@ -59,28 +60,61 @@ func (User *User) CreateUser(db *sql.DB, resp http.ResponseWriter) error {
 	return nil
 }
 
-func (User *User) ValidInfo(db *sql.DB) error {
-	err := ValidUserName(User.Username)
-	if err != nil {
-		return err
+func (User *User) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
+	httpErr = &errors.HttpError{
+		Status:  400,
+		Code:    errors.CodeInvalidUsername,
+		Message: "invalid username",
 	}
-	err = db.QueryRow("SELECT (*) FROM users WHERE username=(?)", User.Username).Scan()
+
+	if !ValidUserName(User.Username) {
+		httpErr.Details = "username contains invalid character"
+		return
+	}
+
+	var err error
+	defer func() {
+		if httpErr != nil && httpErr.Status == 500 {
+			fmt.Println(err)
+		}
+	}()
+
+	err = db.QueryRow("SELECT * FROM users WHERE username=(?)", User.Username).Scan()
 	if err != sql.ErrNoRows {
 		if err != nil {
-			return errors.New("internal server error")
+			httpErr.Status = 500
+			httpErr.Code = errors.CodeInternalServerError
+			httpErr.Message = "internal server error"
+			return
 		}
-		return errors.New("user already exists")
+
+		httpErr.Details = "username already taken"
+		return
 	}
-	err = ValidEmail(User.Email)
-	if err != nil {
-		return err
+
+	httpErr.Code = errors.CodeInvalidEmail
+	httpErr.Message = "invalid email"
+
+	if !ValidEmail(User.Email) {
+		httpErr.Details = "email contains invalid character"
+		return
 	}
-	err = db.QueryRow("SELECT (*) FROM users WHERE email=(?)", User.Email).Scan()
+
+	err = db.QueryRow("SELECT * FROM users WHERE email=(?)", User.Email).Scan()
 	if err != sql.ErrNoRows {
 		if err != nil {
-			return errors.New("internal server error")
+			httpErr.Status = 500
+			httpErr.Code = errors.CodeInternalServerError
+			httpErr.Message = "internal server error"
+			return
 		}
-		return errors.New("email taken")
+
+		httpErr.Details = "email already in use"
+		return
 	}
-	return ValidPassword(User.Password, User.PasswordConfirm)
+	if !ValidPassword(User.Password) {
+		httpErr.Details = "password contains invalid character"
+		return
+	}
+	return nil
 }

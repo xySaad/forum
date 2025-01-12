@@ -3,29 +3,36 @@ package auth
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"forum/app/modules"
-	"io"
-	"net/http"
+	"forum/app/modules/errors"
 )
 
-func Register(dataReader io.ReadCloser, resp http.ResponseWriter) error {
+func Register(conn *modules.Connection) {
 	var potentialuser modules.User
-	err := json.NewDecoder(dataReader).Decode(&potentialuser)
+	err := json.NewDecoder(conn.Req.Body).Decode(&potentialuser)
 	if err != nil {
-		return errors.New("invalid format")
+		conn.NewError(500, errors.CodeParsingError, "internal server error", "request is not a valid JSON")
+		return
 	}
 	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
-		return errors.New("internal server error")
-	}
-	defer db.Close()
-	if err := potentialuser.ValidInfo(db); err != nil {
-		return err
+		conn.NewError(500, errors.CodeInternalServerError, "internal server error", "")
+		return
 	}
 
-	if err := potentialuser.CreateUser(db, resp); err != nil {
-		return err
+	defer db.Close()
+	httpErr := potentialuser.ValidInfo(db)
+	if httpErr != nil {
+		conn.Error(httpErr)
+		return
 	}
-	return nil
+
+	err = potentialuser.CreateUser(db, conn.Resp)
+	if err != nil {
+		fmt.Println(err)
+		conn.NewError(500, errors.CodeUserCreationError, "can't register", "cannot create that specific user")
+		return
+	}
+	conn.Resp.Write([]byte("success"))
 }

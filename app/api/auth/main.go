@@ -1,32 +1,33 @@
 package auth
 
 import (
+	"forum/app/modules"
 	"net/http"
 	"time"
 )
 
-func Entry(resp http.ResponseWriter, req *http.Request) {
-	switch req.URL.Path[6:] {
+func Entry(conn *modules.Connection) {
+	req := conn.Req
+	resp := conn.Resp
+	switch req.URL.Path[10:] {
 	case "register":
 		if req.Method != http.MethodPost {
+			http.Error(resp, "405 - method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		err := Register(req.Body, resp)
-		if err != nil {
-			// send the err message to front
-			return
-		}
+		Register(conn)
 	case "login":
-		if req.Method != http.MethodGet {
-			return
+		if req.Method != http.MethodPost {
+			http.Error(resp, "405 - method not allowed", http.StatusMethodNotAllowed)
 		}
 		err := LogIn(req.Body, resp)
 		if err != nil {
-			// send the err message to front
+			http.Error(resp, "500 - "+err.Error(), 500)
 			return
 		}
 	case "logout":
 		if req.Method != http.MethodPost {
+			http.Error(resp, "405 - method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		cookie := http.Cookie{
@@ -48,6 +49,9 @@ func Entry(resp http.ResponseWriter, req *http.Request) {
 			// unothorized
 			return
 		}
+	default:
+		http.Error(conn.Resp, "404 - page not found", 404)
+		return
 	}
 
 }
