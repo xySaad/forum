@@ -3,15 +3,21 @@ package api
 import (
 	"forum/app/api/auth"
 	"forum/app/api/posts"
+	"forum/app/modules"
 	"net/http"
 	"strings"
 )
 
 func Router(resp http.ResponseWriter, req *http.Request) {
+	conn := &modules.Connection{
+		Resp: resp,
+		Req:  req,
+	}
+
 	path := strings.Split(req.URL.Path[5:], "/")
 	switch path[0] {
 	case "auth":
-		auth.Entry(resp, req)
+		auth.Entry(conn)
 	case "posts":
 		if req.Method == http.MethodGet {
 			data, err := posts.GetPost(req.URL.Path)
@@ -22,5 +28,8 @@ func Router(resp http.ResponseWriter, req *http.Request) {
 			resp.Header().Set("Content-Type", "application/json")
 			resp.Write(data)
 		}
+	default:
+		http.Error(conn.Resp, "404 - page not found", 404)
+		return
 	}
 }
