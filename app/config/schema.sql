@@ -40,5 +40,19 @@ CREATE TABLE IF NOT EXISTS reactions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
-    CHECK (post_id IS NOT NULL OR comment_id IS NOT NULL)
+    CHECK (post_id IS NOT NULL OR comment_id IS NOT NULL),
+    CHECK (NOT (post_id IS NOT NULL AND comment_id IS NOT NULL)),
+    UNIQUE (post_id, user_id, comment_id)
 );
+
+
+CREATE TABLE IF NOT EXISTS reactionCount (
+    post_id INTEGER,
+    comment_id INTEGER,
+    reaction_type TEXT NOT NULL,
+    count INTEGER DEFAULT 0,
+    CHECK (post_id IS NOT NULL OR comment_id IS NOT NULL),
+    CHECK (NOT (post_id IS NOT NULL AND comment_id IS NOT NULL)),
+    UNIQUE (post_id, comment_id, reaction_type)
+);
+
