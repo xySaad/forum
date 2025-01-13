@@ -3,6 +3,7 @@ package api
 import (
 	"forum/app/api/auth"
 	"forum/app/api/posts"
+	"forum/app/api/reactions"
 	"forum/app/modules"
 	"net/http"
 	"strings"
@@ -28,6 +29,8 @@ func Router(resp http.ResponseWriter, req *http.Request) {
 			resp.Header().Set("Content-Type", "application/json")
 			resp.Write(data)
 		}
+	case "reactions":
+		reactions.HandleReactions(conn, path, conn.Req.Method)
 	default:
 		http.Error(conn.Resp, "404 - page not found", 404)
 		return
