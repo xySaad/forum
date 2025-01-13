@@ -45,7 +45,7 @@ func (User *User) CreateUser(db *sql.DB, resp http.ResponseWriter) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("INSERT INTO users (username,uuid,password,email) VALUES (? ,? ,? ,?)", User.Username, uuid, hashedPassWord, User.Email)
+	_, err = db.Exec("INSERT INTO users (username,id,password,email) VALUES (? ,? ,? ,?)", User.Username, uuid, hashedPassWord, User.Email)
 	if err != nil {
 		return err
 	}
