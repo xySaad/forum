@@ -1,0 +1,39 @@
+.post {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 1rem;
+    border-radius: 10px;
+    background: var(--background2);
+    box-shadow: 0 0 10px 1px var(--text);
+}
+
+.post .text {
+    font-size: clamp(0.5rem, 3vw, 1rem);
+}
+
+.post .title {
+    margin: auto;
+    font-family: 'Patua One';
+    font-weight: 400;
+    color: var(--primary);
+    overflow: hidden;
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    font-size: clamp(0.5rem, 5vw, 1.5rem);
+}
+
+.categories {
+    padding: 1rem 0.5rem;
+    gap: 0.3rem;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.category {
+    padding: 0.4rem;
+    border-radius: 10px;
+    background: var(--secondary);
+    font-size: clamp(0.5rem, 3vw, 1rem);
+}

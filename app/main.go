@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"forum/app/api"
 	"forum/app/config"
 	db "forum/app/database"
 	"forum/app/handlers"
-	"forum/app/handlers/api"
 )
 
 func main() {
@@ -16,8 +16,8 @@ func main() {
 	config.InitTemplates("templates/components/*.html")
 
 	http.HandleFunc("/static/", handlers.Static)
-	http.HandleFunc("/auth/", handlers.Auth)
-	http.HandleFunc("/api/", api.Entry)
+	http.HandleFunc("/auth/", handlers.AuthPage)
+	http.HandleFunc("/api/", api.Router)
 	http.HandleFunc("/", handlers.Home)
 
 	fmt.Println("server started: http://localhost:8080")

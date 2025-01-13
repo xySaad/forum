@@ -1,3 +1,4 @@
+import { Home } from "./home.js";
 const theme = document.documentElement.attributes.getNamedItem("data-theme");
 if (!!localStorage.getItem("theme")) {
   theme.value = localStorage.getItem("theme");
@@ -13,3 +14,15 @@ themeSwitcher.addEventListener("click", () => {
   theme.value = theme.value == "dark" ? "light" : "dark";
   localStorage.setItem("theme", theme.value);
 });
+
+const addPostIcon = document.querySelector(".addPost");
+addPostIcon.addEventListener("click", () => {
+  if (!addPostIcon.classList.contains("active")) {
+    addPostIcon.classList.add("active");
+    setTimeout(() => {
+      addPostIcon.classList.remove("active");
+    }, 1000);
+  }
+});
+
+Home();
