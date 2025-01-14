@@ -11,6 +11,7 @@ var posts = []modules.Post{
 		Title:        "Exploring Golang Concurrency",
 		Image:        "https://example.com/images/golang-concurrency.jpg",
 		Text:         "Concurrency in Go makes it easy to build scalable and efficient software. The unique implementation of goroutines and channels allows developers to manage multiple tasks simultaneously without the complexity often associated with traditional threading models. With goroutines, creating concurrent functions is both lightweight and efficient. Channels further simplify the process by enabling safe communication between concurrent tasks. This approach not only enhances performance but also ensures the code remains clean and maintainable. Whether you're building a web server, data pipeline, or real-time application, Go's concurrency model offers unparalleled advantages.",
+		ID:           "posts-3",
 		Categories:   []string{"Programming", "Golang", "Concurrency"},
 		CreationTime: time.Now().Add(-time.Minute),
 		Publisher: modules.User{

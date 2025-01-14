@@ -9,6 +9,12 @@ import (
 )
 
 func AddReaction(conn *modules.Connection) {
+
+	validReactions := map[string]bool{
+		"like":    true,
+		"dislike": true,
+	}
+
 	var request struct {
 		UserID       string `json:"user_id"`
 		ItemID       string `json:"item_id"`       // item_id can refer to either post_id or comment_id
@@ -26,12 +32,18 @@ func AddReaction(conn *modules.Connection) {
 		return
 	}
 
+	if !validReactions[request.ReactionType] {
+		conn.NewError(http.StatusBadRequest, errors.CodeInvalidOrMissingData, "Invalid Reaction Type", "")
+		return
+	}
+
 	err = db.AddOrUpdateReaction(request.ItemID, request.UserID, request.ReactionType)
 	if err != nil {
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again at later time.")
 		return
 	}
 
-	// need to handle how the display here
+	conn.Resp.WriteHeader(http.StatusOK)
+	json.NewEncoder(conn.Resp).Encode(map[string]string{"message": "Reaction added/updated successfully"})
 
 }

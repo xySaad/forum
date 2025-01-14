@@ -12,8 +12,14 @@ type Reaction struct {
 	Timestamp    string `json:"timestamp"`
 }
 
+type ReactionCounter struct {
+	Item_id      string
+	ReactionType string `json:"reaction_type"`
+	Count        int
+}
+
 // getReactions fetches reactions for either a post or a comment based on itemID
-func GetReactions(itemID string) ([]Reaction, error) {
+func GetReactions(itemID string) ([]ReactionCounter, error) {
 	if itemID == "" {
 		return nil, fmt.Errorf("itemID must be provided")
 	}
@@ -27,9 +33,9 @@ func GetReactions(itemID string) ([]Reaction, error) {
 
 	// Query reactions for both posts and comments using the same itemID
 	rows, err := db.Query(`
-		SELECT user_id, reaction_type, created_at 
-		FROM reactions 
-		WHERE post_id = ? OR comment_id = ?`, itemID, itemID)
+		SELECT item_id, reaction_type, count 
+		FROM reactionCount 
+		WHERE item_id = ?`, itemID)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch reactions: %w", err)
@@ -37,12 +43,13 @@ func GetReactions(itemID string) ([]Reaction, error) {
 	defer rows.Close()
 
 	//prepare a slice to store the results
-	var reactions []Reaction
+	var reactions []ReactionCounter
 	for rows.Next() {
-		var reaction Reaction
-		if err := rows.Scan(&reaction.UserID, &reaction.ReactionType, &reaction.Timestamp); err != nil {
+		var reaction ReactionCounter
+		if err := rows.Scan(&reaction.Item_id, &reaction.ReactionType, &reaction.Count); err != nil {
 			return nil, fmt.Errorf("could not scan row: %w", err)
 		}
+		fmt.Println("react", reaction)
 		reactions = append(reactions, reaction)
 	}
 
@@ -61,14 +68,13 @@ func AddOrUpdateReaction(itemID, userID, reactionType string) error {
 	var existingReactionID int
 	err = db.QueryRow(`
 		SELECT id FROM reactions 
-		WHERE (post_id = ? OR comment_id = ?) 
+		WHERE item_id = ?
 		AND user_id = ?`, itemID, itemID, userID).Scan(&existingReactionID)
 
 	if err != nil && err != sql.ErrNoRows {
 		return fmt.Errorf("could not check for existing reaction: %w", err)
 	}
 
-	// If the reaction already exists, update it
 	if existingReactionID > 0 {
 		_, err = db.Exec(`
 			UPDATE reactions 
@@ -87,13 +93,6 @@ func AddOrUpdateReaction(itemID, userID, reactionType string) error {
 			return fmt.Errorf("could not insert reaction: %w", err)
 		}
 	}
-
-	// Update the reaction count in the reactionCount table
-	_, err = db.Exec(`
-		INSERT INTO reactionCount (post_id, comment_id, reaction_type, count) 
-		VALUES (?, ?, ?, 1) 
-		ON CONFLICT(post_id, comment_id, reaction_type) 
-		DO UPDATE SET count = count + 1`, itemID, itemID, reactionType)
 
 	if err != nil {
 		return fmt.Errorf("could not update reaction count: %w", err)
