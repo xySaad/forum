@@ -9,16 +9,12 @@ export function timePassed(date) {
   const days = Math.floor(hours / 24);
 
   if (seconds < 60) {
-    return `${seconds} seconds ago`;
+    return `${seconds} sec ago`;
   } else if (minutes < 60) {
-    return `${minutes} minutes ago`;
+    return `${minutes} mins ago`;
   } else if (hours < 24) {
     return `${hours} hours ago`;
   } else {
     return `${days} days ago`;
   }
 }
-
-// Example usage
-const pastDate = "2025-01-14T12:00:00"; // Replace with your date
-console.log(timePassed(pastDate));
