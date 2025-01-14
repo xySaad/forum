@@ -8,7 +8,15 @@
 }
 
 .posts {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 24px;
+}
+
+@media screen and (orientation: portrait) {
+
+    .homePage {
+        padding: 10vh 10vmin;
+    }
 }
