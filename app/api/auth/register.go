@@ -9,7 +9,7 @@ import (
 )
 
 func Register(conn *modules.Connection) {
-	var potentialuser modules.User
+	var potentialuser modules.AuthCredentials
 	err := json.NewDecoder(conn.Req.Body).Decode(&potentialuser)
 	if err != nil {
 		conn.NewError(500, errors.CodeParsingError, "internal server error", "request is not a valid JSON")

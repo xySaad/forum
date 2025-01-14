@@ -1,12 +1,14 @@
 @import url("./post.css");
 
-.posts {
-    margin-left: auto;
-    margin-top: 1rem;
-    justify-content: flex-end;
+.homePage {
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    overflow: scroll;
-    padding: 1rem;
+    flex-direction: column;
+    gap: 39px;
+    padding: 10vh 20vw;
+}
+
+.posts {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
