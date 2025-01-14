@@ -1,8 +1,14 @@
 package modules
 
+import (
+	"time"
+)
+
 type Post struct {
-	Title      string   `json:"title"`
-	Image      string   `json:"image"`
-	Text       string   `json:"text"`
-	Categories []string `json:"categories"`
+	Title        string    `json:"title"`
+	Image        string    `json:"image,omitempty"`
+	Text         string    `json:"text"`
+	Categories   []string  `json:"categories"`
+	CreationTime time.Time `json:"creationTime"`
+	Publisher    User      `json:"publisher"`
 }
