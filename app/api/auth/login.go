@@ -13,7 +13,7 @@ import (
 )
 
 func LogIn(dataReader io.ReadCloser, resp http.ResponseWriter) error {
-	var potentialuser modules.User
+	var potentialuser modules.AuthCredentials
 	err := json.NewDecoder(dataReader).Decode(&potentialuser)
 	if err != nil {
 		return errors.New("invalid format")
