@@ -1,5 +1,6 @@
 import { onResize } from "./utils/events.js";
 import { timePassed } from "./utils/time.js";
+import { Reaction } from "./reactions.js";
 
 export const Home = async () => {
   try {
@@ -9,29 +10,37 @@ export const Home = async () => {
       return;
     }
     const posts = await resp.json();
+    console.log(posts);
     posts.forEach((post) => {
-      document.querySelector(".posts").innerHTML += `<div class="postContainer">
-      <div class="post">
-          <div class="publisher">
-            <img src="/static/svg/no-profile.svg" alt="no-profile">
-            <div>${post.publisher.name}</div>
-            <div>${timePassed(post.creationTime)}</div>
-          </div>
-          <div class="title">${post.title}</div>
-          <div class="text">${post.text}</div>
-          <div class="readmore">Read more</div>
+      document.querySelector(".posts").innerHTML += `
+  <div class="postContainer">
+    <div class="post">
+      <div class="publisher"> 
+        <img src="/static/svg/no-profile.svg" alt="no-profile">
+        <div>${post.publisher.name}</div>
+        <div>${timePassed(post.creationTime)}</div>
       </div>
-      <div class="leftBar">
-        <img src="/static/svg/arrow-up.svg" alt="arrow-up">
-        <img src="/static/svg/comment-bubble.svg" alt="comment-bubble">
-        <img src="/static/svg/arrow-down.svg" alt="arrow-down">
-      </div>
-    </div>`;
+      <div class="title">${post.title}</div>
+      <div class="text">${post.text}</div>
+      <div class="readmore">Read more</div>
+    </div>
+    <div class="leftBar">
+      <img src="/static/svg/arrow-up.svg" alt="arrow-up" class="reaction-btn" id="${
+        post.ID
+      }">
+      <img src="/static/svg/comment-bubble.svg" alt="comment-bubble">
+      <img src="/static/svg/arrow-down.svg" alt="arrow-down" class="reaction-btn" id="${
+        post.ID
+      }">
+    </div>
+  </div>`;
     });
-    onResize(AdjustPostLines);
+    
   } catch (error) {
     console.error(error);
   }
+  onResize(AdjustPostLines);
+  Reaction()
 };
 
 const AdjustPostLines = () => {
@@ -55,3 +64,4 @@ function getLineCount(element) {
   let lineCount = Math.floor(height / lineHeight);
   return lineCount;
 }
+
