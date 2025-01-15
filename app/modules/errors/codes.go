@@ -16,6 +16,9 @@ const (
 
 	// Client Request
 	CodeInvalidRequestFormat = 3000
+	CodeInvalidOrMissingData = 3001
+	CodeMethodNotAllowed     = 3002
+	CodeUnauthorized         = 3003
 
 	// Server Errors
 	CodeInternalServerError = 4000

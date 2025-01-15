@@ -1,16 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-</head>
-<body>
-    <form action="/api/login" method="POST">
-    <input type="text" name="username" id="username" placeholder="Username">
-    <input type="email" name="email" id="email" placeholder="Email">
-    <input type="password" name="password" id="password" placeholder="Password">
-    <input type="submit" value="Register">
-    </form>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Speak - Login/Register</title>
+    <style>
+      body {
+        background-color: #181818;
+        color: #fff;
+        font-family: sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .container {
+        background-color: #282828;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .container h1 {
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #444;
+        border-radius: 5px;
+        background-color: #383838;
+        color: #fff;
+      }
+
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s;
+      }
+
+      .login-btn {
+        background-color: #f44336;
+        color: #fff;
+      }
+
+      .register-btn {
+        background-color: #4caf50;
+        color: #fff;
+      }
+
+      .toggle-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #2196f3;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .social-links {
+        margin-top: 20px;
+      }
+
+      .social-links a {
+        display: inline-block;
+        margin: 0 5px;
+        color: #fff;
+        text-decoration: none;
+      }
+
+      .social-links a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 id="form-title">Login to Speak</h1>
+      <form id="auth-form" method="POST">
+        <div class="form-group" id="username-email-group">
+          <label for="username-email">Username or Email</label>
+          <input
+            type="text"
+            id="username-email"
+            name="username-email"
+            required
+          />
+        </div>
+        <div class="form-group" id="email-group" style="display: none">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" />
+        </div>
+        <div class="form-group" id="password-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <div
+          class="form-group"
+          id="confirm-password-group"
+          style="display: none"
+        >
+          <label for="confirm-password">Confirm Password</label>
+          <input
+            type="password"
+            id="confirm-password"
+            name="confirm-password"
+          />
+        </div>
+        <button type="submit" class="login-btn" id="submit-btn">Login</button>
+      </form>
+      <button type="button" class="toggle-btn" id="toggle-btn">
+        Switch to Register
+      </button>
+    </div>
+
+    <script>
+      let firstVisit = true; // Initially assume it's the first visit
+
+      // Function to toggle between login and register forms
+      function toggleForm() {
+        const formTitle = document.getElementById("form-title");
+        const toggleBtn = document.getElementById("toggle-btn");
+        const submitBtn = document.getElementById("submit-btn");
+        const usernameEmailGroup = document.getElementById(
+          "username-email-group"
+        );
+        const emailGroup = document.getElementById("email-group");
+        const confirmPasswordGroup = document.getElementById(
+          "confirm-password-group"
+        );
+        const authForm = document.getElementById("auth-form");
+
+        const path = window.location.pathname;
+
+        // When the toggle button is clicked, switch between login and register
+        if (submitBtn.textContent == "Login" && !firstVisit) {
+          formTitle.textContent = "Create an Account";
+          submitBtn.textContent = "Register";
+          toggleBtn.textContent = "Switch to Login";
+          usernameEmailGroup.style.display = "block";
+          emailGroup.style.display = "block";
+          confirmPasswordGroup.style.display = "block";
+          // authForm.action = '/api/auth/register';
+          // history.pushState(null, '', '/register');
+        } else if (submitBtn.textContent == "Register" && !firstVisit) {
+          formTitle.textContent = "Login to Speak";
+          submitBtn.textContent = "Login";
+          toggleBtn.textContent = "Switch to Register";
+          usernameEmailGroup.style.display = "block";
+          emailGroup.style.display = "none";
+          confirmPasswordGroup.style.display = "none";
+          // history.pushState(null, '', '/login');
+        }
+
+        firstVisit = false;
+      }
+
+      document
+        .getElementById("toggle-btn")
+        .addEventListener("click", toggleForm);
+
+      window.addEventListener("load", function () {
+        firstVisit = false;
+        toggleForm();
+      });
+    </script>
+
+    <script>
+      document
+        .getElementById("auth-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Gather data from the form
+          const isLogin =
+            document.getElementById("submit-btn").textContent === "Login";
+          const data = {
+            password: document.getElementById("password").value,
+          };
+          const inputValue = document.getElementById("username-email").value.trim();
+          if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputValue) && isLogin) {
+            data.email = inputValue;
+          } else {
+            data.username = inputValue;
+          }
+
+          if (!isLogin) {
+            data.email = document.getElementById("email").value;
+            data.confirmPassword =
+              document.getElementById("confirm-password").value;
+
+            if (data.password !== data.confirmPassword) {
+              alert("Password and Confirm Password do not match");
+              return;
+            }
+          }
+
+          try {
+            const response = await fetch(
+              isLogin ? "/api/auth/login" : "/api/auth/register",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+                credentials: "include",
+              }
+            );
+
+            if (response.ok) {
+              const message = isLogin
+                ? "Login successful"
+                : "Registration successful";
+              showNotification(message, "success");
+
+              setTimeout(() => {
+                window.location.href = "/";
+              }, 1500);
+            } else {
+              const error = await response.json();
+              showNotification(
+                `${isLogin ? "Login" : "Registration"} failed: ${
+                  error.message
+                }`,
+                "error"
+              );
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            showNotification("An error occurred", "error");
+          }
+        });
+
+      function showNotification(message, type) {
+        const notification = document.createElement("div");
+        notification.classList.add("notification", type);
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+    </script>
+  </body>
 </html>

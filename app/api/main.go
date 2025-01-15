@@ -3,6 +3,7 @@ package api
 import (
 	"forum/app/api/auth"
 	"forum/app/api/posts"
+	"forum/app/api/reactions"
 	"forum/app/modules"
 	"net/http"
 	"strings"
