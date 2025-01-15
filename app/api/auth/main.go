@@ -9,49 +9,54 @@ import (
 func Entry(conn *modules.Connection) {
 	req := conn.Req
 	resp := conn.Resp
+
 	switch req.URL.Path[10:] {
 	case "register":
 		if req.Method != http.MethodPost {
-			http.Error(resp, "405 - method not allowed", http.StatusMethodNotAllowed)
+			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		Register(conn)
+
 	case "login":
 		if req.Method != http.MethodPost {
-			http.Error(resp, "405 - method not allowed", http.StatusMethodNotAllowed)
+			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
+			return
 		}
 		err := LogIn(req.Body, resp)
 		if err != nil {
-			http.Error(resp, "500 - "+err.Error(), 500)
+			http.Error(resp, "500 - "+err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 	case "logout":
 		if req.Method != http.MethodPost {
-			http.Error(resp, "405 - method not allowed", http.StatusMethodNotAllowed)
+			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		cookie := http.Cookie{
-			Name:     "ticket",
+			Name:     "token",
 			Value:    "",
 			Expires:  time.Now().Add(-time.Hour),
 			HttpOnly: true,
 			Path:     "/",
 		}
 		http.SetCookie(resp, &cookie)
-		// then redirect to / or whatever
-	case "auth":
-		cookie, err := req.Cookie("ticket")
-		if err != nil {
-			// unothorized
+		http.Redirect(resp, req, "/", http.StatusSeeOther)
+
+	case "session":
+		cookie, err := req.Cookie("token")
+		if err != nil || cookie.Value == "" {
+			http.Error(resp, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		if err := CheckAuth(cookie.Value); err != nil {
-			// unothorized
+			http.Error(resp, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
+
 	default:
-		http.Error(conn.Resp, "404 - page not found", 404)
+		http.Error(resp, "404 - Page Not Found", http.StatusNotFound)
 		return
 	}
-
 }

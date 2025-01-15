@@ -13,30 +13,51 @@ import (
 )
 
 func LogIn(dataReader io.ReadCloser, resp http.ResponseWriter) error {
-	var potentialuser modules.AuthCredentials
-	err := json.NewDecoder(dataReader).Decode(&potentialuser)
-	if err != nil {
-		return errors.New("invalid format")
-	}
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		return errors.New("internal server error")
-	}
-	defer db.Close()
-	if err := potentialuser.CheckAccount(db); err != nil {
+	var potentialUser modules.AuthCredentials
+	if err := json.NewDecoder(dataReader).Decode(&potentialUser); err != nil {
+		http.Error(resp, "Invalid request format", http.StatusBadRequest)
 		return err
 	}
-	uuid, err := uuid.NewV7()
-	if err != nil {
-		return errors.New("internal server error")
+
+	if potentialUser.Username == "" && potentialUser.Email == "" || potentialUser.Password == "" {
+		http.Error(resp, "Username/Email and password are required", http.StatusBadRequest)
+		return errors.New("missing required fields")
 	}
+
+	db, err := sql.Open("sqlite3", "./forum.db")
+	if err != nil {
+		http.Error(resp, "Internal server error", http.StatusInternalServerError)
+		return err
+	}
+	defer db.Close()
+
+	if err := potentialUser.CheckAccount(db); err != nil {
+		http.Error(resp, "Invalid username/email or password", http.StatusUnauthorized)
+		return err
+	}
+
+	token, err := uuid.NewV7()
+	if err != nil {
+		http.Error(resp, "Internal server error", http.StatusInternalServerError)
+		return err
+	}
+
+	_, err = db.Exec("UPDATE users SET token = ? WHERE username = ? OR email = ?", token.String(), potentialUser.Username, potentialUser.Email)
+	if err != nil {
+		http.Error(resp, "Failed to save token to database", http.StatusInternalServerError)
+		return err
+	}
+
 	cookie := http.Cookie{
-		Name:     "ticket",
-		Value:    uuid.String(),
-		Expires:  time.Now().Add(time.Hour),
-		HttpOnly: true, // Makes the cookie inaccessible to JavaScript
+		Name:     "token",
+		Value:    token.String(),
+		Expires:  time.Now().Add(1 * time.Hour),
+		HttpOnly: true,
 		Path:     "/",
 	}
 	http.SetCookie(resp, &cookie)
+
+	resp.WriteHeader(http.StatusOK)
+	resp.Write([]byte(`{"message": "Login successful"}`))
 	return nil
 }

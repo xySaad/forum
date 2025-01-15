@@ -18,14 +18,6 @@ export function Reaction() {
             return; 
         }
         const postID = button.id;
-        let userID = getUserID();
-  
-        if (!userID) {
-          alert("User is not authenticated. Please log in.");
-          return;
-          // userID = "user-4"
-        }
-
   
         try {
           const resp = await fetch("/api/reactions", {
@@ -34,10 +26,10 @@ export function Reaction() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              user_id: userID,
-              item_id: postID, // Assuming `item_id` can refer to post or comment
+              item_id: postID, 
               reaction_type: reactionType,
             }),
+            credentials: 'include'
           });
   
           if (resp.ok) {
@@ -68,14 +60,3 @@ export function Reaction() {
     });
   
 } 
-
-
-function getUserID() {
-  const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
-    const [key, value] = cookie.split("=");
-    acc[key] = value;
-    return acc;
-  }, {});
-
-  return cookies["token"];
-}
