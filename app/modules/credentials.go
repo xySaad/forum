@@ -38,7 +38,7 @@ type AuthCredentials struct {
 
 func (User *AuthCredentials) CheckAccount(db *sql.DB) error {
 	hashedPassWord := ""
-	err := db.QueryRow("SELECT (password) FROM users WHERE username=? AND email=? VALUES (?,?)", User.Username, User.Email).Scan(&hashedPassWord)
+	err := db.QueryRow("SELECT (password) FROM users WHERE username=? OR email=? VALUES (?,?)", User.Username, User.Email).Scan(&hashedPassWord)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// need to change
@@ -59,17 +59,21 @@ func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) er
 	if err != nil {
 		return err
 	}
-	uuid, err := uuid.NewV7()
+	token, err := uuid.NewV7()
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("INSERT INTO users (username,id,password,email) VALUES (? ,? ,? ,?)", User.Username, uuid, hashedPassWord, User.Email)
+	id, err := uuid.NewV6()
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("INSERT INTO users (id,username,token,password,email) VALUES (?, ? ,? ,? ,?)", id.String(), User.Username, token, hashedPassWord, User.Email)
 	if err != nil {
 		return err
 	}
 	cookie := http.Cookie{
-		Name:     "ticket",
-		Value:    uuid.String(),
+		Name:     "token",
+		Value:    token.String(),
 		Expires:  time.Now().Add(time.Hour),
 		HttpOnly: true, // Makes the cookie inaccessible to JavaScript
 		Path:     "/",

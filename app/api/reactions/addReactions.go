@@ -16,7 +16,6 @@ func AddReaction(conn *modules.Connection) {
 	}
 
 	var request struct {
-		UserID       string `json:"user_id"`
 		ItemID       string `json:"item_id"`       // item_id can refer to either post_id or comment_id
 		ReactionType string `json:"reaction_type"` // like, love, etc.
 	}
@@ -27,7 +26,7 @@ func AddReaction(conn *modules.Connection) {
 		return
 	}
 
-	if request.UserID == "" || request.ItemID == "" || request.ReactionType == "" {
+	if request.ItemID == "" || request.ReactionType == "" {
 		conn.NewError(http.StatusBadRequest, errors.CodeInvalidOrMissingData, "Empty Post ID/Comment ID", "")
 		return
 	}
@@ -37,7 +36,17 @@ func AddReaction(conn *modules.Connection) {
 		return
 	}
 
-	err = db.AddOrUpdateReaction(request.ItemID, request.UserID, request.ReactionType)
+	cookie, err := conn.Req.Cookie("token")
+	if err != nil || cookie.Value == "" {
+		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Missing or invalid authentication token", "")
+		return
+	}
+	userID, err := db.GetUserIDByToken(cookie.Value)
+	if err != nil {
+		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Invalid or expired authentication token", "")
+		return
+	}
+	err = db.AddOrUpdateReaction(request.ItemID, userID, request.ReactionType)
 	if err != nil {
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again at later time.")
 		return

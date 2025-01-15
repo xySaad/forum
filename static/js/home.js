@@ -40,7 +40,7 @@ export const Home = async () => {
     console.error(error);
   }
   onResize(AdjustPostLines);
-  Reaction()
+  document.addEventListener("DOMContentLoaded", Reaction);
 };
 
 const AdjustPostLines = () => {

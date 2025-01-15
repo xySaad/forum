@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 )
@@ -16,6 +17,25 @@ type ReactionCounter struct {
 	Item_id      string
 	ReactionType string `json:"reaction_type"`
 	Count        int
+}
+
+func GetUserIDByToken(token string) (string, error) {
+	db, err := sql.Open("sqlite3", "./forum.db")
+	if err != nil {
+		return "", errors.New("internal server error")
+	}
+	defer db.Close()
+
+	var userID string
+	err = db.QueryRow("SELECT id FROM users WHERE token = ?", token).Scan(&userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", errors.New("invalid token")
+		}
+		return "", errors.New("internal server error")
+	}
+
+	return userID, nil
 }
 
 // getReactions fetches reactions for either a post or a comment based on itemID
