@@ -1,5 +1,5 @@
+import Post from "./components/Post.js";
 import { onResize } from "./utils/events.js";
-import { timePassed } from "./utils/time.js";
 
 export const Home = async () => {
   try {
@@ -9,24 +9,9 @@ export const Home = async () => {
       return;
     }
     const posts = await resp.json();
+    const postsElement = document.querySelector(".posts");
     posts.forEach((post) => {
-      document.querySelector(".posts").innerHTML += `<div class="postContainer">
-      <div class="post">
-          <div class="publisher">
-            <img src="/static/svg/no-profile.svg" alt="no-profile">
-            <div>${post.publisher.name}</div>
-            <div>${timePassed(post.creationTime)}</div>
-          </div>
-          <div class="title">${post.title}</div>
-          <div class="text">${post.text}</div>
-          <div class="readmore">Read more</div>
-      </div>
-      <div class="leftBar">
-        <img src="/static/svg/arrow-up.svg" alt="arrow-up">
-        <img src="/static/svg/comment-bubble.svg" alt="comment-bubble">
-        <img src="/static/svg/arrow-down.svg" alt="arrow-down">
-      </div>
-    </div>`;
+      postsElement.append(Post(post));
     });
     onResize(AdjustPostLines);
   } catch (error) {
