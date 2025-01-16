@@ -17,12 +17,8 @@ func HandleReactions(conn *modules.Connection, path []string, method string) {
 	case http.MethodPost:
 		AddReaction(conn)
 	case http.MethodDelete:
-		if len(path) < 2 {
-			http.Error(conn.Resp, "400 - user ID required", 400)
-			return
-		}
-		RemoveReaction(conn) // path[1] = user_id
-	case http.MethodGet: // get Reactions for a Post
+		RemoveReaction(conn)
+	case http.MethodGet:
 		if len(path) < 2 {
 			conn.NewError(http.StatusBadRequest, errors.CodeInvalidOrMissingData, "Post ID required", "No Post ID provided")
 			return

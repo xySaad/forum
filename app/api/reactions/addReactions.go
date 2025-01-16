@@ -2,6 +2,7 @@ package reactions
 
 import (
 	"encoding/json"
+	"fmt"
 	db "forum/app/database"
 	"forum/app/modules"
 	"forum/app/modules/errors"
@@ -16,8 +17,8 @@ func AddReaction(conn *modules.Connection) {
 	}
 
 	var request struct {
-		ItemID       string `json:"item_id"`       // item_id can refer to either post_id or comment_id
-		ReactionType string `json:"reaction_type"` // like, love, etc.
+		ItemID       string `json:"item_id"`
+		ReactionType string `json:"reaction_type"`
 	}
 
 	err := json.NewDecoder(conn.Req.Body).Decode(&request)
@@ -48,6 +49,7 @@ func AddReaction(conn *modules.Connection) {
 	}
 	err = db.AddOrUpdateReaction(request.ItemID, userID, request.ReactionType)
 	if err != nil {
+		fmt.Println(err)
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again at later time.")
 		return
 	}

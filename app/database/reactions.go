@@ -77,19 +77,17 @@ func GetReactions(itemID string) ([]ReactionCounter, error) {
 }
 
 func AddOrUpdateReaction(itemID, userID, reactionType string) error {
-	// Connect to the database
 	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	// Check if the reaction already exists for the given post/comment and user
 	var existingReactionID int
 	err = db.QueryRow(`
 		SELECT id FROM reactions 
 		WHERE item_id = ?
-		AND user_id = ?`, itemID, itemID, userID).Scan(&existingReactionID)
+		AND user_id = ?`, itemID, userID).Scan(&existingReactionID)
 
 	if err != nil && err != sql.ErrNoRows {
 		return fmt.Errorf("could not check for existing reaction: %w", err)
@@ -104,10 +102,9 @@ func AddOrUpdateReaction(itemID, userID, reactionType string) error {
 			return fmt.Errorf("could not update reaction: %w", err)
 		}
 	} else {
-		// If no existing reaction, insert a new one
 		_, err = db.Exec(`
-			INSERT INTO reactions (user_id, post_id, comment_id, reaction_type) 
-			VALUES (?, ?, ?, ?)`, userID, itemID, itemID, reactionType)
+			INSERT INTO reactions (user_id, item_id, reaction_type) 
+			VALUES (?, ?, ?)`, userID, itemID, reactionType)
 
 		if err != nil {
 			return fmt.Errorf("could not insert reaction: %w", err)
@@ -121,21 +118,18 @@ func AddOrUpdateReaction(itemID, userID, reactionType string) error {
 	return nil
 }
 
-// RemoveReaction removes a reaction from a post or comment
 func RemoveReaction(itemID, userID string) error {
-	// Connect to the database
 	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	// Check if the reaction exists for the given post/comment and user
 	var reactionID int
 	err = db.QueryRow(`
 		SELECT id FROM reactions 
-		WHERE (post_id = ? OR comment_id = ?) 
-		AND user_id = ?`, itemID, itemID, userID).Scan(&reactionID)
+		WHERE (item_id = ?) 
+		AND user_id = ?`, itemID, userID).Scan(&reactionID)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -144,7 +138,6 @@ func RemoveReaction(itemID, userID string) error {
 		return fmt.Errorf("could not check for existing reaction: %w", err)
 	}
 
-	// Delete the reaction from the reactions table
 	_, err = db.Exec(`
 		DELETE FROM reactions 
 		WHERE id = ?`, reactionID)
@@ -153,23 +146,21 @@ func RemoveReaction(itemID, userID string) error {
 		return fmt.Errorf("could not delete reaction: %w", err)
 	}
 
-	// Decrement the reaction count in the reactionCount table
 	_, err = db.Exec(`
 		UPDATE reactionCount 
 		SET count = count - 1 
-		WHERE (post_id = ? OR comment_id = ?) 
+		WHERE (item_id = ?) 
 		AND reaction_type = (SELECT reaction_type FROM reactions WHERE id = ?)`,
-		itemID, itemID, reactionID)
+		itemID, reactionID)
 
 	if err != nil {
 		return fmt.Errorf("could not update reaction count: %w", err)
 	}
 
-	// Remove the reaction count if it reaches zero
 	_, err = db.Exec(`
 		DELETE FROM reactionCount 
-		WHERE (post_id = ? OR comment_id = ?) 
-		AND count = 0`, itemID, itemID)
+		WHERE (item_id = ?) 
+		AND count = 0`, itemID)
 
 	if err != nil {
 		return fmt.Errorf("could not delete reaction count: %w", err)

@@ -1,6 +1,5 @@
 import Post from "./components/Post.js";
 import { onResize } from "./utils/events.js";
-import { timePassed } from "./utils/time.js";
 import { Reaction } from "./reactions.js";
 
 export const Home = async () => {
@@ -11,6 +10,7 @@ export const Home = async () => {
       return;
     }
     const posts = await resp.json();
+    console.log(posts)
     const postsElement = document.querySelector(".posts");
     posts.forEach((post) => {
       postsElement.append(Post(post));
@@ -20,7 +20,7 @@ export const Home = async () => {
     console.error(error);
   }
   onResize(AdjustPostLines);
-  document.addEventListener("DOMContentLoaded", Reaction);
+  Reaction()
 };
 
 const AdjustPostLines = () => {
