@@ -9,6 +9,14 @@ import (
 
 func GetComents(URL *url.URL) ([]Comment, error) {
 	post_id := URL.Query().Get("p_id")
+	Offset := URL.Query().Get("offset")
+	if Offset == "" {
+		return nil, errors.New("invalid url")
+	}
+	offset, err := strconv.Atoi(Offset)
+	if err != nil {
+		return nil, errors.New("invalid post id")
+	}
 	if post_id == "" {
 		return nil, errors.New("invalid url")
 	}
@@ -16,12 +24,12 @@ func GetComents(URL *url.URL) ([]Comment, error) {
 	if err != nil {
 		return nil, errors.New("invalid post id")
 	}
-	query := `SELECT id, post_id, user_id, content, created_at FROM comments WHERE post_id = ? ORDER BY updated_at DESC`
+	query := `SELECT id, post_id, user_id, content, created_at FROM comments WHERE post_id = ? ORDER BY updated_at DESC LIMIT 10 OFFSET ?`
 	db, err := sql.Open("sqlite3", "forum.db")
 	if err != nil {
 		return nil, errors.New("internal pointer variable")
 	}
-	rows, err := db.Query(query, p_id)
+	rows, err := db.Query(query, p_id, offset)
 	if err != nil {
 		return nil, err
 	}
