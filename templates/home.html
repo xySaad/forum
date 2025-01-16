@@ -4,7 +4,23 @@
   <body>
     {{template "header"}}
     <div class="homePage">
-      <div class="filter"></div>
+      <div class="create-post">
+        <input
+          type="text"
+          placeholder="want to share a story?! write here..."
+          class="post-input"
+        />
+        <button class="create-post-button">+ Create a Post</button>
+      </div>
+      <div class="filter">
+        <div class="categories">
+          <button class="category active">All</button>
+          <button class="category">Sportif</button>
+          <button class="category">Art</button>
+          <button class="category">Technology</button>
+          <button class="category">Musical</button>
+        </div>
+      </div>
       <div class="posts"></div>
     </div>
     <script type="module" src="../static/js/index.js"></script>
