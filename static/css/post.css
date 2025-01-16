@@ -5,69 +5,41 @@
     gap: 10px;
     border-radius: 24px;
     max-height: 30vmax;
+    max-width: 900px;
+    margin: auto;
 }
 
 
 .post {
     width: 100%;
     position: relative;
-    padding: 32px 40px 50px 40px;
+    padding: 40px;
     gap: 8px;
     border-radius: 24px;
     z-index: 1;
     background: #FFFFFF14;
+    overflow: hidden;
 }
-
-.post::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 24.5px;
-    border-radius: 24px 0 0 0;
-    width: calc(100% - 50px);
-    height: 100%;
-    border: 0.8px solid;
-    border-left: none;
-    border-right: none;
-    border-image-slice: 1;
-    border-image-source: linear-gradient(96.07deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 91.96%);
-}
-
-.post::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-radius:24px 0 0 24px;
-    width: 24px;
-    height: 100%;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-right: none;
-}
-
 
 .post .text {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: clamp(0.6rem, 1vw, 1.5rem);
+    font-size: clamp(0.6rem, 1vw, 1.2rem);
     max-height: 70%;
+    line-height: 1rem;
 }
 
 .post .title {
     font-family: Inter;
     font-weight: 600;
     line-height: 1.9vmax;
-    text-align: left;
-    padding-top: 5px;
-    font-size: clamp(0.8rem, 2vw, 2rem);
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
+    padding: 5px 0;
+    font-size: clamp(0.8rem, 1.5vw, 1.5rem);
     overflow: hidden;
     text-overflow: ellipsis;
-    line-clamp: 1;
-    -webkit-line-clamp: 1;
+    white-space: nowrap;
 }
 
 .leftBar {
@@ -95,25 +67,25 @@
     flex-direction: row;
     align-items: center;
     gap: 5px;
+    font-weight: 500;
+
 }
 
-
 .publisher div:nth-child(2) {
-    font-family: Inter;
     font-size: 0.875rem;
-    font-weight: 500;
     line-height: 16.94px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .publisher div:nth-child(3) {
-    font-family: Inter;
     font-size: 0.75rem;
-    font-weight: 500;
     color: #FFFFFF52;
 }
 
 .readmore {
-    margin-top: 0.5rem;
+    margin-top: 1rem;
     font-size: clamp(0.75rem, 1vw, 1rem);
     font-weight: 700;
     line-height: 14.52px;
@@ -125,15 +97,49 @@
 
 
 @media screen and (max-width: 575px) {
+    .publisher div:nth-child(3) {
+        font-size: 0.6rem;
+    }
+
     .postContainer {
         flex-wrap: wrap;
         max-height: unset;
     }
+
     .post {
         max-height: 20vmax;
     }
+
     .leftBar {
         flex-direction: row;
         margin: auto;
+    }
+}
+
+@media screen and (max-width: 980px) {
+    .postContainer {
+        max-width: 750px;
+    }
+}
+
+
+@media screen and (max-width: 700px) {
+    .postContainer {
+        max-width: 100%;
+    }
+
+    .homePage {
+        padding: 10vh 20vw;
+    }
+}
+
+
+@media screen and (min-width: 1380px) {
+    .postContainer {
+        max-width: 1500px;
+    }
+
+    .post .text {
+        line-height: 2rem;
     }
 }

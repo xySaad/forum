@@ -23,14 +23,10 @@ const AdjustPostLines = () => {
   const post = document.querySelectorAll(".post");
 
   post.forEach((elm) => {
-    const title = elm.querySelector(".title");
-    const titleLines = getLineCount(title) - 1;
-    console.log(titleLines, title.textContent);
-
     const text = elm.querySelector(".text");
     text.style["-webkit-line-clamp"] = "unset";
     const linesToFit = getLineCount(text);
-    text.style["-webkit-line-clamp"] = linesToFit - titleLines;
+    text.style["-webkit-line-clamp"] = linesToFit;
   });
 };
 
