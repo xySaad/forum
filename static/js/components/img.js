@@ -1,3 +1,5 @@
+import { importSvg } from "../utils/index.js";
+
 const img = (src, alt, className, id) => {
   const imgElement = document.createElement("img");
   imgElement.src = src;
@@ -8,6 +10,10 @@ const img = (src, alt, className, id) => {
   if (id) {
     imgElement.id = id;
   }
+
+  imgElement.onerror = (e) => {
+    e.target.src = importSvg("no-profile");
+  };
   return imgElement;
 };
 export default img;
