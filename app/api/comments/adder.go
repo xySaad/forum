@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 )
 
@@ -22,6 +23,7 @@ func AddComment(data io.ReadCloser) error {
 if err!=nil {
 	return errors.New("internal pointer variable")
 }
+fmt.Printf("comment: %v\n", comment)
 return  nil
 }
  

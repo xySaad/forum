@@ -17,7 +17,7 @@ func GetComents(URL *url.URL) ([]Comment, error) {
 		return nil, errors.New("invalid post id")
 	}
 	query := `SELECT id, post_id, user_id, content, created_at FROM comments WHERE post_id = ? ORDER BY updated_at DESC`
-	db,err:=sql.Open("sqlite3","forum.db")
+	db, err := sql.Open("sqlite3", "forum.db")
 	if err != nil {
 		return nil, errors.New("internal pointer variable")
 	}

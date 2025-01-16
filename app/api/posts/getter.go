@@ -1,7 +1,9 @@
 package posts
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"forum/app/modules"
 	"time"
 )
@@ -95,5 +97,14 @@ var posts = []modules.Post{
 }
 
 func GetPost(path string) ([]byte, error) {
+	db, _ := sql.Open("sqlite3", "forum.db")
+	for _, v := range posts {
+		query := "INSERT INTO posts (title, content) VALUES (?, ?)"
+		_, err := db.Exec(query, v.Title, v.Text)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+	db.Close()
 	return json.Marshal(posts)
 }
