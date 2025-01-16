@@ -22,7 +22,7 @@ const Post = (postData) =>
     div("leftBar").add(
       img(importSvg("arrow-up"), "arrow-up", "reaction-arrow", postData.id),
       img(importSvg("comment-bubble"), "comment-bubble"),
-      img(importSvg("arrow-down"), "arrow-down", "reaction-arrow")
+      img(importSvg("arrow-down"), "arrow-down", "reaction-arrow", postData.id)
     )
   );
 export default Post;
