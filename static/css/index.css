@@ -47,3 +47,60 @@ svg {
     cursor: pointer;
     fill: var(--text);
 }
+
+.frame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.frame>* {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    left: 24.5px;
+    border-radius: 24px 0 0 0;
+    width: calc(100% - 50px);
+    height: 50%;
+    border: 0.8px solid;
+    border-left: none;
+    border-right: none;
+    border-image-slice: 1;
+    border-image-source: linear-gradient(96.07deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 91.96%);
+}
+
+.frame .top {
+    top: 0;
+    border-bottom: none;
+}
+
+.frame .bottom {
+    bottom: 0;
+    border-top: none;
+}
+
+.frame::before,
+.frame::after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 24px;
+    height: 50%;
+    border: 0.8px solid rgba(255, 255, 255, 0.4);
+    border-right: none;
+}
+
+.frame::before {
+    top: 0;
+    border-radius: 24px 0 0 0;
+    border-bottom: none;
+}
+
+.frame::after {
+    border-radius: 0 0 0 24px;
+    bottom: 0;
+    border-top: none;
+}
