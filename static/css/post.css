@@ -71,6 +71,11 @@
 
 }
 
+.publisher img {
+    border-radius: 100%;
+    width: 2rem;
+}
+
 .publisher div:nth-child(2) {
     font-size: 0.875rem;
     line-height: 16.94px;

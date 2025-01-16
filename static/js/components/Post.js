@@ -2,15 +2,14 @@ import div from "./div.js";
 import img from "./img.js";
 import { timePassed } from "../utils/time.js";
 import Frame from "./Frame.js";
-
-const importSvg = (svgName) => "./static/svg/" + svgName + ".svg";
+import { importSvg } from "../utils/index.js";
 
 const Post = (postData) =>
   div("postContainer").add(
     Frame(
       div("post").add(
         div("publisher").add(
-          img(importSvg("no-profile"), "no-profile"),
+          img(postData.publisher.profilePicture, "no-profile"),
           div(null, postData.publisher.name),
           div(null, timePassed(postData.creationTime))
         ),
