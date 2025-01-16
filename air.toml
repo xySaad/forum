@@ -1,0 +1,11 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/main ./app/main.go"
+  bin = "./tmp/main"
+  include_ext = ["go", "html", "css", "js"]
+[proxy]
+  enabled = true
+  proxy_port = 3000
+  app_port = 8080

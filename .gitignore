@@ -1,1 +1,4 @@
-.db/
+.vscode/
+*.db
+*.log
+tmp
