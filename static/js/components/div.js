@@ -1,4 +1,4 @@
-const div = (className, textContent) => {
+const div = (className = "", textContent) => {
   const divElement = document.createElement("div");
   divElement.className = className;
   divElement.textContent = textContent;
