@@ -16,7 +16,7 @@ var posts = []modules.Post{
 		CreationTime: time.Now().Add(-time.Minute),
 		Publisher: modules.User{
 			Username:       "srm",
-			ProfilePicture: "https://example.com/images/profile/srm.jpg",
+			ProfilePicture: "https://avatars.githubusercontent.com/u/151461794?v=4",
 			Name:           "Saad",
 		},
 	},
