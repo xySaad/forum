@@ -17,7 +17,9 @@ export function checkPost() {
                 } else {
                     post.title = titl
                     post.content = input
+                    post = JSON.stringify(post)
                     console.log(post);
+                    post = {}
                 }
             } else {
                 console.error('No input field with class "title" found.')
