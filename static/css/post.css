@@ -18,6 +18,7 @@
     background: #FFFFFF14;
     overflow: hidden;
     cursor: default;
+    max-height: 35vh;
 }
 
 .post .text {
@@ -27,6 +28,7 @@
     text-overflow: ellipsis;
     font-size: clamp(0.6rem, 1vw, 1.2rem);
     line-height: 1rem;
+    max-height: calc(80% - 2rem);
 }
 
 .post .title {
