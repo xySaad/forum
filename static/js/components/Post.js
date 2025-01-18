@@ -3,9 +3,16 @@ import img from "./img.js";
 import { timePassed } from "../utils/time.js";
 import Frame from "./Frame.js";
 import { importSvg } from "../utils/index.js";
+import PostView from "./PostView.js";
 
-const Post = (postData) =>
-  div("postContainer").add(
+const Post = (postData) => {
+  const readMore = div("readmore", "Read more");
+
+  readMore.onclick = () => {
+    document.body.prepend(PostView(postData));
+  };
+
+  return div("postContainer").add(
     Frame(
       div("post").add(
         div("publisher").add(
@@ -15,7 +22,7 @@ const Post = (postData) =>
         ),
         div("title", postData.title),
         div("text", postData.text),
-        div("readmore", "Read more")
+        readMore
       )
     ),
     div("leftBar").add(
@@ -24,4 +31,5 @@ const Post = (postData) =>
       img(importSvg("arrow-down"), "arrow-down", "reaction-arrow", postData.ID)
     )
   );
+};
 export default Post;
