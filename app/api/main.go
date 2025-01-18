@@ -33,7 +33,7 @@ func Router(resp http.ResponseWriter, req *http.Request) {
 		}
 	case "coments":
 		if req.Method == http.MethodPost {
-			err := comments.AddComment(req.Body)
+			err := comments.AddComment(conn)
 			if err != nil {
 				http.Error(resp, err.Error()+"500 - internal server error", 500)
 				return
