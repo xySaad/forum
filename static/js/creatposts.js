@@ -15,6 +15,8 @@ export function checkPost() {
                     message.textContent = 'Input cannot be empty!'
                     message.style.color = 'red'
                 } else {
+                     message.textContent = 'post created '
+                     message.style.color = 'green'
                     post.title = titl
                     post.content = input
                     post = JSON.stringify(post)
