@@ -12,7 +12,12 @@ const img = (src, alt, className, id) => {
   }
 
   imgElement.onerror = (e) => {
-    e.target.src = importSvg("no-profile");
+    if (!alt) {
+      imgElement.remove();
+      return;
+    }
+    e.target.src = importSvg(alt);
+    imgElement.onerror = null;
   };
   return imgElement;
 };

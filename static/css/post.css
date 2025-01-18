@@ -33,6 +33,7 @@
     font-family: Inter;
     font-weight: 600;
     line-height: 1.9vmax;
+    min-height: 1.9vmax;
     padding: 5px 0;
     font-size: clamp(0.8rem, 1.5vw, 1.5rem);
     overflow: hidden;
