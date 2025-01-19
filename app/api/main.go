@@ -33,7 +33,7 @@ func Router(resp http.ResponseWriter, req *http.Request) {
 		}
 	case "coments":
 		if req.Method == http.MethodPost {
-			err := comments.AddComment(req.Body)
+			err := comments.AddComment(conn)
 			if err != nil {
 				http.Error(resp, err.Error()+"500 - internal server error", 500)
 				return
@@ -56,7 +56,7 @@ func Router(resp http.ResponseWriter, req *http.Request) {
 	case "reactions":
 		reactions.HandleReactions(conn, path, conn.Req.Method)
 	default:
-		http.Error(conn.Resp, "404 - page not found", 404)
+
 		return
 	}
 }
