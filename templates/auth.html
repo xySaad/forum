@@ -1,18 +1,74 @@
-<!DOCTYPE html>
 <html lang="en">
-  {{template "head"}}
-  <body>
-    {{template "header"}}
-    <form action="/api/login" method="POST">
-      <input type="text" name="username" id="username" placeholder="Username" />
-      <input type="email" name="email" id="email" placeholder="Email" />
-      <input
-        type="password"
-        name="password"
-        id="password"
-        placeholder="Password"
-      />
-      <input type="submit" value="Register" />
-    </form>
-  </body>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/css/auth.css">
+</head>
+ <script>
+    function SwitchToRegister () {
+        let log = document.querySelector("span.login")
+                let reg = document.querySelector("span.register")
+                log.classList.remove("clicked")
+                reg.classList.add("clicked")
+                let logdiv = document.querySelector("div.login")
+                let regdiv = document.querySelector("div.register")
+                logdiv.style.display = "none"
+                regdiv.style.display ="block"
+    }
+    function SwitchToLogin() {
+            let log = document.querySelector("span.login")
+                let reg = document.querySelector("span.register")
+                log.classList.add("clicked")
+                reg.classList.remove("clicked")
+                let logdiv = document.querySelector("div.login")
+                let regdiv = document.querySelector("div.register")
+                logdiv.style.display = "block"
+                regdiv.style.display ="none"
+    }
+ </script>
+<body>
+    <div class="full-screen-background"></div>
+    <div class="blur-layer"></div>
+    <div class="authontication">
+        <div class="card">
+            <div class="tocenter">
+                <img src="../static/svg/logo.svg" alt="" class="logo">
+            </div>
+            <div class="toggle">
+                <span class="login clicked" onclick="SwitchToLogin()">login</span>
+                <span class="register" onclick="SwitchToRegister()">register</span>
+            </div>
+            
+            <div class="login">
+                <form action="post" class="form">
+                    <input type="email" placeholder="Enter your email" class="input">
+                    <input type="password" placeholder="Enter your password" class="input tall">
+                    <div class="btns">
+                        <button class="secondary">Cancel</button>
+                        <button type="submit">Login</button>
+                    </div>
+    
+                </form>
+            </div>
+             <div class="register" style="display: none;">
+                <form action="post" class="form">
+                    <input type="name" placeholder="Enter your name" class="input">
+                    <input type="email" placeholder="Enter your email" class="input">
+                    <input type="password" placeholder="Enter your password" class="input tall">
+                    <input type="password" placeholder="Confirm password" class="input tall">
+                    <div class="btns">
+                        <button class="secondary">Cancel</button>
+                        <button type="submit">Login</button>
+                    </div>
+    
+                </form>
+            </div> 
+        </div>
+    </div>
+
+    <div class="join"></div>
+</body>
+
 </html>
