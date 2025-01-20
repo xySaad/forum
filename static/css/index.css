@@ -1,4 +1,3 @@
-@import url("./header.css");
 @import url('https://fonts.googleapis.com/css?family=Patua%20One:700|Patua%20One:400');
 @import url('https://fonts.googleapis.com/css?family=Inter:700|Inter:400');
 
@@ -11,8 +10,8 @@
 }
 
 :root[data-theme="dark"] {
-    --text: #ebe9fc;
-    --background: #010104;
+    --text: hsla(0, 0%, 100%, 1);
+    --background: linear-gradient(129.76deg, #252937 -0.72%, #101218 80.04%);
     --primary: #3a31d8;
     --secondary: #020024;
     --accent: #0600c2;
@@ -29,8 +28,11 @@ h1 {
 }
 
 body {
-    font-family: 'Inter';
+    margin: 0;
+    font-family: Inter;
+    font-size: 0.75rem;
     font-weight: 400;
+    line-height: 1.7vmax;
     background: var(--background);
 }
 
@@ -45,4 +47,62 @@ a {
 svg {
     cursor: pointer;
     fill: var(--text);
+}
+
+.frame {
+    z-index: -1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.frame>* {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    left: 24.5px;
+    border-radius: 24px 0 0 0;
+    width: calc(100% - 50px);
+    height: 50%;
+    border: 0.8px solid;
+    border-left: none;
+    border-right: none;
+    border-image-slice: 1;
+    border-image-source: linear-gradient(96.07deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 91.96%);
+}
+
+.frame .top {
+    top: 0;
+    border-bottom: none;
+}
+
+.frame .bottom {
+    bottom: 0;
+    border-top: none;
+}
+
+.frame::before,
+.frame::after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 24px;
+    height: 50%;
+    border: 0.8px solid rgba(255, 255, 255, 0.4);
+    border-right: none;
+}
+
+.frame::before {
+    top: 0;
+    border-radius: 24px 0 0 0;
+    border-bottom: none;
+}
+
+.frame::after {
+    border-radius: 0 0 0 24px;
+    bottom: 0;
+    border-top: none;
 }

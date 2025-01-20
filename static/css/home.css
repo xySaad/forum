@@ -1,12 +1,115 @@
 @import url("./post.css");
+@import url("./postView.css");
+
+.homePage {
+  display: flex;
+  flex-direction: column;
+  gap: 39px;
+  padding: 10vh 0;
+}
 
 .posts {
-    margin-left: auto;
-    margin-top: 1rem;
-    justify-content: flex-end;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    overflow: scroll;
-    padding: 1rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.create-post {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 8px 8px 24px;
+  gap: 10px;
+  border: 2.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+}
+
+.post-input {
+  padding: 10px;
+  width: 100%;
+  border-radius: 20px;
+  border: none;
+  font-size: 14px;
+  outline: none;
+  background: none;
+}
+
+.create-post-button {
+  border: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 21px;
+  gap: 10px;
+
+  font-weight: 600;
+
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  border-radius: 18px;
+
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+  cursor: pointer;
+}
+
+.create-post-button:hover {
+  background-color: #444;
+}
+
+.categories {
+  justify-content: space-around;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 0px;
+  gap: 16px;
+  overflow: scroll;
+}
+
+.category {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 21.06px;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(3.45px);
+  border-radius: 76px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.category.active {
+  padding: 12px 24px 12px 24px;
+  gap: 12px;
+  border-radius: 76px;
+  border: 1px 0px 0px 0px;
+  background: none;
+  font-weight: 700;
+  font-size: 16px;
+  color: #fd5f49;
+  border: 1px solid #fd5f49;
+}
+
+.category:hover {
+  background-color: #555;
+}
+
+@media screen and (orientation: portrait) {
+  .homePage {
+    padding: 10vh 10vmin;
+  }
+}
+
+@media screen and (min-width: 1380px) {
+  .homePage {
+    padding: 10vw 20vw;
+  }
 }
