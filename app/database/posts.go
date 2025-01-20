@@ -1,12 +1,13 @@
 package db
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"database/sql"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
 	"log"
+	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -22,7 +23,7 @@ func createPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Failed to read request body", http.StatusBadRequest)
 		return
@@ -66,4 +67,22 @@ func createPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprintln(w, "Post created successfully")
+}
+func GetUserIDByToken(token string) (string, error) {
+	db, err := sql.Open("sqlite3", "./forum.db")
+	if err != nil {
+		return "", errors.New("internal server error")
+	}
+	defer db.Close()
+
+	var userID string
+	err = db.QueryRow("SELECT id FROM users WHERE token = ?", token).Scan(&userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", errors.New("invalid token")
+		}
+		return "", errors.New("internal server error")
+	}
+
+	return userID, nil
 }
