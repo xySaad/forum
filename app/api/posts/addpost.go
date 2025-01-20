@@ -71,3 +71,5 @@ func CreatePost(title, description, userID string) error {
 	_, err = stmt.Exec(title, description, userID)
 	return err
 }
+
+
