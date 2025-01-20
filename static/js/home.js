@@ -10,17 +10,16 @@ export const Home = async () => {
       return;
     }
     const posts = await resp.json();
-    console.log(posts)
+
     const postsElement = document.querySelector(".posts");
     posts.forEach((post) => {
       postsElement.append(Post(post));
     });
-    
   } catch (error) {
     console.error(error);
   }
   onResize(AdjustPostLines);
-  Reaction()
+  Reaction();
 };
 
 const AdjustPostLines = () => {
@@ -40,4 +39,3 @@ function getLineCount(element) {
   let lineCount = Math.floor(height / lineHeight);
   return lineCount;
 }
-
