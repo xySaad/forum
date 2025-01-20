@@ -8,12 +8,15 @@ import (
 func CheckAuth(cookieValue string) error {
 	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
-		return errors.New("internal server error")
+		return errors.New("Internal server error")
 	}
 	defer db.Close()
-	err = db.QueryRow("SELECT (*) FROM users WHERE uuid=?", cookieValue).Scan()
-	if err != nil {
 
+	var userID string
+	err = db.QueryRow("SELECT id FROM users WHERE token=?", cookieValue).Scan(&userID)
+	if err != nil {
+		return errors.New("Unauthorized access")
 	}
+
 	return nil
 }
