@@ -1,7 +1,6 @@
 import Post from "./components/Post.js";
 
-
-export const filterCat = () => {
+export const filterCat = (page = 1) => {
     let selectedCategories = []; 
     const categories = document.querySelectorAll(".category");
     const allCategoryButton = document.querySelector(".category.active");
@@ -35,8 +34,8 @@ export const filterCat = () => {
             console.log("Selected categories:", selectedCategories);
 
             let url = selectedCategories.length > 0 
-                ? `/api/posts/categories=${selectedCategories.join("&")}` 
-                : `/api/posts`;
+                ? `/api/posts/${page}/categories=${selectedCategories.join("&")}` 
+                : `/api/posts/${page}`;
 
             try {
                 const resp = await fetch(url);
