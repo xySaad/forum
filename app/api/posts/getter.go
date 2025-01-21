@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"forum/app/modules"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -94,6 +95,16 @@ func GetPosts(conn *modules.Connection) ([]byte, error) {
 
 	log.Printf("Request URL Path: %s", conn.Req.URL.Path)
 
+	queryParams := conn.Req.URL.Query()
+	pageStr := queryParams.Get("page")
+	page := 1 // Default to page 1
+
+	if pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+
 	if strings.Contains(conn.Req.URL.Path, "categories") {
 		cat := strings.Split(conn.Req.URL.Path, "/categories=")[1]
 		categories = strings.Split(cat, "&")
@@ -101,11 +112,11 @@ func GetPosts(conn *modules.Connection) ([]byte, error) {
 	}
 
 	if len(categories) > 0 {
-		log.Printf("Fetching posts by categories: %v", categories)
-		err = fetchPostsByCategories(categories, &posts)
+		log.Printf("Fetching posts by categories: %v for page %d", categories, page)
+		err = fetchPostsByCategories(categories, &posts, page)
 	} else {
-		log.Println("Fetching all posts")
-		err = fetchAllPosts(&posts)
+		log.Printf("Fetching posts for page %d", page)
+		err = fetchAllPosts(&posts, page)
 	}
 
 	if err != nil {
@@ -124,12 +135,23 @@ func GetPosts(conn *modules.Connection) ([]byte, error) {
 	return postJSON, nil
 }
 
-func fetchPostsByCategories(categories []string, posts *[]modules.Post) error {
+func fetchPostsByCategories(categories []string, posts *[]modules.Post, page int) error {
+	const limit = 10
+	offset := (page - 1) * limit
+
 	categoriesCode := GetCategoryMask(categories)
+	categoryInt, err := strconv.ParseInt(categoriesCode, 2, 64)
+	if err != nil {
+		return fmt.Errorf("error parsing category mask: %v", err)
+	}
 
-	query := fmt.Sprintf("SELECT user_id, item_id, title, content, categories FROM posts WHERE categories = ?")
+	query := `SELECT user_id, item_id, title, content, categories, created_at 
+              FROM posts 
+              WHERE (CAST(categories AS INTEGER) & ?) != 0 
+              ORDER BY created_at DESC 
+              LIMIT ? OFFSET ?`
 
-	log.Printf("Executing query: %s with category mask: %s", query, categoriesCode)
+	log.Printf("Executing query: %s with category mask: %d, limit: %d, offset: %d", query, categoryInt, limit, offset)
 
 	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
@@ -138,7 +160,7 @@ func fetchPostsByCategories(categories []string, posts *[]modules.Post) error {
 	}
 	defer db.Close()
 
-	rows, err := db.Query(query, categoriesCode)
+	rows, err := db.Query(query, categoryInt, limit, offset)
 	if err != nil {
 		log.Printf("Error querying posts by category: %v", err)
 		return fmt.Errorf("error querying posts by category: %v", err)
@@ -149,13 +171,12 @@ func fetchPostsByCategories(categories []string, posts *[]modules.Post) error {
 		var post modules.Post
 		var categoryMask string
 
-		if err := rows.Scan(&post.Publisher.Username, &post.ID, &post.Title, &post.Text, &categoryMask); err != nil {
+		if err := rows.Scan(&post.Publisher.Username, &post.ID, &post.Title, &post.Text, &categoryMask, &post.CreationTime); err != nil {
 			log.Printf("Error scanning post: %v", err)
 			return fmt.Errorf("error scanning post: %v", err)
 		}
 
 		post.Categories = GetCategoriesFromMask(categoryMask)
-
 		*posts = append(*posts, post)
 	}
 
@@ -167,10 +188,16 @@ func fetchPostsByCategories(categories []string, posts *[]modules.Post) error {
 	return nil
 }
 
-func fetchAllPosts(posts *[]modules.Post) error {
-	query := "SELECT user_id, item_id, title, content, categories, created_at FROM posts ORDER BY created_at DESC LIMIT 10"
+func fetchAllPosts(posts *[]modules.Post, page int) error {
+	const limit = 10
+	offset := (page - 1) * limit
 
-	log.Printf("Executing query: %s", query)
+	query := `SELECT user_id, item_id, title, content, categories, created_at 
+              FROM posts 
+              ORDER BY created_at DESC 
+              LIMIT ? OFFSET ?`
+
+	log.Printf("Executing query: %s with limit %d and offset %d", query, limit, offset)
 
 	db, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
@@ -179,7 +206,7 @@ func fetchAllPosts(posts *[]modules.Post) error {
 	}
 	defer db.Close()
 
-	rows, err := db.Query(query)
+	rows, err := db.Query(query, limit, offset)
 	if err != nil {
 		log.Printf("Error querying all posts: %v", err)
 		return fmt.Errorf("error querying all posts: %v", err)
