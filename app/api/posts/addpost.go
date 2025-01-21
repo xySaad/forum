@@ -96,9 +96,13 @@ func GetCategoryMask(categories []string) string {
 
 	mask := [4]rune{'0', '0', '0', '0'}
 
+	log.Printf("Input categories: %v", categories)
+
 	for _, category := range categories {
 		if index, exists := categoryMap[category]; exists {
 			mask[index] = '1'
+		} else {
+			log.Printf("Unknown category: %s", category)
 		}
 	}
 
