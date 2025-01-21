@@ -1,6 +1,7 @@
 import Post from "./components/Post.js";
 import { onResize } from "./utils/events.js";
 import { Reaction } from "./reactions.js";
+import CreatePost from "./components/createPost.js";
 
 export const Home = async () => {
   try {
@@ -20,6 +21,9 @@ export const Home = async () => {
   }
   onResize(AdjustPostLines);
   Reaction();
+  document.getElementById("create-post-btn").onclick = () => {
+    CreatePost();
+  };
 };
 
 const AdjustPostLines = () => {

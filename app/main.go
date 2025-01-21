@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"forum/app/api"
-	"forum/app/api/posts"
 	"forum/app/config"
 	db "forum/app/database"
 	"forum/app/handlers"
@@ -13,7 +12,7 @@ import (
 
 func main() {
 	db.InitDB()
-	posts.GetPost("")
+	// posts.GetPosts(conn * modules.Connection)
 	config.InitTemplates("templates/*.html")
 	config.InitTemplates("templates/components/*.html")
 

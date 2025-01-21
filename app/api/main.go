@@ -23,13 +23,15 @@ func Router(resp http.ResponseWriter, req *http.Request) {
 		auth.Entry(conn)
 	case "posts":
 		if req.Method == http.MethodGet {
-			data, err := posts.GetPost(req.URL.Path)
+			data, err := posts.GetPosts(conn)
 			if err != nil {
 				http.Error(resp, "500 - internal server error", 500)
 				return
 			}
 			resp.Header().Set("Content-Type", "application/json")
 			resp.Write(data)
+		} else if req.Method == http.MethodPost {
+			posts.AddPost(conn)
 		}
 	case "coments":
 		if req.Method == http.MethodPost {

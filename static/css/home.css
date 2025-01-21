@@ -1,5 +1,6 @@
 @import url("./post.css");
 @import url("./postView.css");
+@import url("./createPostView.css");
 
 .homePage {
   display: flex;

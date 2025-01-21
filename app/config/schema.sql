@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
-    username TEXT NOT NULL UNIQUE,
-    email TEXT NOT NULL UNIQUE,
+    username TEXT NOT NULL UNIQUE CHECK(length(username) >= 3 AND length(username) <= 50),
+    email TEXT NOT NULL UNIQUE CHECK(length(email) <= 255),
     password TEXT NOT NULL,
     token TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS posts (
     item_id TEXT UNIQUE, -- Formatted ID, e.g. "posts-1"
     user_id TEXT ,
     title TEXT NOT NULL,
-    content TEXT NOT NULL,
+    content TEXT NOT NULL CHECK(length(content) <= 10000),
+    categories TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

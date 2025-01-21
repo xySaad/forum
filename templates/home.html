@@ -3,6 +3,7 @@
   {{template "head" "home.css"}}
   <body>
     {{template "header"}}
+    <div id="backdrop"></div>
     <div class="homePage">
       <div class="create-post">
         <input
@@ -10,11 +11,25 @@
           placeholder="want to share a story?! write here..."
           class="post-input"
         />
-        <button class="create-post-button">+ Create a Post</button>
+        <button class="create-post-button" id="create-post-btn">+ Create a Post</button>
       </div>
+      
       <div class="filter">
         <div class="categories">
           <button class="category active">All</button>
+          <!-- <label class="category">Sportif
+            <input type="checkbox">
+          </label>
+          <label class="category">Tech
+            <input type="checkbox">
+          </label>
+          <label class="category">Finance
+            <input type="checkbox">
+          </label>
+          <label class="category">Sience
+            <input type="checkbox">
+          </label> -->
+          
           <button class="category">Sportif</button>
           <button class="category">Art</button>
           <button class="category">Technology</button>
