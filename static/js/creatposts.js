@@ -1,51 +1,60 @@
-export let post = {}
+export let post = {};
 
 export function checkPost() {
-    let createPost = document.getElementsByClassName('create')
-    Array.from(createPost).forEach((element) => {
-        element.addEventListener('click', () => {
-            const message = document.getElementById('message')
-            const title = document.querySelector('.title')
-            const inputElement = document.querySelector('.description')
+    const createPost = document.querySelector(".submitButton");
+
+    if (createPost) {
+        console.log("Found submitButton, adding event listener");
+
+        createPost.addEventListener('click', async () => {
+            console.log("Submit button clicked");
+
+            const title = document.querySelector('.titleInput');
+            const inputElement = document.querySelector('.textInput');
+            const selectedCategories = Array.from(
+                document.querySelectorAll('.category-checkbox:checked')
+            ).map((checkbox) => checkbox.value);
+
+            console.log("Title:", title.value, "Content:", inputElement.value, "Categories:", selectedCategories);
+
             if (inputElement && title) {
-                let input = inputElement.value
-                let titl = title.value
-                if ((input.trim() === '' || titl.trim() === "")) {
-                    message.textContent = 'Input cannot be empty!'
-                    message.style.color = 'red'
+                let input = inputElement.value;
+                let titl = title.value;
+
+                if (input.trim() === '' || titl.trim() === '') {
+                    alert("Title or Content are Empty!!");
                 } else {
                     const data = {
                         title: titl,
-                        description: input
+                        content: input,
+                        categories: selectedCategories,
+                    };
+
+                    try {
+                        const resp = await fetch('/api/posts/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data),
+                            credentials: "include",
+                        });
+
+                        if (resp.ok) {
+                            const responseData = await resp.json();
+                            console.log('Post created successfully:', responseData);
+                        } else {
+                            console.error('Failed to create post:', resp.statusText);
+                        }
+                    } catch (error) {
+                        console.error('Error occurred while creating post:', error);
                     }
-                    fetch('/api/creatpost', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: (JSON.stringify(data))
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok ' + response.statusText)
-                            }
-                            return response.json()
-                        })
-                        .then(data => {
-                            message.textContent = 'Post created successfully!'
-                            message.style.color = 'green'
-                            console.log('Success:', data)
-                        })
-                        .catch(error => {
-                            message.textContent = 'Failed to create post!'
-                            message.style.color = 'red'
-                            console.error('Error:', error)
-                        })
                 }
             } else {
-                console.error('No input field with class "title" found.')
+                console.error('No input field with class "titleInput" or "textInput" found.');
             }
-        })
-    })
+        });
+    } else {
+        console.error("submitButton not found");
+    }
 }
-checkPost()
