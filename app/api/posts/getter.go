@@ -92,11 +92,13 @@ func GetPosts(conn *modules.Connection) ([]byte, error) {
 	var posts []modules.Post
 	var categories []string
 	var err error
-
+	var pageStr = ""
 	log.Printf("Request URL Path: %s", conn.Req.URL.Path)
 
-	pageStr := strings.Split(conn.Req.URL.Path, "/")[3]
-	log.Printf("Page: %s", pageStr)
+	if len(strings.Split(conn.Req.URL.Path, "/")) == 4 {
+		pageStr = strings.Split(conn.Req.URL.Path, "/")[3]
+		log.Printf("Page: %s", pageStr)
+	}
 	page := 1
 
 	if pageStr != "" {
