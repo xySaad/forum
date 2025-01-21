@@ -95,9 +95,9 @@ func GetPosts(conn *modules.Connection) ([]byte, error) {
 
 	log.Printf("Request URL Path: %s", conn.Req.URL.Path)
 
-	queryParams := conn.Req.URL.Query()
-	pageStr := queryParams.Get("page")
-	page := 1 // Default to page 1
+	pageStr := strings.Split(conn.Req.URL.Path, "/")[3]
+	log.Printf("Page: %s", pageStr)
+	page := 1
 
 	if pageStr != "" {
 		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
