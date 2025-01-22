@@ -40,12 +40,15 @@
     flex-direction: column;
     gap: 24px;
     background: none;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 }
 
 .postView .text {
     display: flex;
-    overflow: visible;
+    overflow: visible   ;
+    text-overflow: ellipsis;
     line-height: 1.5rem;
     font-size: clamp(0.6rem, 1.3vw, 1.2rem);
 }
