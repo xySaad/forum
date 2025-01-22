@@ -1,6 +1,7 @@
 package reactions
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	db "forum/app/database"
@@ -8,8 +9,8 @@ import (
 	"net/http"
 )
 
-func GetReaction(conn *modules.Connection, itemID string) {
-	reactions, err := db.GetReactions(itemID)
+func GetReaction(conn *modules.Connection, itemID string, forumDB *sql.DB) {
+	reactions, err := db.GetReactions(itemID, forumDB)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(conn.Resp, "500 - internal server error", 500)

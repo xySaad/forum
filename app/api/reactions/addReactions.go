@@ -1,6 +1,7 @@
 package reactions
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	db "forum/app/database"
@@ -9,7 +10,7 @@ import (
 	"net/http"
 )
 
-func AddReaction(conn *modules.Connection) {
+func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 
 	validReactions := map[string]bool{
 		"like":    true,
@@ -42,12 +43,12 @@ func AddReaction(conn *modules.Connection) {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Missing or invalid authentication token", "")
 		return
 	}
-	userID, err := db.GetUserIDByToken(cookie.Value)
+	userID, err := db.GetUserIDByToken(cookie.Value, forumDB)
 	if err != nil {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Invalid or expired authentication token", "")
 		return
 	}
-	err = db.AddOrUpdateReaction(request.ItemID, userID, request.ReactionType)
+	err = db.AddOrUpdateReaction(request.ItemID, userID, request.ReactionType, forumDB)
 	if err != nil {
 		fmt.Println(err)
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again at later time.")

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 )
 
 type Reaction struct {
@@ -19,15 +18,10 @@ type ReactionCounter struct {
 	Count        int
 }
 
-func GetUserIDByToken(token string) (string, error) {
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		return "", errors.New("internal server error")
-	}
-	defer db.Close()
+func GetUserIDByToken(token string, forumDB *sql.DB) (string, error) {
 
 	var userID string
-	err = db.QueryRow("SELECT id FROM users WHERE token = ?", token).Scan(&userID)
+	err := forumDB.QueryRow("SELECT id FROM users WHERE token = ?", token).Scan(&userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return "", errors.New("invalid token")
@@ -39,20 +33,12 @@ func GetUserIDByToken(token string) (string, error) {
 }
 
 // getReactions fetches reactions for either a post or a comment based on itemID
-func GetReactions(itemID string) ([]ReactionCounter, error) {
+func GetReactions(itemID string, forumDB *sql.DB) ([]ReactionCounter, error) {
 	if itemID == "" {
 		return nil, fmt.Errorf("itemID must be provided")
 	}
-
-	// Connect to the database
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	// Query reactions for both posts and comments using the same itemID
-	rows, err := db.Query(`
+	rows, err := forumDB.Query(`
 		SELECT item_id, reaction_type, count 
 		FROM reactionCount 
 		WHERE item_id = ?`, itemID)
@@ -76,16 +62,11 @@ func GetReactions(itemID string) ([]ReactionCounter, error) {
 	return reactions, nil
 }
 
-func AddOrUpdateReaction(itemID, userID, reactionType string) error {
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+func AddOrUpdateReaction(itemID, userID, reactionType string, forumDB *sql.DB) error {
 
 	var existingReactionID int
-	err = db.QueryRow(`
-		SELECT id FROM reactions 
+	err := forumDB.QueryRow(`
+		SELECT id FROM reactions db
 		WHERE item_id = ?
 		AND user_id = ?`, itemID, userID).Scan(&existingReactionID)
 
@@ -94,7 +75,7 @@ func AddOrUpdateReaction(itemID, userID, reactionType string) error {
 	}
 
 	if existingReactionID > 0 {
-		_, err = db.Exec(`
+		_, err = forumDB.Exec(`
 			UPDATE reactions 
 			SET reaction_type = ? 
 			WHERE id = ?`, reactionType, existingReactionID)
@@ -102,7 +83,7 @@ func AddOrUpdateReaction(itemID, userID, reactionType string) error {
 			return fmt.Errorf("could not update reaction: %w", err)
 		}
 	} else {
-		_, err = db.Exec(`
+		_, err = forumDB.Exec(`
 			INSERT INTO reactions (user_id, item_id, reaction_type) 
 			VALUES (?, ?, ?)`, userID, itemID, reactionType)
 
@@ -118,15 +99,10 @@ func AddOrUpdateReaction(itemID, userID, reactionType string) error {
 	return nil
 }
 
-func RemoveReaction(itemID, userID string) error {
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
+func RemoveReaction(itemID, userID string, forumDB *sql.DB) error {
 
 	var reactionID int
-	err = db.QueryRow(`
+	err := forumDB.QueryRow(`
 		SELECT id FROM reactions 
 		WHERE (item_id = ?) 
 		AND user_id = ?`, itemID, userID).Scan(&reactionID)
@@ -138,7 +114,7 @@ func RemoveReaction(itemID, userID string) error {
 		return fmt.Errorf("could not check for existing reaction: %w", err)
 	}
 
-	_, err = db.Exec(`
+	_, err = forumDB.Exec(`
 		DELETE FROM reactions 
 		WHERE id = ?`, reactionID)
 
@@ -146,7 +122,7 @@ func RemoveReaction(itemID, userID string) error {
 		return fmt.Errorf("could not delete reaction: %w", err)
 	}
 
-	_, err = db.Exec(`
+	_, err = forumDB.Exec(`
 		UPDATE reactionCount 
 		SET count = count - 1 
 		WHERE (item_id = ?) 
@@ -157,7 +133,7 @@ func RemoveReaction(itemID, userID string) error {
 		return fmt.Errorf("could not update reaction count: %w", err)
 	}
 
-	_, err = db.Exec(`
+	_, err = forumDB.Exec(`
 		DELETE FROM reactionCount 
 		WHERE (item_id = ?) 
 		AND count = 0`, itemID)

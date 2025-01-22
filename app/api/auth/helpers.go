@@ -5,15 +5,10 @@ import (
 	"errors"
 )
 
-func CheckAuth(cookieValue string) error {
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		return errors.New("Internal server error")
-	}
-	defer db.Close()
+func CheckAuth(cookieValue string, forumDB *sql.DB) error {
 
 	var userID string
-	err = db.QueryRow("SELECT id FROM users WHERE token=?", cookieValue).Scan(&userID)
+	err := forumDB.QueryRow("SELECT id FROM users WHERE token=?", cookieValue).Scan(&userID)
 	if err != nil {
 		return errors.New("Unauthorized access")
 	}
