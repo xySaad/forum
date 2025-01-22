@@ -9,17 +9,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func InitDB() {
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	createTables(db)
-}
-
-func createTables(db *sql.DB) {
+func CreateTables(db *sql.DB) {
 	statement, err := os.ReadFile("./app/config/schema.sql")
 	if err != nil {
 		log.Fatal(err)
@@ -29,5 +19,5 @@ func createTables(db *sql.DB) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Database and tables created successfully!")
+	fmt.Println("Database Connected successfully!")
 }

@@ -1,12 +1,13 @@
 package auth
 
 import (
+	"database/sql"
 	"forum/app/modules"
 	"net/http"
 	"time"
 )
 
-func Entry(conn *modules.Connection) {
+func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	req := conn.Req
 	resp := conn.Resp
 
@@ -16,14 +17,14 @@ func Entry(conn *modules.Connection) {
 			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		Register(conn)
+		Register(conn, forumDB)
 
 	case "login":
 		if req.Method != http.MethodPost {
 			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		err := LogIn(req.Body, resp)
+		err := LogIn(req.Body, resp, forumDB)
 		if err != nil {
 			http.Error(resp, "500 - "+err.Error(), http.StatusInternalServerError)
 			return
@@ -50,7 +51,7 @@ func Entry(conn *modules.Connection) {
 			http.Error(resp, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		if err := CheckAuth(cookie.Value); err != nil {
+		if err := CheckAuth(cookie.Value, forumDB); err != nil {
 			http.Error(resp, "Unauthorized", http.StatusUnauthorized)
 			return
 		}

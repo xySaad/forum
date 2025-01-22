@@ -12,7 +12,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-func LogIn(dataReader io.ReadCloser, resp http.ResponseWriter) error {
+func LogIn(dataReader io.ReadCloser, resp http.ResponseWriter, forumDB *sql.DB) error {
 	var potentialUser modules.AuthCredentials
 	if err := json.NewDecoder(dataReader).Decode(&potentialUser); err != nil {
 		http.Error(resp, "Invalid request format", http.StatusBadRequest)
@@ -24,14 +24,7 @@ func LogIn(dataReader io.ReadCloser, resp http.ResponseWriter) error {
 		return errors.New("missing required fields")
 	}
 
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		http.Error(resp, "Internal server error", http.StatusInternalServerError)
-		return err
-	}
-	defer db.Close()
-
-	if err := potentialUser.CheckAccount(db); err != nil {
+	if err := potentialUser.CheckAccount(forumDB); err != nil {
 		http.Error(resp, "Invalid username/email or password", http.StatusUnauthorized)
 		return err
 	}
@@ -42,7 +35,7 @@ func LogIn(dataReader io.ReadCloser, resp http.ResponseWriter) error {
 		return err
 	}
 
-	_, err = db.Exec("UPDATE users SET token = ? WHERE username = ? OR email = ?", token.String(), potentialUser.Username, potentialUser.Email)
+	_, err = forumDB.Exec("UPDATE users SET token = ? WHERE username = ? OR email = ?", token.String(), potentialUser.Username, potentialUser.Email)
 	if err != nil {
 		http.Error(resp, "Failed to save token to database", http.StatusInternalServerError)
 		return err

@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func AddPost(conn *modules.Connection) {
+func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 	var request struct {
 		Title      string   `json:"title"`
 		Content    string   `json:"content"`
@@ -39,7 +39,7 @@ func AddPost(conn *modules.Connection) {
 		return
 	}
 
-	userID, err := db.GetUserIDByToken(cookie.Value)
+	userID, err := db.GetUserIDByToken(cookie.Value, forumDB)
 	if err != nil {
 		log.Printf("Error getting user ID from token: %v", err)
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Invalid or expired authentication token", "")
@@ -47,7 +47,7 @@ func AddPost(conn *modules.Connection) {
 	}
 
 	log.Printf("Creating post for user ID: %s", userID)
-	postID, err := CreatePost(request.Title, request.Content, userID, request.Categories)
+	postID, err := CreatePost(request.Title, request.Content, userID, request.Categories, forumDB)
 	if err != nil {
 		log.Printf("Error creating post: %v", err)
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again later.")
@@ -110,19 +110,19 @@ func GetCategoryMask(categories []string) string {
 	return string(mask[:])
 }
 
-func CreatePost(title, content, userID string, categories []string) (int64, error) {
+func CreatePost(title, content, userID string, categories []string, forumDB *sql.DB) (int64, error) {
 	categoryMask := GetCategoryMask(categories)
 
 	log.Printf("Inserting post into database with title: %s, categories: %s", title, categoryMask)
 
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		log.Printf("Error opening database: %v", err)
-		return 0, err
-	}
-	defer db.Close()
+	// db, err := sql.Open("sqlite3", "./forum.db")
+	// if err != nil {
+	// 	log.Printf("Error opening database: %v", err)
+	// 	return 0, err
+	// }
+	// defer db.Close()
 
-	stmt, err := db.Prepare("INSERT INTO posts (title, content, user_id, categories) VALUES (?, ?, ?, ?)")
+	stmt, err := forumDB.Prepare("INSERT INTO posts (title, content, user_id, categories) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		log.Printf("Error preparing SQL statement: %v", err)
 		return 0, err

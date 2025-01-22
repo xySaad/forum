@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func GetComents(URL *url.URL) ([]Comment, error) {
+func GetComents(URL *url.URL, forumDB *sql.DB) ([]Comment, error) {
 	post_id := URL.Query().Get("p_id")
 	Offset := URL.Query().Get("offset")
 	if Offset == "" {
@@ -25,11 +25,7 @@ func GetComents(URL *url.URL) ([]Comment, error) {
 		return nil, errors.New("invalid post id")
 	}
 	query := `SELECT id, post_id, user_id, content, created_at FROM comments WHERE post_id = ? ORDER BY updated_at DESC LIMIT 10 OFFSET ?`
-	db, err := sql.Open("sqlite3", "forum.db")
-	if err != nil {
-		return nil, errors.New("internal pointer variable")
-	}
-	rows, err := db.Query(query, p_id, offset)
+	rows, err := forumDB.Query(query, p_id, offset)
 	if err != nil {
 		return nil, err
 	}

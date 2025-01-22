@@ -88,7 +88,7 @@ var posts = []modules.Post{
 	// your predefined posts
 }
 
-func GetPosts(conn *modules.Connection) ([]byte, error) {
+func GetPosts(conn *modules.Connection, forumDB *sql.DB) ([]byte, error) {
 	var posts []modules.Post
 	var categories []string
 	var err error
@@ -115,10 +115,10 @@ func GetPosts(conn *modules.Connection) ([]byte, error) {
 
 	if len(categories) > 0 {
 		log.Printf("Fetching posts by categories: %v for page %d", categories, page)
-		err = fetchPostsByCategories(categories, &posts, page)
+		err = fetchPostsByCategories(categories, &posts, page, forumDB)
 	} else {
 		log.Printf("Fetching posts for page %d", page)
-		err = fetchAllPosts(&posts, page)
+		err = fetchAllPosts(&posts, page, forumDB)
 	}
 
 	if err != nil {
@@ -137,7 +137,7 @@ func GetPosts(conn *modules.Connection) ([]byte, error) {
 	return postJSON, nil
 }
 
-func fetchPostsByCategories(categories []string, posts *[]modules.Post, page int) error {
+func fetchPostsByCategories(categories []string, posts *[]modules.Post, page int, forumDB *sql.DB) error {
 	const limit = 10
 	offset := (page - 1) * limit
 
@@ -155,14 +155,14 @@ func fetchPostsByCategories(categories []string, posts *[]modules.Post, page int
 
 	log.Printf("Executing query: %s with category mask: %d, limit: %d, offset: %d", query, categoryInt, limit, offset)
 
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		log.Printf("Error opening database: %v", err)
-		return err
-	}
-	defer db.Close()
+	// db, err := sql.Open("sqlite3", "./forum.db")
+	// if err != nil {
+	// 	log.Printf("Error opening database: %v", err)
+	// 	return err
+	// }
+	// defer db.Close()
 
-	rows, err := db.Query(query, categoryInt, limit, offset)
+	rows, err := forumDB.Query(query, categoryInt, limit, offset)
 	if err != nil {
 		log.Printf("Error querying posts by category: %v", err)
 		return fmt.Errorf("error querying posts by category: %v", err)
@@ -190,7 +190,7 @@ func fetchPostsByCategories(categories []string, posts *[]modules.Post, page int
 	return nil
 }
 
-func fetchAllPosts(posts *[]modules.Post, page int) error {
+func fetchAllPosts(posts *[]modules.Post, page int, forumDB *sql.DB) error {
 	const limit = 10
 	offset := (page - 1) * limit
 
@@ -201,14 +201,14 @@ func fetchAllPosts(posts *[]modules.Post, page int) error {
 
 	log.Printf("Executing query: %s with limit %d and offset %d", query, limit, offset)
 
-	db, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		log.Printf("Error opening database: %v", err)
-		return err
-	}
-	defer db.Close()
+	// db, err := sql.Open("sqlite3", "./forum.db")
+	// if err != nil {
+	// 	log.Printf("Error opening database: %v", err)
+	// 	return err
+	// }
+	// defer db.Close()
 
-	rows, err := db.Query(query, limit, offset)
+	rows, err := forumDB.Query(query, limit, offset)
 	if err != nil {
 		log.Printf("Error querying all posts: %v", err)
 		return fmt.Errorf("error querying all posts: %v", err)

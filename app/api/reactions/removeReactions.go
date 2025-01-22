@@ -1,6 +1,7 @@
 package reactions
 
 import (
+	"database/sql"
 	"encoding/json"
 	db "forum/app/database"
 	"forum/app/modules"
@@ -8,7 +9,7 @@ import (
 	"net/http"
 )
 
-func RemoveReaction(conn *modules.Connection) {
+func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
 	var request struct {
 		ItemID       string `json:"item_id"`
 		ReactionType string `json:"reaction_type"` // item_id can refer to either post_id or comment_id
@@ -24,7 +25,7 @@ func RemoveReaction(conn *modules.Connection) {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Missing or invalid authentication token", "")
 		return
 	}
-	userID, err := db.GetUserIDByToken(cookie.Value)
+	userID, err := db.GetUserIDByToken(cookie.Value, forumDB)
 	if err != nil {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Invalid or expired authentication token", "")
 		return
@@ -34,7 +35,7 @@ func RemoveReaction(conn *modules.Connection) {
 		return
 	}
 
-	err = db.RemoveReaction(request.ItemID, userID)
+	err = db.RemoveReaction(request.ItemID, userID, forumDB)
 	if err != nil {
 		http.Error(conn.Resp, "500 - Internal Server Error", 500)
 		return
