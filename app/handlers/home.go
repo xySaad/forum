@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"forum/app/config"
 	"net/http"
 )
 
@@ -14,5 +13,5 @@ func Home(resp http.ResponseWriter, req *http.Request) {
 		http.Error(resp, "404 - page not found", 404)
 		return
 	}
-	config.Templates.Exec(resp, "home.html", nil)
+	http.ServeFile(resp, req, "./static/index.html")
 }

@@ -36,4 +36,5 @@ func sendHttpError(conn *Connection, httpError *errors.HttpError) {
 type Connection struct {
 	Resp http.ResponseWriter
 	Req  *http.Request
+	Path []string
 }

@@ -7,7 +7,9 @@ import (
 	"forum/app/api/comments"
 	"forum/app/api/posts"
 	"forum/app/api/reactions"
+	"forum/app/config"
 	"forum/app/modules"
+	"forum/app/modules/errors"
 	"net/http"
 	"strings"
 )
@@ -16,24 +18,25 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 	conn := &modules.Connection{
 		Resp: resp,
 		Req:  req,
+		Path: strings.Split(req.URL.Path, "/")[1:],
 	}
 
-	path := strings.Split(req.URL.Path[5:], "/")
-	switch path[0] {
+	switch conn.Path[1] {
 	case "auth":
 		auth.Entry(conn, forumDB)
 	case "posts":
 		if req.Method == http.MethodGet {
-			data, err := posts.GetPosts(conn, forumDB)
+			err := posts.GetPosts(conn, forumDB)
 			if err != nil {
-				http.Error(resp, "500 - internal server error", 500)
-				return
+				config.Logger.Println(err)
 			}
-			resp.Header().Set("Content-Type", "application/json")
-			resp.Write(data)
-		} else if req.Method == http.MethodPost {
-			posts.AddPost(conn, forumDB)
+			return
 		}
+		if req.Method == http.MethodPost {
+			posts.AddPost(conn, forumDB)
+			return
+		}
+		conn.Error(errors.HttpNotFound)
 	case "coments":
 		if req.Method == http.MethodPost {
 			err := comments.AddComment(conn, forumDB)
@@ -57,9 +60,8 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 			return
 		}
 	case "reactions":
-		reactions.HandleReactions(conn, path, conn.Req.Method, forumDB)
+		reactions.HandleReactions(conn, forumDB)
 	default:
-
-		return
+		conn.Error(errors.HttpNotFound)
 	}
 }

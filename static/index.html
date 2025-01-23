@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
-  {{template "head" "home.css"}}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forum</title>
+    <link rel="stylesheet" href="/static/css/index.css" />
+  </head>
   <body>
-    {{template "header"}}
     <div id="backdrop"></div>
     <div class="homePage">
       <div class="create-post">
@@ -11,25 +15,14 @@
           placeholder="want to share a story?! write here..."
           class="post-input"
         />
-        <button class="create-post-button" id="create-post-btn">+ Create a Post</button>
+        <button class="create-post-button" id="create-post-btn">
+          + Create a Post
+        </button>
       </div>
-      
+
       <div class="filter">
         <div class="categories">
           <button class="category active all">All</button>
-          <!-- <label class="category">Sportif
-            <input type="checkbox">
-          </label>
-          <label class="category">Tech
-            <input type="checkbox">
-          </label>
-          <label class="category">Finance
-            <input type="checkbox">
-          </label>
-          <label class="category">Sience
-            <input type="checkbox">
-          </label> -->
-          
           <button class="category">Sport</button>
           <button class="category">Technology</button>
           <button class="category">Finance</button>
@@ -38,6 +31,6 @@
       </div>
       <div class="posts"></div>
     </div>
-    <script type="module" src="../static/js/index.js"></script>
+    <script type="module" src="/static/js/index.js"></script>
   </body>
 </html>

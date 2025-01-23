@@ -3,7 +3,7 @@ package reactions
 import (
 	"database/sql"
 	"encoding/json"
-	db "forum/app/database"
+	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"net/http"
@@ -25,7 +25,7 @@ func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Missing or invalid authentication token", "")
 		return
 	}
-	userID, err := db.GetUserIDByToken(cookie.Value, forumDB)
+	userID, err := handlers.GetUserIDByToken(cookie.Value, forumDB)
 	if err != nil {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Invalid or expired authentication token", "")
 		return
@@ -35,7 +35,7 @@ func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	err = db.RemoveReaction(request.ItemID, userID, forumDB)
+	err = handlers.RemoveReaction(request.ItemID, userID, forumDB)
 	if err != nil {
 		http.Error(conn.Resp, "500 - Internal Server Error", 500)
 		return
