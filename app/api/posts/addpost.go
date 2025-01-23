@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	db "forum/app/database"
+	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"log"
@@ -39,7 +39,7 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	userID, err := db.GetUserIDByToken(cookie.Value, forumDB)
+	userID, err := handlers.GetUserIDByToken(cookie.Value, forumDB)
 	if err != nil {
 		log.Printf("Error getting user ID from token: %v", err)
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Invalid or expired authentication token", "")

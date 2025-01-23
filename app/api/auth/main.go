@@ -2,7 +2,9 @@ package auth
 
 import (
 	"database/sql"
+	"forum/app/config"
 	"forum/app/modules"
+	"forum/app/modules/errors"
 	"net/http"
 	"time"
 )
@@ -11,22 +13,25 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	req := conn.Req
 	resp := conn.Resp
 
-	switch req.URL.Path[10:] {
+	switch conn.Path[2] {
 	case "register":
 		if req.Method != http.MethodPost {
 			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		Register(conn, forumDB)
-
+		err := Register(conn, forumDB)
+		if err != nil {
+			config.Logger.Println(err)
+			return
+		}
 	case "login":
 		if req.Method != http.MethodPost {
 			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		err := LogIn(req.Body, resp, forumDB)
+		err := LogIn(conn, forumDB)
 		if err != nil {
-			http.Error(resp, "500 - "+err.Error(), http.StatusInternalServerError)
+			config.Logger.Println(err)
 			return
 		}
 
@@ -51,13 +56,14 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 			http.Error(resp, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		if err := CheckAuth(cookie.Value, forumDB); err != nil {
+
+		if CheckAuth(cookie.Value, forumDB) != nil {
 			http.Error(resp, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
 	default:
-		http.Error(resp, "404 - Page Not Found", http.StatusNotFound)
+		conn.Error(errors.HttpNotFound)
 		return
 	}
 }

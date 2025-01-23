@@ -7,25 +7,26 @@ import (
 	"forum/app/modules/errors"
 )
 
-func Register(conn *modules.Connection, forumDB *sql.DB) {
+func Register(conn *modules.Connection, forumDB *sql.DB) error {
 	var potentialuser modules.AuthCredentials
 	err := json.NewDecoder(conn.Req.Body).Decode(&potentialuser)
 	if err != nil {
 		conn.NewError(500, errors.CodeParsingError, "Internal Server Error", "Request is not valid JSON")
-		return
+		return err
 	}
 
 	httpErr := potentialuser.ValidInfo(forumDB)
 	if httpErr != nil {
 		conn.Error(httpErr)
-		return
+		return err
 	}
 
 	err = potentialuser.CreateUser(forumDB, conn.Resp)
 	if err != nil {
 		conn.NewError(500, errors.CodeUserCreationError, "User creation failed", "Unable to create user")
-		return
+		return err
 	}
 
 	conn.Resp.Write([]byte("Registration successful"))
+	return nil
 }

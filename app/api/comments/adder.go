@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	db "forum/app/database"
+	"forum/app/handlers"
 	"forum/app/modules"
 )
 
@@ -19,7 +19,7 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) error {
 	if err != nil || cookie.Value == "" {
 		return errors.New("unotorized")
 	}
-	uId, err := db.GetUserIDByToken(cookie.Value, forumDB)
+	uId, err := handlers.GetUserIDByToken(cookie.Value, forumDB)
 	if err != nil {
 		return err
 	}

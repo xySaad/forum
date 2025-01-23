@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Patua%20One:700|Patua%20One:400');
 @import url('https://fonts.googleapis.com/css?family=Inter:700|Inter:400');
+@import url("../css/home.css");
 
 :root[data-theme="light"] {
     --text: #050316;
@@ -34,6 +35,7 @@ body {
     font-weight: 400;
     line-height: 1.7vmax;
     background: var(--background);
+    background: linear-gradient(129.76deg, #252937 -0.72%, #101218 80.04%);
 }
 
 a {

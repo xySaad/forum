@@ -10,11 +10,12 @@ func AuthPage(resp http.ResponseWriter, req *http.Request) {
 		http.Error(resp, "405 - method not allowed", 405)
 		return
 	}
-	if req.URL.Path == "/auth/" || req.URL.Path == "/auth" {
-		config.Templates.Exec(resp, "login.html", nil)
-	} else {
+	
+	if req.URL.Path != "/auth/" {
 		http.Error(resp, "404 - page not found", 404)
 		return
 	}
 
+	config.Templates.Exec(resp, "login.html", nil)
+	return
 }

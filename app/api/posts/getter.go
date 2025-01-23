@@ -88,7 +88,7 @@ var posts = []modules.Post{
 	// your predefined posts
 }
 
-func GetPosts(conn *modules.Connection, forumDB *sql.DB) ([]byte, error) {
+func GetPosts(conn *modules.Connection, forumDB *sql.DB) error {
 	var posts []modules.Post
 	var categories []string
 	var err error
@@ -122,19 +122,18 @@ func GetPosts(conn *modules.Connection, forumDB *sql.DB) ([]byte, error) {
 	}
 
 	if err != nil {
-		log.Printf("Error fetching posts: %v", err)
-		return nil, fmt.Errorf("error fetching posts: %v", err)
+		return fmt.Errorf("error fetching posts: %v", err)
 	}
 
 	postJSON, err := json.Marshal(posts)
 	if err != nil {
-		log.Printf("Error marshaling posts: %v", err)
-		return nil, fmt.Errorf("error marshaling posts: %v", err)
+		return fmt.Errorf("error marshaling posts: %v", err)
 	}
+	conn.Resp.Write(postJSON)
 
 	log.Printf("Number of posts returned: %d", len(posts))
 
-	return postJSON, nil
+	return nil
 }
 
 func fetchPostsByCategories(categories []string, posts *[]modules.Post, page int, forumDB *sql.DB) error {

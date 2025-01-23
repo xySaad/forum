@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	db "forum/app/database"
+	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"net/http"
@@ -43,12 +43,12 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Missing or invalid authentication token", "")
 		return
 	}
-	userID, err := db.GetUserIDByToken(cookie.Value, forumDB)
+	userID, err := handlers.GetUserIDByToken(cookie.Value, forumDB)
 	if err != nil {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Invalid or expired authentication token", "")
 		return
 	}
-	err = db.AddOrUpdateReaction(request.ItemID, userID, request.ReactionType, forumDB)
+	err = handlers.AddOrUpdateReaction(request.ItemID, userID, request.ReactionType, forumDB)
 	if err != nil {
 		fmt.Println(err)
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again at later time.")
