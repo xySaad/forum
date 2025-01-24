@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,38 +19,57 @@ func main() {
 
 	err := config.InitLogger()
 	if err != nil {
-		log.Fatal(err)
+		config.Logger.Println(err)
+		return
 	}
+	defer config.CloseLogger()
 
 	forumDB, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
-		log.Fatal(err)
+		config.Logger.Println(err)
+		return
 	}
 
-	config.CreateTables(forumDB)
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	defer signal.Stop(sigChan)
+
+	defer func() {
+		err = forumDB.Close()
+		if err != nil {
+			config.Logger.Println("Error closing database connection:", err)
+		} else {
+			config.Logger.Println("Database connection closed.")
+		}
+	}()
+
+	err = config.CreateTables(forumDB)
+	if err != nil {
+		config.Logger.Println("Error creating tables:", err)
+		return
+	}
 
 	http.HandleFunc("/static/", handlers.Static)
 	http.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) { api.Router(w, r, forumDB) })
 	http.HandleFunc("/", handlers.Home)
 
+	server := &http.Server{Addr: ":8080"}
+
 	go func() {
 		fmt.Println("server started: http://localhost:8080")
-		err = http.ListenAndServe(":8080", nil)
-		if err != nil {
+		err = server.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
 			config.Logger.Println("Error starting server: ", err)
-			config.CloseLogger()
-			forumDB.Close()
-			os.Exit(1)
+			sigChan <- syscall.SIGTERM
 		}
 	}()
 
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	config.Logger.Print("Shutting down... signal: ", <-sigChan)
 
-	sig := <-sigChan
-	config.Logger.Println("\nReceived termination signal:", sig)
-	config.Logger.Println("Shutting down gracefully...")
-	forumDB.Close()
-	config.Logger.Println("Database connection closed.")
-	config.CloseLogger()
+	err = server.Close()
+	if err != nil {
+		config.Logger.Println("Error during graceful shutdown: ", err)
+	} else {
+		config.Logger.Println("Server gracefully stopped.")
+	}
 }
