@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"forum/app/handlers"
 	"forum/app/modules"
 )
@@ -29,6 +28,5 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) error {
 	if err != nil {
 		return errors.New("internal pointer variable")
 	}
-	fmt.Printf("comment: %v\n", comment)
 	return nil
 }

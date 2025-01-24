@@ -3,7 +3,6 @@ package reactions
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
@@ -50,7 +49,6 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 	}
 	err = handlers.AddOrUpdateReaction(request.ItemID, userID, request.ReactionType, forumDB)
 	if err != nil {
-		fmt.Println(err)
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again at later time.")
 		return
 	}
