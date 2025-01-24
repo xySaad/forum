@@ -29,13 +29,16 @@ h1 {
 }
 
 body {
+    width: 100vw;
+    min-height: 100vh;
     margin: 0;
     font-family: Inter;
     font-size: 0.75rem;
     font-weight: 400;
     line-height: 1.7vmax;
-    background: var(--background);
     background: linear-gradient(129.76deg, #252937 -0.72%, #101218 80.04%);
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 a {
