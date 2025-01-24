@@ -55,7 +55,6 @@ func GetReactions(itemID string, forumDB *sql.DB) ([]ReactionCounter, error) {
 		if err := rows.Scan(&reaction.Item_id, &reaction.ReactionType, &reaction.Count); err != nil {
 			return nil, fmt.Errorf("could not scan row: %w", err)
 		}
-		fmt.Println("react", reaction)
 		reactions = append(reactions, reaction)
 	}
 
