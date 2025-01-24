@@ -3,6 +3,7 @@ import { onResize } from "./utils/events.js";
 import { Reaction } from "./reactions.js";
 import CreatePost from "./components/createPost.js";
 import { filterCat } from "./filter.js";
+import ensureAuth from "./utils/ensureAuth.js";
 
 export const Home = async () => {
   try {
@@ -22,7 +23,12 @@ export const Home = async () => {
   }
   onResize(AdjustPostLines);
   Reaction();
-  document.getElementById("create-post-btn").onclick = () => {
+  document.getElementById("create-post-btn").onclick = async () => {
+    if (!(await ensureAuth())) {
+      return;
+    }
+    console.log("alo");
+
     CreatePost();
   };
   filterCat();
