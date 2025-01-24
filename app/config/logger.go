@@ -2,14 +2,16 @@ package config
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
 )
 
 var (
-	Logger  *log.Logger
-	logFile *os.File
+	Logger      *log.Logger
+	MultiLogger *log.Logger
+	logFile     *os.File
 )
 
 func InitLogger() error {
@@ -24,9 +26,8 @@ func InitLogger() error {
 	if err != nil {
 		return fmt.Errorf("failed to open log file: %w", err)
 	}
-
+	MultiLogger = log.New(io.MultiWriter(os.Stdout, logFile), "", log.LstdFlags)
 	Logger = log.New(logFile, "", log.LstdFlags)
-	Logger.Println("logger created Succefly")
 	return nil
 }
 
