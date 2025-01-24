@@ -1,5 +1,5 @@
-import div from "./div.js";
-import img from "./img.js";
+import div from "./native/div.js";
+import img from "./native/img.js";
 import { timePassed } from "../utils/time.js";
 import Frame from "./Frame.js";
 import { importSvg } from "../utils/index.js";

@@ -1,6 +1,6 @@
 import { importSvg } from "../utils/index.js";
-import div from "./div.js";
-import img from "./img.js";
+import div from "./native/div.js";
+import img from "./native/img.js";
 
 export const CommentInput = () => {
   const input = document.createElement("input"),

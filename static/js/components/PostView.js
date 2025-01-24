@@ -1,6 +1,6 @@
 import { timePassed } from "../utils/time.js";
-import div from "./div.js";
-import img from "./img.js";
+import div from "./native/div.js";
+import img from "./native/img.js";
 import { CommentInput } from "./CommentInput.js";
 import { CommentsList } from "./CommentsList.js";
 import { onResize } from "../utils/events.js";
