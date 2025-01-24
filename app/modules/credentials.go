@@ -2,7 +2,7 @@ package modules
 
 import (
 	"database/sql"
-	"fmt"
+	"forum/app/config"
 	"forum/app/modules/errors"
 	"net/http"
 	"regexp"
@@ -97,7 +97,7 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	var err error
 	defer func() {
 		if httpErr != nil && httpErr.Status == 500 {
-			fmt.Println(err)
+			config.MultiLogger.Println(err)
 		}
 	}()
 

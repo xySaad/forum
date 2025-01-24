@@ -19,14 +19,14 @@ func main() {
 
 	err := config.InitLogger()
 	if err != nil {
-		config.Logger.Println(err)
+		config.MultiLogger.Println("Error initializing logger:", err)
 		return
 	}
 	defer config.CloseLogger()
 
 	forumDB, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
-		config.Logger.Println(err)
+		config.MultiLogger.Println("Error opening databse:", err)
 		return
 	}
 
@@ -37,15 +37,15 @@ func main() {
 	defer func() {
 		err = forumDB.Close()
 		if err != nil {
-			config.Logger.Println("Error closing database connection:", err)
+			config.MultiLogger.Println("Error closing database connection:", err)
 		} else {
-			config.Logger.Println("Database connection closed.")
+			config.MultiLogger.Println("Database connection closed.")
 		}
 	}()
 
 	err = config.CreateTables(forumDB)
 	if err != nil {
-		config.Logger.Println("Error creating tables:", err)
+		config.MultiLogger.Println("Error creating tables:", err)
 		return
 	}
 
@@ -59,17 +59,17 @@ func main() {
 		fmt.Println("server started: http://localhost:8080")
 		err = server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			config.Logger.Println("Error starting server: ", err)
+			config.MultiLogger.Println("Error starting server: ", err)
 			sigChan <- syscall.SIGTERM
 		}
 	}()
 
-	config.Logger.Print("Shutting down... signal: ", <-sigChan)
+	config.MultiLogger.Print("Shutting down... signal: ", <-sigChan)
 
 	err = server.Close()
 	if err != nil {
-		config.Logger.Println("Error during graceful shutdown: ", err)
+		config.MultiLogger.Println("Error during graceful shutdown: ", err)
 	} else {
-		config.Logger.Println("Server gracefully stopped.")
+		config.MultiLogger.Println("Server gracefully stopped.")
 	}
 }
