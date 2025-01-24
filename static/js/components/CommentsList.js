@@ -1,4 +1,4 @@
-import div from "./div.js";
+import div from "./native/div.js";
 
 const getComments = async (postId, commentsList) => {
   const resp = await fetch(`/api/coments?p_id=${postId}&offset=10`);

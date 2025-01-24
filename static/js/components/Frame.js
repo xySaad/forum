@@ -1,4 +1,4 @@
-import div from "./div.js";
+import div from "./native/div.js";
 
 const Frame = (HTMLelement) => {
   HTMLelement.append(

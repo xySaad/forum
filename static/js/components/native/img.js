@@ -1,4 +1,4 @@
-import { importSvg } from "../utils/index.js";
+import { importSvg } from "../../utils/index.js";
 
 const img = (src, alt, className, id) => {
   const imgElement = document.createElement("img");
