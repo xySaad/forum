@@ -3,41 +3,44 @@ package auth
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
-	"forum/app/modules"
 	"net/http"
 	"time"
+
+	"forum/app/modules"
+	"forum/app/modules/log"
 
 	"github.com/gofrs/uuid"
 )
 
-func LogIn(conn *modules.Connection, forumDB *sql.DB) error {
+func LogIn(conn *modules.Connection, forumDB *sql.DB) {
 	var potentialUser modules.AuthCredentials
 	if err := json.NewDecoder(conn.Req.Body).Decode(&potentialUser); err != nil {
-		http.Error(conn.Resp, "Invalid request format", http.StatusBadRequest)
-		return err
+		conn.NewError(http.StatusBadRequest, 405, "invalid format", "")
+		return
 	}
 
 	if potentialUser.Username == "" && potentialUser.Email == "" || potentialUser.Password == "" {
-		http.Error(conn.Resp, "Username/Email and password are required", http.StatusBadRequest)
-		return errors.New("missing required fields")
+		conn.NewError(http.StatusBadRequest, 405, "missing required fields", "")
+		return
 	}
 
 	if err := potentialUser.CheckAccount(forumDB); err != nil {
-		http.Error(conn.Resp, "Invalid username/email or password", http.StatusUnauthorized)
-		return err
+		conn.Error(err)
+		return
 	}
 
 	token, err := uuid.NewV7()
 	if err != nil {
-		http.Error(conn.Resp, "Internal server error", http.StatusInternalServerError)
-		return err
+		conn.NewError(http.StatusInternalServerError, 500, "inetrnal server error", "")
+
+		return
 	}
 
 	_, err = forumDB.Exec("UPDATE users SET token = ? WHERE username = ? OR email = ?", token.String(), potentialUser.Username, potentialUser.Email)
 	if err != nil {
-		http.Error(conn.Resp, "Failed to save token to database", http.StatusInternalServerError)
-		return err
+		log.Error("internal server error: ",err)
+		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
+		return
 	}
 
 	cookie := http.Cookie{
@@ -51,5 +54,5 @@ func LogIn(conn *modules.Connection, forumDB *sql.DB) error {
 
 	conn.Resp.WriteHeader(http.StatusOK)
 	conn.Resp.Write([]byte(`{"message": "Login successful"}`))
-	return nil
+	return 
 }

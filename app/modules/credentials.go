@@ -2,11 +2,12 @@ package modules
 
 import (
 	"database/sql"
-	"forum/app/config"
-	"forum/app/modules/errors"
 	"net/http"
 	"regexp"
 	"time"
+
+	"forum/app/modules/errors"
+	"forum/app/modules/log"
 
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -36,40 +37,42 @@ type AuthCredentials struct {
 	Password string
 }
 
-func (User *AuthCredentials) CheckAccount(db *sql.DB) error {
+func (User *AuthCredentials) CheckAccount(db *sql.DB) *errors.HttpError {
 	hashedPassWord := ""
+
 	err := db.QueryRow("SELECT (password) FROM users WHERE username=? OR email=? VALUES (?,?)", User.Username, User.Email).Scan(&hashedPassWord)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			return errors.NewError(404, 404, "account not found", "")
 			// need to change
-			// return errors.New("invalid dkxi rak tem")
 		}
 		// return errors.New("internal server error")
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassWord), []byte(User.Password))
 	if err != nil {
+		return errors.NewError(403, 403, "wrong paasword", "")
+
 		// ........
-		// return errors.New("invalid okda")
 	}
 	return nil
 }
 
-func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) error {
+func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) *errors.HttpError {
 	hashedPassWord, err := bcrypt.GenerateFromPassword([]byte(User.Password), 12)
 	if err != nil {
-		return err
+		return errors.NewError(500, 500, "internal server error", "")
 	}
 	token, err := uuid.NewV7()
 	if err != nil {
-		return err
+		return errors.NewError(500, 500, "internal server error", "")
 	}
 	id, err := uuid.NewV6()
 	if err != nil {
-		return err
+		return errors.NewError(500, 500, "internal server error", "")
 	}
 	_, err = db.Exec("INSERT INTO users (id,username,token,password,email) VALUES (?, ? ,? ,? ,?)", id.String(), User.Username, token, hashedPassWord, User.Email)
 	if err != nil {
-		return err
+		//handle later
 	}
 	cookie := http.Cookie{
 		Name:     "token",
@@ -97,7 +100,7 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	var err error
 	defer func() {
 		if httpErr != nil && httpErr.Status == 500 {
-			config.MultiLogger.Println(err)
+			log.Error("internal server error: " + err.Error())
 		}
 	}()
 
@@ -105,6 +108,7 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	if err != sql.ErrNoRows {
 		if err != nil {
 			httpErr.Status = 500
+			log.Error("internal server error", err)
 			httpErr.Code = errors.CodeInternalServerError
 			httpErr.Message = "internal server error"
 			return
@@ -126,6 +130,7 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	if err != sql.ErrNoRows {
 		if err != nil {
 			httpErr.Status = 500
+			log.Error("internal server error", err)
 			httpErr.Code = errors.CodeInternalServerError
 			httpErr.Message = "internal server error"
 			return
