@@ -48,6 +48,10 @@ const createRegisterForm = () => {
 
 const Auth = () => {
   const registerForm = createRegisterForm();
+  registerForm.form.onsubmit = (e)=>{
+    e.preventDefault()
+  }
+  
   const loginSpan = document.createElement("span");
   loginSpan.className = "login clicked";
   loginSpan.textContent = "login";
