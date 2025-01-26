@@ -2,12 +2,10 @@ package api
 
 import (
 	"database/sql"
-	"encoding/json"
 	"forum/app/api/auth"
 	"forum/app/api/comments"
 	"forum/app/api/posts"
 	"forum/app/api/reactions"
-	"forum/app/config"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"net/http"
@@ -26,37 +24,19 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		auth.Entry(conn, forumDB)
 	case "posts":
 		if req.Method == http.MethodGet {
-			err := posts.GetPosts(conn, forumDB)
-			if err != nil {
-				config.Logger.Println(err)
-			}
-			return
-		}
-		if req.Method == http.MethodPost {
+			posts.GetPosts(conn, forumDB)
+		} else if req.Method == http.MethodPost {
 			posts.AddPost(conn, forumDB)
-			return
+		} else {
+			conn.Error(errors.HttpNotFound)
 		}
-		conn.Error(errors.HttpNotFound)
 	case "coments":
 		if req.Method == http.MethodPost {
-			err := comments.AddComment(conn, forumDB)
-			if err != nil {
-				http.Error(resp, err.Error()+"500 - internal server error", 500)
-				return
-			}
+			comments.AddComment(conn, forumDB)
 		} else if req.Method == http.MethodGet {
-			coments, err := comments.GetComents(req.URL, forumDB)
-			if err != nil {
-				http.Error(resp, err.Error()+"500 - internal server error", 500)
-				return
-			}
-			err = json.NewEncoder(resp).Encode(coments)
-			if err != nil {
-				http.Error(resp, err.Error()+"500 - internal server error", 500)
-				return
-			}
+			comments.GetComents(conn, forumDB)
 		} else {
-			http.Error(conn.Resp, "405 - method not allowed ", 405)
+			conn.Error(errors.HttpMethodNotAllowed)
 			return
 		}
 	case "reactions":
