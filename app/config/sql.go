@@ -16,7 +16,5 @@ func CreateTables(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-
-	MultiLogger.Println("Database tables initialed successfully")
 	return nil
 }

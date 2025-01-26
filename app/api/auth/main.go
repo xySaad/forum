@@ -2,11 +2,11 @@ package auth
 
 import (
 	"database/sql"
-	"forum/app/config"
-	"forum/app/modules"
-	"forum/app/modules/errors"
 	"net/http"
 	"time"
+
+	"forum/app/modules"
+	"forum/app/modules/errors"
 )
 
 func Entry(conn *modules.Connection, forumDB *sql.DB) {
@@ -19,22 +19,13 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		err := Register(conn, forumDB)
-		if err != nil {
-			config.Logger.Println(err)
-			return
-		}
+		Register(conn, forumDB)
 	case "login":
 		if req.Method != http.MethodPost {
 			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
-		err := LogIn(conn, forumDB)
-		if err != nil {
-			config.Logger.Println(err)
-			return
-		}
-
+		LogIn(conn, forumDB)
 	case "logout":
 		if req.Method != http.MethodPost {
 			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
