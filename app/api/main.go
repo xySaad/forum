@@ -32,6 +32,7 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 			return
 		}
 		if req.Method == http.MethodPost {
+
 			posts.AddPost(conn, forumDB)
 		} else {
 			conn.Error(errors.HttpNotFound)
