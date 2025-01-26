@@ -2,8 +2,9 @@ package modules
 
 import (
 	"encoding/json"
-	"forum/app/modules/errors"
 	"net/http"
+
+	"forum/app/modules/errors"
 )
 
 func (conn *Connection) NewError(httpStatus, code int, message, details string) {
@@ -16,8 +17,16 @@ func (conn *Connection) NewError(httpStatus, code int, message, details string) 
 
 	sendHttpError(conn, &httpError)
 }
+
 func (conn *Connection) Error(httpError *errors.HttpError) {
 	sendHttpError(conn, httpError)
+}
+
+func (conn *Connection) Respond(data any) {
+	err := json.NewEncoder(conn.Resp).Encode(data)
+	if err != nil {
+		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
+	}
 }
 
 func sendHttpError(conn *Connection, httpError *errors.HttpError) {
