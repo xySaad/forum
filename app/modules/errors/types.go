@@ -9,6 +9,15 @@ type HttpError struct {
 	Details string `json:"details,omitempty"`
 }
 
+func NewError(status, code int, msg, details string) *HttpError {
+	return &HttpError{
+		Status:  status,
+		Code:    code,
+		Message: msg,
+		Details: details,
+	}
+}
+
 var HttpNotFound = &HttpError{
 	http.StatusNotFound, http.StatusNotFound,
 	"404 - page not found",
