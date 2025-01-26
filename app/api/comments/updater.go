@@ -3,24 +3,22 @@ package comments
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
-	"io"
+	"net/http"
+
+	"forum/app/modules"
 )
 
-func UpdateComent(data io.ReadCloser) error {
+func UpdateComent(conn *modules.Connection, forumdb *sql.DB) {
 	var newcomment Comment
-	err := json.NewDecoder(data).Decode(&newcomment)
+	err := json.NewDecoder(conn.Req.Body).Decode(&newcomment)
 	if err != nil {
-		return errors.New("invalid format")
+		conn.NewError(http.StatusBadRequest, 400, "ivalid format", "")
+		return
 	}
-	db, err := sql.Open("sqlite3", "forum.db")
-	if err != nil {
-		return errors.New("internal pointer variable")
-	}
+
 	query := `UPDATE comments SET content=?, updated_at = CURRENT_TIMESTAMP   WHERE item_id= ?`
-	_, err = db.Exec(query, newcomment.Content,newcomment.Item_id)
+	_, err = forumdb.Exec(query, newcomment.Content, newcomment.Item_id)
 	if err != nil {
-		return errors.New("internal pointer variable")
+		conn.NewError(http.StatusInternalServerError, 500, "internaL server error", "")
 	}
-	return nil
 }

@@ -3,30 +3,34 @@ package comments
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
+	"net/http"
+
 	"forum/app/handlers"
 	"forum/app/modules"
 )
 
-func AddComment(conn *modules.Connection, forumDB *sql.DB) error {
+func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 	var comment Comment
 	err := json.NewDecoder(conn.Req.Body).Decode(&comment)
 	if err != nil {
-		return errors.New("invalid data format")
+		conn.NewError(http.StatusBadRequest, 400, "ivalid format", "")
+		return
 	}
 	cookie, err := conn.Req.Cookie("token")
 	if err != nil || cookie.Value == "" {
-		return errors.New("unotorized")
+		conn.NewError(http.StatusForbidden, 403, "unothorized", "")
+		return
 	}
 	uId, err := handlers.GetUserIDByToken(cookie.Value, forumDB)
 	if err != nil {
-		return err
+		conn.NewError(http.StatusForbidden, 403, "unothorized", "")
+		return
 	}
 
 	query := `INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)`
 	_, err = forumDB.Exec(query, comment.Post_id, uId, comment.Content)
 	if err != nil {
-		return errors.New("internal pointer variable")
+		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
+		return
 	}
-	return nil
 }
