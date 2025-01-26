@@ -2,14 +2,15 @@ package api
 
 import (
 	"database/sql"
+	"net/http"
+	"strings"
+
 	"forum/app/api/auth"
 	"forum/app/api/comments"
 	"forum/app/api/posts"
 	"forum/app/api/reactions"
 	"forum/app/modules"
 	"forum/app/modules/errors"
-	"net/http"
-	"strings"
 )
 
 func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
@@ -24,8 +25,13 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		auth.Entry(conn, forumDB)
 	case "posts":
 		if req.Method == http.MethodGet {
-			posts.GetPosts(conn, forumDB)
-		} else if req.Method == http.MethodPost {
+
+			err := posts.GetPosts(conn, forumDB)
+			if err != nil {
+			}
+			return
+		}
+		if req.Method == http.MethodPost {
 			posts.AddPost(conn, forumDB)
 		} else {
 			conn.Error(errors.HttpNotFound)
@@ -35,6 +41,8 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 			comments.AddComment(conn, forumDB)
 		} else if req.Method == http.MethodGet {
 			comments.GetComents(conn, forumDB)
+		} else if req.Method == http.MethodPatch {
+			comments.UpdateComent(conn, forumDB)
 		} else {
 			conn.Error(errors.HttpMethodNotAllowed)
 			return

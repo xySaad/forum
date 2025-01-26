@@ -11,25 +11,22 @@ import (
 	"forum/app/api"
 	"forum/app/config"
 	"forum/app/handlers"
+	"forum/app/modules/log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
-
-	err := config.InitLogger()
+	err := log.Initlog()
 	if err != nil {
-		config.MultiLogger.Println("Error initializing logger:", err)
+		fmt.Fprintln(os.Stderr, "error creating log file: ", err)
 		return
 	}
-	defer config.CloseLogger()
-
 	forumDB, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
-		config.MultiLogger.Println("Error opening databse:", err)
+		log.Error("error opening database: " + err.Error())
 		return
 	}
-
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	defer signal.Stop(sigChan)
@@ -37,15 +34,16 @@ func main() {
 	defer func() {
 		err = forumDB.Close()
 		if err != nil {
-			config.MultiLogger.Println("Error closing database connection:", err)
+			log.Error("error closinging database: " + err.Error())
 		} else {
-			config.MultiLogger.Println("Database connection closed.")
+			log.Info("database closed successfully")
 		}
 	}()
 
 	err = config.CreateTables(forumDB)
 	if err != nil {
-		config.MultiLogger.Println("Error creating tables:", err)
+		log.Error("error creating tables: " + err.Error())
+
 		return
 	}
 
@@ -59,17 +57,17 @@ func main() {
 		fmt.Println("server started: http://localhost:8080")
 		err = server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			config.MultiLogger.Println("Error starting server: ", err)
+			log.Error("error starting server " + err.Error())
+
 			sigChan <- syscall.SIGTERM
 		}
 	}()
 
-	config.MultiLogger.Print("Shutting down... signal: ", <-sigChan)
-
+	log.Info("shuting down the server", <-sigChan)
 	err = server.Close()
 	if err != nil {
-		config.MultiLogger.Println("Error during graceful shutdown: ", err)
+		log.Error("error shuthing dowm the server: " + err.Error())
 	} else {
-		config.MultiLogger.Println("Server gracefully stopped.")
+		log.Info("server shutdown successfully")
 	}
 }
