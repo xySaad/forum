@@ -27,7 +27,6 @@ export const Home = async () => {
     if (!(await ensureAuth())) {
       return;
     }
-    console.log("alo");
 
     CreatePost();
   };

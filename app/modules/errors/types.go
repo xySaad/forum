@@ -29,3 +29,9 @@ var HttpMethodNotAllowed = &HttpError{
 	"405 - method not allowed",
 	"The Method you are using is not supported in this endpoint",
 }
+
+var HttpInternalServerError = &HttpError{
+	http.StatusInternalServerError, http.StatusInternalServerError,
+	"500 - internal server error",
+	"Sorry something went wrong",
+}

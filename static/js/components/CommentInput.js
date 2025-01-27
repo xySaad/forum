@@ -3,8 +3,8 @@ import div from "./native/div.js";
 import img from "./native/img.js";
 
 export const CommentInput = () => {
-  const input = document.createElement("input"),
-    button = document.createElement("button");
+  const input = document.createElement("input");
+  const button = document.createElement("button");
   button.append(img(importSvg("arrow-up")));
   button.onclick = async () => {
     const body = {};

@@ -9,11 +9,11 @@ import (
 var logFile *os.File
 
 func Initlog() error {
-	err := os.MkdirAll("./log", 0o777)
+	err := os.MkdirAll("./logs", 0o777)
 	if err != nil {
 		return err
 	}
-	logFile, err = os.Create("./log/logs.log")
+	logFile, err = os.Create("./logs/" + time.Now().Format(time.DateOnly) + ".log")
 	if err != nil {
 		return err
 	}
@@ -42,6 +42,6 @@ func Error(v ...any) {
 }
 
 func Log(logLevel string, msg any) error {
-	_, err := fmt.Fprint(logFile, time.Now().Format(time.DateTime)+logLevel+":", msg)
+	_, err := fmt.Fprintln(logFile, fmt.Sprintf("%v %v: %v", time.Now().Format(time.DateTime), logLevel, msg))
 	return err
 }

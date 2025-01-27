@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"forum/app/modules"
+	"forum/app/modules/errors"
 )
 
 func UpdateComent(conn *modules.Connection, forumdb *sql.DB) {
@@ -16,9 +17,9 @@ func UpdateComent(conn *modules.Connection, forumdb *sql.DB) {
 		return
 	}
 
-	query := `UPDATE comments SET content=?, updated_at = CURRENT_TIMESTAMP   WHERE item_id= ?`
-	_, err = forumdb.Exec(query, newcomment.Content, newcomment.Item_id)
+	query := `UPDATE comments SET content=?, updated_at = CURRENT_TIMESTAMP WHERE id= ?`
+	_, err = forumdb.Exec(query, newcomment.Content, newcomment.ItemID)
 	if err != nil {
-		conn.NewError(http.StatusInternalServerError, 500, "internaL server error", "")
+		conn.Error(errors.HttpInternalServerError)
 	}
 }

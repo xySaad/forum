@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"forum/app/modules"
+	"forum/app/modules/errors"
 	"forum/app/modules/log"
 
 	"github.com/gofrs/uuid"
@@ -28,17 +29,15 @@ func LogIn(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(err)
 		return
 	}
-
 	token, err := uuid.NewV7()
 	if err != nil {
-		conn.NewError(http.StatusInternalServerError, 500, "inetrnal server error", "")
-
+		conn.Error(errors.HttpInternalServerError)
 		return
 	}
 
 	_, err = forumDB.Exec("UPDATE users SET token = ? WHERE username = ? OR email = ?", token.String(), potentialUser.Username, potentialUser.Email)
 	if err != nil {
-		log.Error("internal server error: ",err)
+		log.Error("internal server error: ", err)
 		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 		return
 	}
@@ -54,5 +53,5 @@ func LogIn(conn *modules.Connection, forumDB *sql.DB) {
 
 	conn.Resp.WriteHeader(http.StatusOK)
 	conn.Resp.Write([]byte(`{"message": "Login successful"}`))
-	return 
+	return
 }
