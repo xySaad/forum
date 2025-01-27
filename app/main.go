@@ -43,7 +43,6 @@ func main() {
 	err = config.CreateTables(forumDB)
 	if err != nil {
 		log.Error("error creating tables: " + err.Error())
-
 		return
 	}
 
@@ -55,6 +54,7 @@ func main() {
 
 	go func() {
 		fmt.Println("server started: http://localhost:8080")
+		log.Info("server started: http://localhost:8080")
 		err = server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			log.Error("error starting server " + err.Error())
