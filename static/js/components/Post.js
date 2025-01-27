@@ -6,11 +6,14 @@ import { importSvg } from "../utils/index.js";
 import PostView from "./PostView.js";
 
 const Post = (postData) => {
-  const readMore = div("readmore", "Read more");
-
-  readMore.onclick = () => {
+  const showPost = () => {
     document.body.prepend(PostView(postData));
   };
+
+  const readMore = div("readmore", "Read more");
+  readMore.onclick = showPost;
+  const comment = img(importSvg("comment-bubble"), "comment-bubble");
+  comment.onclick = showPost;
 
   return div("postContainer").add(
     Frame(
@@ -27,7 +30,7 @@ const Post = (postData) => {
     ),
     div("leftBar").add(
       img(importSvg("arrow-up"), "arrow-up", "reaction-arrow", postData.ID),
-      img(importSvg("comment-bubble"), "comment-bubble"),
+      comment,
       img(importSvg("arrow-down"), "arrow-down", "reaction-arrow", postData.ID)
     )
   );

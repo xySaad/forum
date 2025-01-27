@@ -1,40 +1,53 @@
 import img from "./native/img.js";
 import { importSvg } from "../utils/index.js";
 import div from "./native/div.js";
+let context = "register";
+let authElement = null;
 
-const passwordInput = (params) => {
-  const { confirm } = params ?? {};
+const input = (type, confirm) => {
   const input = document.createElement("input");
-  input.classList = "input tall";
-  input.type = "password";
-
-  input.placeholder = confirm ? "Confirm" : "Enter your";
-  input.placeholder += " password";
-  return input;
-};
-
-const userIdInput = (type = "") => {
-  const input = document.createElement("input");
-  input.classList = "input";
-  input.type = type;
-  input.placeholder = "Enter your " + type;
+  input.required = true;
+  input.type = type == "name" ? "text" : type;
+  input.className = "input";
+  input.placeholder = (confirm ? "Confirm" : "Enter") + " your " + type;
   return input;
 };
 
 const createRegisterForm = () => {
   const form = document.createElement("form");
-  const password = passwordInput();
-  const confirmPassword = passwordInput({ confirm: true });
-  const username = userIdInput("name");
-  const email = userIdInput("email");
+
+  const username = input("name");
+  const email = input("email");
+  const password = input("password");
+  const confirmPassword = input("password", true);
+
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const resp = await fetch("/api/auth/" + context, {
+      method: "POST",
+      body: JSON.stringify({
+        username: username.value,
+        email: email.value,
+        password: password.value,
+      }),
+    });
+    if (resp.ok) {
+      // authElement.remove();
+      // authElement = null;
+    }
+    console.log(await resp.text());
+  };
+
   const loginButton = document.createElement("button");
-  loginButton.type = "submit";
   loginButton.textContent = "Login";
 
   const cancelButton = document.createElement("button");
-  cancelButton.classList = "secondary";
+  cancelButton.className = "secondary";
   cancelButton.textContent = "Cancel";
-  cancelButton.onclick = () => {};
+  cancelButton.onclick = () => {
+    authElement.remove();
+    authElement = null;
+  };
 
   form.append(
     username,
@@ -43,44 +56,72 @@ const createRegisterForm = () => {
     confirmPassword,
     div("btns").add(loginButton, cancelButton)
   );
-  return { form, email, confirmPassword };
+
+  return {
+    form,
+    email,
+    confirmPassword,
+    reset: () => {
+      form.innerHTML = "";
+      form.append(
+        username,
+        email,
+        password,
+        confirmPassword,
+        div("btns").add(loginButton, cancelButton)
+      );
+    },
+  };
+};
+
+const changeContext = (registerForm) => {
+  if (context == "register") {
+    context = "login";
+    registerForm.email.remove();
+    registerForm.confirmPassword.remove();
+    registerForm.registerSpan.classList.remove("clicked");
+    registerForm.loginSpan.classList.add("clicked");
+  } else {
+    registerForm.loginSpan.classList.remove("clicked");
+    registerForm.registerSpan.classList.add("clicked");
+    context = "register";
+    registerForm.reset();
+  }
 };
 
 const Auth = () => {
-  const registerForm = createRegisterForm();
-  registerForm.form.onsubmit = (e)=>{
-    e.preventDefault()
+  if (authElement != null) {
+    return authElement;
   }
-  
-  const loginSpan = document.createElement("span");
-  loginSpan.className = "login clicked";
-  loginSpan.textContent = "login";
-  loginSpan.onclick = () => {
-    loginSpan.classList.add("clicked");
-    registerSpan.classList.remove("clicked");
+  const registerForm = createRegisterForm();
 
-    registerForm.email.style.display = "none";
-    registerForm.confirmPassword.style.display = "none";
-  };
+  const loginSpan = document.createElement("span");
+  loginSpan.className = "login";
+  loginSpan.textContent = "login";
+  loginSpan.onclick = () => changeContext(registerForm);
+  registerForm.loginSpan = loginSpan;
 
   const registerSpan = document.createElement("span");
-  registerSpan.className = "register";
+  registerSpan.className = "register clicked";
   registerSpan.textContent = "register";
-  registerSpan.onclick = () => {
-    registerSpan.classList.add("clicked");
-    loginSpan.classList.remove("clicked");
+  registerSpan.onclick = () => changeContext(registerForm);
+  registerForm.registerSpan = registerSpan;
 
-    registerForm.email.style.display = "";
-    registerForm.confirmPassword.style.display = "";
+  authElement = div("auth");
+  const authentication = div("authentication");
+  authentication.onclick = (e) => {
+    if (e.target == authentication) {
+      authElement.remove();
+      authElement = null;
+    }
   };
-
-  return div("auth").add(
+  return authElement.add(
     div("full-screen-background"),
     div("blur-layer"),
-    div("authontication").add(
+    authentication.add(
       div("card").add(
         div("tocenter").add(img(importSvg("logo"))),
-        div("toggle").add(loginSpan, registerSpan),
+        div("toggle").add(registerForm.loginSpan, registerForm.registerSpan),
         div("register").add(registerForm.form)
       )
     )

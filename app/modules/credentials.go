@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"forum/app/modules/errors"
-	"forum/app/modules/log"
 
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -40,19 +39,15 @@ type AuthCredentials struct {
 func (User *AuthCredentials) CheckAccount(db *sql.DB) *errors.HttpError {
 	hashedPassWord := ""
 
-	err := db.QueryRow("SELECT (password) FROM users WHERE username=? OR email=? VALUES (?,?)", User.Username, User.Email).Scan(&hashedPassWord)
+	err := db.QueryRow("SELECT password FROM users WHERE username=? ", User.Username).Scan(&hashedPassWord)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.NewError(404, 404, "account not found", "")
-			// need to change
 		}
-		// return errors.New("internal server error")
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassWord), []byte(User.Password))
 	if err != nil {
 		return errors.NewError(403, 403, "wrong paasword", "")
-
-		// ........
 	}
 	return nil
 }
@@ -75,6 +70,7 @@ func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) *e
 		//handle later
 	}
 	cookie := http.Cookie{
+		SameSite: http.SameSiteStrictMode,
 		Name:     "token",
 		Value:    token.String(),
 		Expires:  time.Now().Add(time.Hour),
@@ -87,7 +83,7 @@ func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) *e
 
 func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	httpErr = &errors.HttpError{
-		Status:  400,
+		Status:  http.StatusBadRequest,
 		Code:    errors.CodeInvalidUsername,
 		Message: "invalid username",
 	}
@@ -96,24 +92,12 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 		httpErr.Details = "username contains invalid character"
 		return
 	}
-
-	var err error
-	defer func() {
-		if httpErr != nil && httpErr.Status == 500 {
-			log.Error("internal server error: " + err.Error())
-		}
-	}()
-
-	err = db.QueryRow("SELECT * FROM users WHERE username=(?)", User.Username).Scan()
+	exists := false
+	err := db.QueryRow("SELECT 1 FROM users WHERE username = ?", User.Username).Scan(&exists)
 	if err != sql.ErrNoRows {
 		if err != nil {
-			httpErr.Status = 500
-			log.Error("internal server error", err)
-			httpErr.Code = errors.CodeInternalServerError
-			httpErr.Message = "internal server error"
-			return
+			return errors.HttpInternalServerError
 		}
-
 		httpErr.Details = "username already taken"
 		return
 	}
@@ -126,20 +110,17 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 		return
 	}
 
-	err = db.QueryRow("SELECT * FROM users WHERE email=(?)", User.Email).Scan()
+	err = db.QueryRow("SELECT 1 FROM users WHERE email = ?", User.Email).Scan(&exists)
 	if err != sql.ErrNoRows {
 		if err != nil {
-			httpErr.Status = 500
-			log.Error("internal server error", err)
-			httpErr.Code = errors.CodeInternalServerError
-			httpErr.Message = "internal server error"
-			return
+			return errors.HttpInternalServerError
 		}
-
 		httpErr.Details = "email already in use"
 		return
 	}
 	if !ValidPassword(User.Password) {
+		httpErr.Message = "invalid password"
+		httpErr.Code = errors.CodeIncorrectPassword
 		httpErr.Details = "password contains invalid character"
 		return
 	}

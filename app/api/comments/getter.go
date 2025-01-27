@@ -45,7 +45,7 @@ func GetComents(conn *modules.Connection, forumDB *sql.DB) {
 	var comments []Comment
 	for rows.Next() {
 		var comment Comment
-		if err := rows.Scan(&comment.Item_id, &comment.Post_id, &comment.User_id, &comment.Content, &comment.Created_at); err != nil {
+		if err := rows.Scan(&comment.PostID, &comment.UserID, &comment.Content, &comment.CreatedAt); err != nil {
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 			return
 		}

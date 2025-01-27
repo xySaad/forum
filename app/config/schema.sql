@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    item_id TEXT UNIQUE, -- Formatted ID, e.g. "posts-1"
     user_id TEXT ,
     title TEXT NOT NULL,
     content TEXT NOT NULL CHECK(length(content) <= 10000),

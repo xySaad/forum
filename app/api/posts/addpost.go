@@ -105,13 +105,6 @@ func GetCategoryMask(categories []string) string {
 func CreatePost(title, content, userID string, categories []string, forumDB *sql.DB) (int64, error) {
 	categoryMask := GetCategoryMask(categories)
 
-	// db, err := sql.Open("sqlite3", "./forum.db")
-	// if err != nil {
-	//
-	// 	return 0, err
-	// }
-	// defer db.Close()
-
 	stmt, err := forumDB.Prepare("INSERT INTO posts (title, content, user_id, categories) VALUES (?, ?, ?, ?)")
 	if err != nil {
 
