@@ -20,7 +20,7 @@ const Post = (postData) => {
       div("post").add(
         div("publisher").add(
           img(postData.publisher.profilePicture, "no-profile"),
-          div(null, postData.publisher.name),
+          div(null, postData.publisher.username),
           div(null, timePassed(postData.creationTime))
         ),
         div("title", postData.title),

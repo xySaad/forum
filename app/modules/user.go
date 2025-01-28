@@ -1,7 +1,8 @@
 package modules
 
 type User struct {
-	Username string `json:"username"`
-	// // ProfilePicture string `json:"profilePicture"`
+	Username       string `json:"username"`
+	Id             string
+	ProfilePicture any `json:"profilePicture"`
 	// Name string `json:"name"`
 }
