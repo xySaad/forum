@@ -4,20 +4,20 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"forum/app/modules"
 	"strconv"
 	"strings"
+
+	"forum/app/modules"
 )
 
 func GetPosts(conn *modules.Connection, forumDB *sql.DB) error {
 	var posts []modules.Post
 	var categories []string
 	var err error
-	var pageStr = ""
+	pageStr := ""
 
 	if len(strings.Split(conn.Req.URL.Path, "/")) == 4 {
 		pageStr = strings.Split(conn.Req.URL.Path, "/")[3]
-
 	}
 	page := 1
 
@@ -34,10 +34,8 @@ func GetPosts(conn *modules.Connection, forumDB *sql.DB) error {
 	}
 
 	if len(categories) > 0 {
-
 		err = fetchPostsByCategories(categories, &posts, page, forumDB)
 	} else {
-
 		err = fetchAllPosts(&posts, page, forumDB)
 	}
 
@@ -72,7 +70,6 @@ func fetchPostsByCategories(categories []string, posts *[]modules.Post, page int
 
 	rows, err := forumDB.Query(query, categoryInt, limit, offset)
 	if err != nil {
-
 		return fmt.Errorf("error querying posts by category: %v", err)
 	}
 	defer rows.Close()
@@ -82,7 +79,6 @@ func fetchPostsByCategories(categories []string, posts *[]modules.Post, page int
 		var categoryMask string
 
 		if err := rows.Scan(&post.Publisher.Username, &post.ID, &post.Title, &post.Text, &categoryMask, &post.CreationTime); err != nil {
-
 			return fmt.Errorf("error scanning post: %v", err)
 		}
 
@@ -91,7 +87,6 @@ func fetchPostsByCategories(categories []string, posts *[]modules.Post, page int
 	}
 
 	if err := rows.Err(); err != nil {
-
 		return err
 	}
 
@@ -102,14 +97,13 @@ func fetchAllPosts(posts *[]modules.Post, page int, forumDB *sql.DB) error {
 	const limit = 10
 	offset := (page - 1) * limit
 
-	query := `SELECT user_id, item_id, title, content, categories, created_at 
+	query := `SELECT user_id, id, title, content, categories, created_at 
               FROM posts 
               ORDER BY created_at DESC 
               LIMIT ? OFFSET ?`
 
 	rows, err := forumDB.Query(query, limit, offset)
 	if err != nil {
-
 		return fmt.Errorf("error querying all posts: %v", err)
 	}
 	defer rows.Close()
@@ -118,22 +112,29 @@ func fetchAllPosts(posts *[]modules.Post, page int, forumDB *sql.DB) error {
 		var post modules.Post
 		var categoryMask string
 
-		if err := rows.Scan(&post.Publisher.Username, &post.ID, &post.Title, &post.Text, &categoryMask, &post.CreationTime); err != nil {
-
+		if err := rows.Scan(&post.Publisher.Id, &post.ID, &post.Title, &post.Text, &categoryMask, &post.CreationTime); err != nil {
 			return fmt.Errorf("error scanning post: %v", err)
 		}
-
+		err := GetPublicUser(&post.Publisher, forumDB)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
 		post.Categories = GetCategoriesFromMask(categoryMask)
 
 		*posts = append(*posts, post)
 	}
 
 	if err := rows.Err(); err != nil {
-
 		return err
 	}
 
 	return nil
+}
+
+func GetPublicUser(user *modules.User, db *sql.DB) error {
+	qreury := `SELECT username,profile FROM users WHERE id=?`
+	return db.QueryRow(qreury, user.Id).Scan(&user.Username, &user.ProfilePicture)
 }
 
 func GetCategoriesFromMask(mask string) []string {
