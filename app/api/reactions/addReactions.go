@@ -42,9 +42,9 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Missing or invalid authentication token", "")
 		return
 	}
-	userID, err := handlers.GetUserIDByToken(cookie.Value, forumDB)
-	if err != nil {
-		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Invalid or expired authentication token", "")
+	userID, httpErr := handlers.GetUserIDByToken(cookie.Value, forumDB)
+	if httpErr != nil {
+		conn.Error(httpErr)
 		return
 	}
 	err = handlers.AddOrUpdateReaction(request.ItemID, userID, request.ReactionType, forumDB)

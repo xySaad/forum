@@ -21,9 +21,9 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 		conn.NewError(http.StatusForbidden, 403, "unothorized", "")
 		return
 	}
-	uId, err := handlers.GetUserIDByToken(cookie.Value, forumDB)
-	if err != nil {
-		conn.NewError(http.StatusForbidden, 403, "unothorized", "")
+	uId, httpErr := handlers.GetUserIDByToken(cookie.Value, forumDB)
+	if httpErr != nil {
+		conn.Error(httpErr)
 		return
 	}
 

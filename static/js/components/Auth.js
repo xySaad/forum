@@ -32,8 +32,8 @@ const createRegisterForm = () => {
       }),
     });
     if (resp.ok) {
-      // authElement.remove();
-      // authElement = null;
+      authElement.remove();
+      authElement = null;
     }
     console.log(await resp.text());
   };

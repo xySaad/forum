@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
+	"forum/app/modules/errors"
+	"net/http"
 )
 
 type Reaction struct {
@@ -18,15 +19,17 @@ type ReactionCounter struct {
 	Count        int
 }
 
-func GetUserIDByToken(token string, forumDB *sql.DB) (string, error) {
-
-	var userID string
+func GetUserIDByToken(token string, forumDB *sql.DB) (userID string, httpErr *errors.HttpError) {
 	err := forumDB.QueryRow("SELECT id FROM users WHERE token = ?", token).Scan(&userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "", errors.New("invalid token")
+			httpErr = &errors.HttpError{
+				Status: http.StatusUnauthorized,
+			}
+			return
 		}
-		return "", errors.New("internal server error")
+		httpErr = errors.HttpInternalServerError
+		return
 	}
 
 	return userID, nil
