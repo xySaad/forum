@@ -31,7 +31,6 @@ CREATE TABLE IF NOT EXISTS comments (
 CREATE TABLE IF NOT EXISTS reactions (
     item_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
-    item_id TEXT NOT NULL,
     reaction_type TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
