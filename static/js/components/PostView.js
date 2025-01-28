@@ -31,14 +31,14 @@ const PostView = (postData) => {
       div("post").add(
         div("publisher").add(
           img(postData.publisher.profilePicture, "no-profile"),
-          div(null, postData.publisher.name),
+          div(null, postData.publisher.username),
           div(null, timePassed(postData.creationTime))
         ),
         div("title", postData.title),
         div("text", postData.text),
         postImg
       ),
-      commentsWrap.add(CommentsList(postData.ID), CommentInput())
+      commentsWrap.add(CommentsList(postData.ID), CommentInput(postData.ID))
     )
   );
 };
