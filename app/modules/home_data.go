@@ -9,7 +9,7 @@ type Post struct {
 	Image        string `json:"image,omitempty"`
 	Text         string `json:"text"`
 	ID           string
-	Categories   []string  `json:"categories"`
+	Categories   string  `json:"categories"`
 	CreationTime time.Time `json:"creationTime"`
 	Publisher    User      `json:"publisher"`
 }
