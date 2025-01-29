@@ -27,8 +27,8 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	query := `INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)`
-	_, err = forumDB.Exec(query, comment.PostID, uId, comment.Content)
+	query := `INSERT INTO comments (post_id, user_id, content, likes, dislikes) VALUES (?, ?, ?, ?, ?)`
+	_, err = forumDB.Exec(query, comment.PostID, uId, comment.Content, 0, 0)
 	if err != nil {
 		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 		return
