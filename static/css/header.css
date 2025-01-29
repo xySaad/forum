@@ -3,11 +3,91 @@ body {
     margin: 0px;
     background: linear-gradient(129.76deg, #252937 -0.72%, #101218 80.04%);
 }
+
+.profileContainer {
+    cursor: pointer;
+}
+
+#profileCard {
+    position: absolute;
+    right: 6%;
+    top: 12%;
+    background: rgba(217, 217, 217, 0.02);
+    box-shadow: 40px 64px 140px rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(60px);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 16px 24px;
+    gap: 16px;
+    cursor: pointer;
+    display: none;
+}
+
+.textContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 6px;
+}
+
+h2 {
+    margin: 0px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 19px;
+    color: #FFFFFF;
+}
+
+h4 {
+    margin: 0px;
+    color: rgba(255, 255, 255, 0.64);
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+}
+
+.line {
+    width: 185px;
+    height: 0px;
+
+    border: 1px solid rgba(255, 255, 255, 0.16);
+
+}
+
+.logoutBtn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px 8px;
+    gap: 8px;
+}
+.logoutBtn:hover {
+    gap: 10px;
+}
+h3 {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 15px;
+
+    color: #FD5F49;
+}
+
 .icons {
     display: flex;
     flex-direction: row;
     gap: 64px;
 }
+
 header {
     display: flex;
     flex-direction: row;
@@ -15,22 +95,36 @@ header {
     padding: 24px 100px;
     align-items: center;
 }
+
 .menu-toggle {
     color: white;
     display: none;
 }
+
 p {
-    display:none;
+    display: none;
+    cursor: pointer;
 }
+
 .close {
-    display:none;
+    display: none;
 }
+
 .contain {
+    color: white;
     width: max-content;
     position: relative;
+    display: flex;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
 }
+
+.contain:hover {
+    color: #FD5F49;
+    cursor: pointer;
+}
+
 .contain::after {
     content: "";
     position: absolute;
@@ -49,89 +143,100 @@ p {
     background-color: #FD5F49;
     transform: scaleX(1);
 }
+
 .icon {
     stroke: #777980;
     fill: none;
     opacity: 1;
     stroke-width: 1.5;
-   
+
 }
-.icon:hover:not(.active){
+
+.icon:hover:not(.active) {
     stroke: #FD5F49;
     cursor: pointer;
 }
+
 .icon:hover {
     cursor: pointer;
 }
-.icon.active {
 
-}
 .icon.active {
     fill: #FD5F49;
     stroke: none;
 }
-@media (max-width: 1100px){
+
+@media (max-width: 1100px) {
     .logo {
-    width: 110px;
+        width: 110px;
     }
+
     .icn {
         width: 20px;
     }
+
     .profile {
         width: 80%;
     }
 }
+
 @media (max-width: 768px) {
     .icons {
         display: none;
     }
+
     .profile {
         display: none;
     }
+
     .menu-toggle {
         display: block;
         cursor: pointer;
-        position:absolute;
-        z-index:3;
+        position: absolute;
+        z-index: 3;
 
     }
+
     .icons.active {
         display: flex;
         flex-direction: column;
         position: absolute;
         padding-top: 300px;
-        gap:32px;
-        right:0px;
-        top:0px;
+        gap: 32px;
+        right: 0px;
+        top: 0px;
         width: 70%;
-        height:100%;
+        height: 100%;
         background: #252937;
         padding: 24px;
-    } 
+    }
+
     i {
-        display:flex;
-        align-items:center;
+        display: flex;
+        align-items: center;
     }
-    i.active  {
-        color:red;
+
+    i.active {
+        color: red;
     }
+
     p {
-        display:inline-block;
-        margin : 0px 10px;
-        color :white;
+        display: inline-block;
+        margin: 0px 10px;
         font-family: sans-serif;
         font-size: 13px;
         font-style: normal;
         font-weight: 400;
     }
+
     .close {
-        display:block;
-        color :white; 
+        display: block;
+        color: white;
         position: absolute;
-        z-index:3;
-        cursor:pointer;
+        z-index: 3;
+        cursor: pointer;
         top: 24px;
-        right:64px;
+        right: 64px;
     }
 
 }
