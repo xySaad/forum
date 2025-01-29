@@ -16,13 +16,17 @@ func GetPosts(conn *modules.Connection, forumDB *sql.DB) error {
 	if err := ValidQueries(qreuries); err != nil {
 		return err
 	}
+
 	categories := qreuries["categories"][0]
 	page, err := strconv.Atoi(qreuries["page"][0])
 	if err != nil {
 		return errors.New("invalide page")
 	}
+
 	err = fetchPosts(&posts, categories, page, forumDB)
-	fmt.Println(err)
+	if err == nil {
+		conn.Respond(posts)
+	}
 	return err
 }
 
@@ -53,7 +57,6 @@ func fetchPosts(posts *[]modules.Post, categories string, page int, forumDB *sql
 		}
 		err := GetPublicUser(&post.Publisher, forumDB)
 		if err != nil {
-			fmt.Println(err)
 			return err
 		}
 		*posts = append(*posts, post)
@@ -62,7 +65,6 @@ func fetchPosts(posts *[]modules.Post, categories string, page int, forumDB *sql
 	if err := rows.Err(); err != nil {
 		return err
 	}
-
 	return nil
 }
 
