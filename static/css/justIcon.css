@@ -1,0 +1,32 @@
+body {
+    background-color: rgb(135, 135, 135) ;
+}
+/* .home::after {
+    content: "";
+    width: ;
+    background-color: red;
+    height: 5px;
+    border-bottom: red;
+} */
+ div {
+    width: max-content;
+    background-color: aquamarine;
+    position: relative;
+ }
+
+.icon {
+    stroke: #3e3e3e;
+    fill: none;
+    opacity: 1;
+    stroke-width: 1.5;
+}
+
+div::after {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 5px;
+    top: 124%;
+    left: 0%;
+    background-color: red;
+}

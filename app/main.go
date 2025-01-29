@@ -20,15 +20,14 @@ func main() {
 	err := config.InitLogger()
 	if err != nil {
 		config.MultiLogger.Println("Error initializing logger:", err)
-		return
-	}
-	defer config.CloseLogger()
-
-	forumDB, err := sql.Open("sqlite3", "./forum.db")
-	if err != nil {
-		config.MultiLogger.Println("Error opening databse:", err)
-		return
-	}
+			return
+		}
+		defer config.CloseLogger()
+		forumDB, err := sql.Open("sqlite3", "./forum.db")
+		if err != nil {
+			config.MultiLogger.Println("Error opening databse:", err)
+			return
+		}
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)

@@ -25,6 +25,30 @@ p {
 .close {
     display:none;
 }
+.contain {
+    width: max-content;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+}
+.contain::after {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease-in-out;
+    border-radius: 40px;
+}
+
+.contain:hover::after {
+    width: 100%;
+    top: 140%;
+    left: 0%;
+    background-color: #FD5F49;
+    transform: scaleX(1);
+}
 .icon {
     stroke: #777980;
     fill: none;
@@ -34,14 +58,13 @@ p {
 }
 .icon:hover:not(.active){
     stroke: #FD5F49;
-    padding-bottom: 16px ;
-    border-bottom: #FD5F49 solid 1px;
     cursor: pointer;
 }
 .icon:hover {
-    padding-bottom: 16px ;
-    border-bottom: #FD5F49 solid 1px;
     cursor: pointer;
+}
+.icon.active {
+
 }
 .icon.active {
     fill: #FD5F49;
