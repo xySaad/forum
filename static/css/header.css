@@ -238,5 +238,24 @@ p {
         top: 24px;
         right: 64px;
     }
+    #profileCard {
+        position: absolute;
+        right: 24%;
+        top: auto;
+        bottom: 10%;
+        height: max-content;
+        background: none;
+        box-shadow:none;
+        backdrop-filter: blur(60px);
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 16px 24px;
+        gap: 16px;
+        cursor: pointer;
+        display: none;
+    }
 
 }
