@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="/static/css/index.css" />
   </head>
   <body>
+    <script type="module">
+      import { ensureAuth } from "/static/js/utils/ensureAuth.js";
+      if (ensureAuth()) {
+        showFirstHeader()
+      }else {
+        showSecondHeader()
+      }
+    </script>
     <div id="backdrop"></div>
     <div class="homePage">
       <div class="create-post">

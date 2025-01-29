@@ -1,6 +1,8 @@
 import Auth from "../components/Auth.js";
 
-const ensureAuth = async () => {
+export const ensureAuth = async () => {
+  console.log("imported!!");
+  
   const homePage = document.querySelector(".homePage");
   const resp = await fetch("/api/auth/session/");
   if (resp.status === 401) {
@@ -11,4 +13,3 @@ const ensureAuth = async () => {
   return true;
 };
 
-export default ensureAuth;
