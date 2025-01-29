@@ -1,4 +1,6 @@
+import { timePassed } from "../utils/time.js";
 import div from "./native/div.js";
+import img from "./native/img.js";
 let offset=0
 
 const getComments = async (postId, commentsList) => {
@@ -7,7 +9,20 @@ const getComments = async (postId, commentsList) => {
   offset=offset+json.length
   
 json.forEach(comment => {
-  commentsList.append(comment.content)
+  console.log(comment);
+  
+  commentsList.add(
+    div("publisher").add(
+      img(comment.publisher.profilePicture, "no-profile"),
+      div(null, comment.publisher.username),
+      div(null, timePassed(comment.creationTime))
+
+    ),
+    div("text", comment.content),
+    div("likes",comment.dislike),
+    div("dislikes",comment.like),
+  )  
+
 });
 };
 
