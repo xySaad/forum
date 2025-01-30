@@ -12,16 +12,20 @@ json.forEach(comment => {
   console.log(comment);
   
   commentsList.add(
+    div("comment").add(
     div("publisher").add(
+      
       img(comment.publisher.profilePicture, "no-profile"),
       div(null, comment.publisher.username),
       div(null, timePassed(comment.creationTime))
 
     ),
     div("text", comment.content),
-    div("likes",comment.dislike),
-    div("dislikes",comment.like),
-  )  
+    div("reactions").add(
+      div("likes",comment.likes),
+      div("dislike",comment.dislikes)
+          ),
+  )  )
 
 });
 };
