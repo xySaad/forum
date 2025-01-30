@@ -9,6 +9,6 @@ type Comment struct {
 	ItemID       string       `json:"item_id"`
 	Content      string       `json:"content"`
 	Likes        int          `json:"likes"`
-	Dislikes     int          `json:"dislike"`
+	Dislikes     int          `json:"dislikes"`
 	CreationTime string       `json:"creationTime"`
 }
