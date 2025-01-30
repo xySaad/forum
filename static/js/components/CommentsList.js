@@ -15,7 +15,11 @@ const getComments = async (postId, commentsList) => {
     isfetch = true
     const resp = await fetch(`/api/coments?p_id=${postId}&offset=${offset}`);
     const json = await resp.json()
+    console.log(offset);
+    
     offset = offset + json.length
+    console.log(offset);
+    
     json.forEach(comment => {
       console.log(comment);
 
