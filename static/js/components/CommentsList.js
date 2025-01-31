@@ -3,11 +3,13 @@ import { timePassed } from "../utils/time.js";
 import div from "./native/div.js";
 import img from "./native/img.js";
 
-const atBottom = (el) => {
-  const sh = el.scrollHeight,
-    st = el.scrollTop,
+export const atBottom = (el) => {
+  let sh = el.scrollHeight,
+   st = el.scrollTop,
     ht = el.offsetHeight;
-  return ht == 0 || st == sh - ht;
+    console.log("ht=",ht,"sh=",sh,"st=",st);
+    
+  return ht == 0 || st == (sh - ht);
 }
 
 const getComments = async (postId, commentsList, isfetch, offset) => {
