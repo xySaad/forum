@@ -1,4 +1,5 @@
 import { Home } from "./home.js";
+import { appendUserHeader } from "./components/Headers.js";
 const theme = document.documentElement.attributes.getNamedItem("data-theme");
 if (!!localStorage.getItem("theme")) {
   theme.value = localStorage.getItem("theme");
@@ -24,5 +25,5 @@ addPostIcon?.addEventListener("click", () => {
     }, 1000);
   }
 });
-
+appendUserHeader()
 Home();
