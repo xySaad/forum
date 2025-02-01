@@ -68,7 +68,6 @@ func ValidatePostContent(req *postRequest) (isValid bool) {
 		req.NewError(http.StatusBadRequest, errors.CodeInvalidRequestFormat, "Content can't be empty or more than 5000 character", "Post content too long")
 		return
 	}
-	//TODO: verify categories
 	return true
 }
 
