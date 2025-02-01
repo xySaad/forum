@@ -1,5 +1,6 @@
 import div from "./native/div.js";
 import img from "./native/img.js";
+import Auth from "./Auth.js";
 function getPosts(type) {
   console.log(type);
   
@@ -20,7 +21,18 @@ function ToggleDisplay() {
     item.style.display = "none";
   }
 }
+async function  Logout() {
+  const resp = await fetch(`/api/auth/logout`,{method:"POST"});
+  if (!resp.ok) {
+    console.log("haven't logged out!");
+    return;
+  }else{
+    appendGuestHeader()
+  }
+}
 export function appendUserHeader() {
+  let head = document.querySelector("header")
+  head.innerHTML = ""
   let icn1 = div("contain")
   let icn2 = div("contain")
   let icn3 = div("contain")
@@ -63,16 +75,19 @@ export function appendUserHeader() {
       logout
     )
   )
-  let head = document.querySelector("header")
+  
   head.append(h)
   document.querySelector(".profileContainer").addEventListener("click", ()=>{ToggleDisplay()})
   document.querySelector(".home").addEventListener("click", ()=>{getPosts('.home')})
   document.querySelector(".liked").addEventListener("click", ()=>{getPosts('.liked')})
   document.querySelector(".created").addEventListener("click", ()=>{getPosts('.created')})
   document.querySelector(".close").addEventListener("click", ()=>{toggleIt()})
+  document.querySelector(".logoutBtn").addEventListener("click", ()=> {Logout()})
 }
 
 export function appendGuestHeader() {
+  let head =  document.querySelector("header")
+  head.innerHTML = ""
   let Content = div("content")
   let Buttons = div("buttons")
   
@@ -83,7 +98,7 @@ export function appendGuestHeader() {
                     <p>👋 welcome Guest</p>
                     <h2>Join Speak to connect with others</h2>
                 </div>`
-  Buttons.innerHTML = `<button class="secondary">cancel</button>
+  Buttons.innerHTML = `<button class="secondary">Register</button>
                 <button class="primary">login</button>`
     
     let header2 =  div("toCenter").add(
@@ -91,6 +106,9 @@ export function appendGuestHeader() {
         Content,Buttons
       )
     )
-    let head =  document.querySelector("header")
     head.append(header2)
+    document.querySelector(".primary").addEventListener("click" , ()=> {
+      document.body.append(Auth("login"))})
+    document.querySelector(".secondary").addEventListener("click" , ()=> {
+      document.body.append(Auth("register"))})
 }
