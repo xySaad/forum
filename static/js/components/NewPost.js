@@ -1,16 +1,17 @@
-import { atBottom } from "./CommentsList.js";
 import { NewReference } from "../utils/reference.js";
 import Post from "./Post.js";
 import div from "./native/div.js";
-const getPosts = async (PostsArea, isfetch, offset, categories) => {
+const getPosts = async (PostsArea, isfetch, offset, categories,lastPostId) => {
   isfetch(true)
   try {
-    const resp = await fetch(`/api/posts?page=${offset()}&categories=${categories}`);
+    const resp = await fetch(`/api/posts?page=${offset()}&categories=${categories}&from=${lastPostId()}`);
     if (!resp.ok) {
       throw new Error('Network response was not ok');
     }
     const json = await resp.json();
-
+    if (offset() === 0) {
+      lastPostId(json[0].id)
+    }
     offset((prev) => prev + 1)
 
     json.forEach(post => {
@@ -23,9 +24,7 @@ const getPosts = async (PostsArea, isfetch, offset, categories) => {
   }
 };
 const getcategories = () => {
-  const alo = 1|5
-  const result = "" + 5
-  
+
   let selectedCategories = ["0", "0", "0", "0"];
   const categories = document.querySelectorAll(".category");
   categories.forEach((child, index) => {
@@ -44,17 +43,16 @@ export const CreatePostsArea = () => {
   let offset = NewReference(0);
   let isfetch = NewReference(false)
   let categoiers = getcategories()
-  let homePage = document.querySelector(".homePage")
-  getPosts(PostsArea, isfetch, offset, categoiers)
-  console.log("hoome=", atBottom(homePage));
-
-  window.addEventListener("scroll", () => {
-    console.log("hoome=", atBottom(homePage));
-
-    if (!atBottom(home) || isfetch()) {
-      return
+  let lastPostId = NewReference(0);
+  getPosts(PostsArea, isfetch, offset, categoiers,lastPostId)
+  
+  window.onscroll = (e)=>{
+    const sh = document.documentElement.scrollHeight || document.body.scrollHeight; // Total height of the document
+    const st = window.scrollY || window.pageYOffset; // Current vertical scroll position
+    const ht = window.innerHeight; // Height of the viewport
+    if ((ht === 0 || st + ht >= sh) && !isfetch()) {
+      getPosts(PostsArea, isfetch, offset, categoiers,lastPostId)
     }
-    getPosts(PostsArea, isfetch, offset, categoiers)
-  })
+  }
   return PostsArea
 }

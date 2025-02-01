@@ -7,22 +7,24 @@ import img from "./native/img.js";
 
 export const atBottom = (el) => {
   const sh = el.scrollHeight,
-  st = el.scrollTop,
-  ht = el.offsetHeight;    
+    st = el.scrollTop,
+    ht = el.offsetHeight;
   return ht == 0 || st == (sh - ht);
 }
 
-const getComments = async (postId, commentsList, isfetch, offset) => {
+const getComments = async (postId, commentsList, isfetch, offset, lastPostId) => {
   isfetch(true)
   try {
-    const resp = await fetch(`/api/coments?p_id=${postId}&offset=${offset()}`);
+    const resp = await fetch(`/api/coments?p_id=${postId}&offset=${offset()}&from=${lastPostId()}`);
     if (!resp.ok) {
       throw new Error('Network response was not ok');
     }
     const json = await resp.json();
-    console.log(offset());
-
-    offset((prev)=>prev+json.length)
+console.log(lastPostId()," ",json[0].id)
+    if (offset() === 0) {
+      lastPostId(json[0].id)
+    }
+    offset((prev) => prev + json.length)
     // offset += json.length; // Update offset
 
     json.forEach(comment => {
@@ -56,7 +58,7 @@ const getComments = async (postId, commentsList, isfetch, offset) => {
   } catch (error) {
     console.error('Error fetching comments:', error);
   } finally {
-      isfetch(false); 
+    isfetch(false);
   }
 };
 
@@ -64,13 +66,15 @@ export const CommentsList = (postId) => {
   const commentsList = div("commentsList");
   let offset = NewReference(0); // Move offset outside the function
   let isfetch = NewReference(false);
-  getComments(postId, commentsList, isfetch, offset)
+  let lastPostId = NewReference(0);
+
+  getComments(postId, commentsList, isfetch, offset, lastPostId)
 
   commentsList.onscroll = () => {
     if (!atBottom(commentsList) || isfetch()) {
       return
     }
-    getComments(postId, commentsList, isfetch, offset)
+    getComments(postId, commentsList, isfetch, offset, lastPostId)
   };
 
   return commentsList;

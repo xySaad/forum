@@ -16,6 +16,10 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 		conn.NewError(http.StatusBadRequest, 400, "ivalid format", "")
 		return
 	}
+	if comment.PostID == "" || comment.Content == "" {
+		conn.NewError(http.StatusBadRequest, 400, ",issing data", "")
+		return
+	}
 	cookie, err := conn.Req.Cookie("token")
 	if err != nil || cookie.Value == "" {
 		conn.NewError(http.StatusForbidden, 403, "unothorized", "")

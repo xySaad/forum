@@ -2,7 +2,6 @@ package comments
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,6 +13,15 @@ func GetComents(conn *modules.Connection, forumDB *sql.DB) {
 	URL := conn.Req.URL
 	post_id := URL.Query().Get("p_id")
 	Offset := URL.Query().Get("offset")
+	from := URL.Query().Get("from")
+	if from == "" {
+		conn.NewError(http.StatusBadRequest, 400, "invalid data", "")
+		return
+	}
+	fromN, err := strconv.Atoi(from)
+	if err != nil {
+		conn.NewError(http.StatusBadRequest, 400, "invalid data", "")
+	}
 	if Offset == "" {
 		conn.NewError(http.StatusBadRequest, 400, "invalid data", "")
 		return
@@ -32,7 +40,11 @@ func GetComents(conn *modules.Connection, forumDB *sql.DB) {
 		conn.NewError(http.StatusBadRequest, 400, "invalid data", "")
 		return
 	}
-	query := `SELECT id, post_id, user_id, content, likes, dislikes, created_at FROM comments WHERE post_id = ? LIMIT 10 OFFSET ?`
+	query := `SELECT id, post_id, user_id, content, likes, dislikes, created_at FROM comments WHERE `
+	if fromN > 0 {
+		query += `id<=` + from
+	}
+	query += `post_id = ? ORDER BY created_at DESC LIMIT 10 OFFSET ?`
 	rows, err := forumDB.Query(query, p_id, offset)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -55,7 +67,6 @@ func GetComents(conn *modules.Connection, forumDB *sql.DB) {
 
 		err = posts.GetPublicUser(&comment.Publisher, forumDB)
 		if err != nil {
-			fmt.Printf("\"no it s me\": %v\n", "no it s me")
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 			return
 		}
