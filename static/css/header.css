@@ -8,7 +8,7 @@ body {
     cursor: pointer;
 }
 
-#profileCard {
+.profileCard {
     position: absolute;
     right: 8%;
     top: 90%;
@@ -89,7 +89,7 @@ h3 {
     gap: 64px;
 }
 
-header {
+.header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;

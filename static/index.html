@@ -5,16 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Forum</title>
     <link rel="stylesheet" href="/static/css/index.css" />
+    <link rel="stylesheet" href="/static/css/header.css" />
   </head>
   <body>
-    <script type="module">
-      import { ensureAuth } from "/static/js/utils/ensureAuth.js";
-      if (ensureAuth()) {
-        showFirstHeader()
-      }else {
-        showSecondHeader()
-      }
-    </script>
+    <header></header>
     <div id="backdrop"></div>
     <div class="homePage">
       <div class="create-post">
