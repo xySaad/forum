@@ -3,49 +3,43 @@ package useractivities
 import (
 	"database/sql"
 	"encoding/json"
-	"forum/app/modules"
-	"forum/app/modules/errors"
 	"net/http"
 	"strings"
+
+	"forum/app/handlers"
+	"forum/app/modules"
+	"forum/app/modules/errors"
 )
 
-func GetUSer(conn modules.Connection, url string) {
-	SpUrl := strings.Split(url, "/")
-	username := SpUrl[0]
-	db, err := sql.Open("sqlite3", "forum.db")
-	if err != nil {
-		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "error opening db")
-
-	}
-	defer db.Close()
-	query := `SELECT id FROM users WHERE username=?`
-	row, err := db.Query(query, username)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			conn.NewError(http.StatusNotFound, errors.CodeUserNotFound, "user doesn't exists", "")
-			return
-		}
-		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
+func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
+	SpUrl := strings.Split(conn.Req.URL.String(), "/")
+	if len(SpUrl) != 3 {
+		conn.NewError(http.StatusNotFound, 404, "not found", "")
 		return
 	}
-	userId := ""
-	err = row.Scan(userId)
-	if err != nil {
-		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
-
+	token, err := conn.Req.Cookie("token")
+	if err != nil || token.Value == "" {
+		conn.NewError(http.StatusUnauthorized, http.StatusUnauthorized, "unauthorized", "")
+		return
 	}
-	switch SpUrl[1] {
+	userId, httpErr := handlers.GetUserIDByToken(token.Value, forumDB)
+	if err != nil {
+		conn.Error(httpErr)
+		return
+	}
+	switch SpUrl[2] {
 	case "posts":
-		GetUSerPosts(conn, userId, db)
+		GetUSerPosts(conn, userId, forumDB)
 	case "like":
-		GetUserReactions(conn, userId, "like", db)
+		GetUserReactions(conn, userId, "like", forumDB)
 	case "dislike":
-		GetUserReactions(conn, userId, "dislike", db)
+		GetUserReactions(conn, userId, "dislike", forumDB)
 	default:
 		conn.NewError(http.StatusNotFound, 404, "not found", "")
 	}
 }
-func GetUserReactions(conn modules.Connection, uId, reaction string, db *sql.DB) {
+
+func GetUserReactions(conn *modules.Connection, uId, reaction string, db *sql.DB) {
 	user, err := GetUser(uId, db)
 	if err != nil {
 		conn.NewError(http.StatusNotFound, errors.CodeUserNotFound, "user not found", "")
@@ -84,7 +78,8 @@ func GetUser(uID string, db *sql.DB) (user modules.User, err error) {
 	err = db.QueryRow(query, uID).Scan(&user.Username)
 	return
 }
-func GetUSerPosts(conn modules.Connection, userId string, db *sql.DB) {
+
+func GetUSerPosts(conn *modules.Connection, userId string, db *sql.DB) {
 	userPosts := []modules.Post{}
 	user, err := GetUser(userId, db)
 	if err != nil {

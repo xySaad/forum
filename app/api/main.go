@@ -9,6 +9,7 @@ import (
 	"forum/app/api/comments"
 	"forum/app/api/posts"
 	"forum/app/api/reactions"
+	useractivities "forum/app/api/userActivities"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 )
@@ -25,7 +26,6 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		auth.Entry(conn, forumDB)
 	case "posts":
 		if req.Method == http.MethodGet {
-
 			err := posts.GetPosts(conn, forumDB)
 			if err != nil {
 			}
@@ -50,6 +50,8 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		}
 	case "reactions":
 		reactions.HandleReactions(conn, forumDB)
+	case "activities":
+		useractivities.GetUSer(conn,forumDB)	
 	default:
 		conn.Error(errors.HttpNotFound)
 	}
