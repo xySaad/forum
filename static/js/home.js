@@ -6,7 +6,7 @@ import { filterCat } from "./filter.js";
 import ensureAuth from "./utils/ensureAuth.js";
 import { CreatePostsArea } from "./components/NewPost.js";
 export const Home = async () => {
-  CreatePostsArea()
+document.body.querySelector(".homePage").append(CreatePostsArea())
   onResize(AdjustPostLines);
   Reaction();
   document.getElementById("create-post-btn").onclick = async () => {

@@ -13,16 +13,15 @@ import (
 func GetPosts(conn *modules.Connection, forumDB *sql.DB) error {
 	var posts []modules.Post
 	qreuries := conn.Req.URL.Query()
+
 	if err := ValidQueries(qreuries); err != nil {
 		return err
 	}
-
 	categories := qreuries["categories"][0]
 	page, err := strconv.Atoi(qreuries["page"][0])
 	if err != nil {
 		return errors.New("invalide page")
 	}
-
 	err = fetchPosts(&posts, categories, page, forumDB)
 	if err == nil {
 		conn.Respond(posts)
@@ -40,7 +39,7 @@ func ValidQueries(queries url.Values) error {
 	return nil
 }
 
-func fetchPosts(posts *[]modules.Post, categories string, page int, forumDB *sql.DB) error {
+func fetchPosts(posts *[]modules.Post, categories string, page int,forumDB *sql.DB) error {
 	const limit = 10
 	offset := (page - 1) * limit
 	query := GenerateQuery(categories)
@@ -95,25 +94,3 @@ func GetPublicUser(user *modules.User, db *sql.DB) error {
 	return db.QueryRow(qreury, user.Id).Scan(&user.Username, &user.ProfilePicture)
 }
 
-func GetCategoriesFromMask(mask string) []string {
-	categoryMap := map[string]int{
-		"Sport":      0,
-		"Technology": 1,
-		"Finance":    2,
-		"Science":    3,
-	}
-
-	categories := []string{}
-	for i, c := range mask {
-		if c == '1' {
-			for category, idx := range categoryMap {
-				if idx == i {
-					categories = append(categories, category)
-					break
-				}
-			}
-		}
-	}
-
-	return categories
-}
