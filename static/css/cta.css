@@ -2,13 +2,13 @@ body {
     background: linear-gradient(129.76deg, #252937 -0.72%, #101218 80.04%);
     color: white;
     font-family: sans-serif;
-    margin: 24px;
 }
 
 .toCenter {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 24px;
 }
 
 .headerContainer {

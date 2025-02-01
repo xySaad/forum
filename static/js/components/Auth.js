@@ -1,6 +1,7 @@
 import img from "./native/img.js";
 import { importSvg } from "../utils/index.js";
 import div from "./native/div.js";
+import { appendUserHeader } from "./Headers.js";
 let context = "register";
 let authElement = null;
 
@@ -32,6 +33,7 @@ const createRegisterForm = () => {
       }),
     });
     if (resp.ok) {
+      appendUserHeader()
       authElement.remove();
       authElement = null;
     }
@@ -73,7 +75,6 @@ const createRegisterForm = () => {
     },
   };
 };
-
 const changeContext = (registerForm) => {
   if (context == "register") {
     context = "login";
@@ -89,7 +90,8 @@ const changeContext = (registerForm) => {
   }
 };
 
-const Auth = () => {
+const Auth = (authType) => {
+  context = authType
   if (authElement != null) {
     return authElement;
   }
@@ -98,13 +100,13 @@ const Auth = () => {
   const loginSpan = document.createElement("span");
   loginSpan.className = "login";
   loginSpan.textContent = "login";
-  loginSpan.onclick = () => changeContext(registerForm);
+  loginSpan.onclick = () => {if (context!="login") {changeContext(registerForm)}};
   registerForm.loginSpan = loginSpan;
 
   const registerSpan = document.createElement("span");
   registerSpan.className = "register clicked";
   registerSpan.textContent = "register";
-  registerSpan.onclick = () => changeContext(registerForm);
+  registerSpan.onclick = () => {if(context!= "register") {changeContext(registerForm)}};
   registerForm.registerSpan = registerSpan;
 
   authElement = div("auth");
