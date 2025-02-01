@@ -87,7 +87,7 @@ export function appendGuestHeader() {
                 <button class="primary">login</button>`
     
     let header2 =  div("toCenter").add(
-      div("container").add(
+      div("headerContainer").add(
         Content,Buttons
       )
     )

@@ -27,7 +27,7 @@ addPostIcon?.addEventListener("click", () => {
     }, 1000);
   }
 });
-if (ensureAuth()) {
+if (await ensureAuth()) {
   appendUserHeader()
 }else{
   appendGuestHeader()
