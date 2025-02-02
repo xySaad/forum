@@ -9,6 +9,8 @@
 
 
 .post {
+    display: flex;
+    flex-direction: column;
     width: 100%;
     position: relative;
     padding: 40px;
@@ -76,7 +78,7 @@
     width: 2rem;
 }
 
-.publisher div:nth-child(2) {
+.publisher div.username {
     font-size: 0.875rem;
     line-height: 16.94px;
     text-overflow: ellipsis;
@@ -84,9 +86,10 @@
     white-space: nowrap;
 }
 
-.publisher div:nth-child(3) {
+.publisher div.time {
     font-size: 0.75rem;
     color: #FFFFFF52;
+    line-height: 16.94px;
 }
 
 .readmore {

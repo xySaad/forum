@@ -65,7 +65,7 @@ h2 {
     gap: 8px;
 }
 
-button {
+.buttons button {
     background: #FD5F49;
     display: flex;
     flex-direction: row;
@@ -84,7 +84,7 @@ button {
     background: #df5341;
 }
 
-.secondary {
+.buttons .secondary {
     background: none;
     border: 1px solid rgba(255, 255, 255, 0.4);
     color: white;
