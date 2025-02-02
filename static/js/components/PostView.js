@@ -25,7 +25,8 @@ const PostView = (postData) => {
   // postImg.onload = adjustCommentsListSize;
   // onResize(adjustCommentsListSize);
 
-  postView.id = postData.ID;
+  postView.id = postData.id;
+
   return postView.add(
     div("postCard").add(
       div("post").add(
@@ -38,7 +39,8 @@ const PostView = (postData) => {
         div("text", postData.text),
         postImg
       ),
-      commentsWrap.add(CommentsList(postData.ID), CommentInput(postData.ID))
+      
+      commentsWrap.add(CommentsList(postView.id), CommentInput(postData.id))
     )
   );
 };
