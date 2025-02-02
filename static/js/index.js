@@ -2,21 +2,7 @@ import { Home } from "./home.js";
 import { appendUserHeader } from "./components/Headers.js";
 import { appendGuestHeader } from "./components/Headers.js";
 import ensureAuth from "./utils/ensureAuth.js";
-const theme = document.documentElement.attributes.getNamedItem("data-theme");
-if (!!localStorage.getItem("theme")) {
-  theme.value = localStorage.getItem("theme");
-}
-const menuIcon = document.querySelector(".menu");
-menuIcon?.addEventListener("click", () => {
-  menuIcon.classList.toggle("active");
-});
-
-const themeSwitcher = document.querySelector(".themeSwitcher");
-themeSwitcher?.addEventListener("click", () => {
-  const theme = document.documentElement.attributes.getNamedItem("data-theme");
-  theme.value = theme.value == "dark" ? "light" : "dark";
-  localStorage.setItem("theme", theme.value);
-});
+import { go } from "./router.js";
 
 const addPostIcon = document.querySelector(".addPost");
 addPostIcon?.addEventListener("click", () => {
@@ -28,8 +14,10 @@ addPostIcon?.addEventListener("click", () => {
   }
 });
 if (await ensureAuth()) {
-  appendUserHeader()
-}else{
-  appendGuestHeader()
+  appendUserHeader();
+} else {
+  appendGuestHeader();
 }
+
 Home();
+go(location.pathname.split("/")[1]);
