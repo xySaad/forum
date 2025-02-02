@@ -2,22 +2,23 @@ package posts
 
 import (
 	"database/sql"
-	"errors"
-	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"forum/app/modules"
+	"forum/app/modules/errors"
 	"forum/app/modules/log"
 )
 
-func GetPosts(conn *modules.Connection, forumDB *sql.DB) error {
+func GetPosts(conn *modules.Connection, forumDB *sql.DB) {
 	qeuries := conn.Req.URL.Query()
 	posts := []modules.Post{}
 	categories, from, page, err := ValidQueries(qeuries)
 	if err != nil {
-		return err
+		conn.Error(err)
+		return
 	}
 	if categories == "" {
 		posts, err = fetchPosts(page, from, forumDB)
@@ -26,34 +27,55 @@ func GetPosts(conn *modules.Connection, forumDB *sql.DB) error {
 	}
 	if err == nil {
 		conn.Respond(posts)
+	} else {
+		conn.Error(err)
 	}
-	return err
 }
 
-func ValidQueries(queries url.Values) (categories, from string, page int, err error) {
+func ValidQueries(queries url.Values) (categories, from string, page int, err *errors.HttpError) {
 	if _, exits := queries["categories"]; !exits {
 		categories = ""
 	} else {
 		categories = queries["categories"][0]
 	}
 	if _, exits := queries["from"]; !exits {
-		err = errors.New("from missing")
+		err = &errors.HttpError{
+			Status:  http.StatusBadRequest,
+			Message: "bad request",
+			Code:    http.StatusBadRequest,
+			Details: "mising from",
+		}
 		return
 	}
 
 	if _, exits := queries["page"]; !exits {
-		err = errors.New("page missing")
+		err = &errors.HttpError{
+			Status:  http.StatusBadRequest,
+			Message: "bad request",
+			Code:    http.StatusBadRequest,
+			Details: "mising page",
+		}
 		return
 	}
 	from = queries["from"][0]
-	page, err = strconv.Atoi(queries["page"][0])
-	if err != nil || page < 0 {
-		err = errors.New("page should be greater or equal to 0")
+	page, Err := strconv.Atoi(queries["page"][0])
+	if Err != nil || page < 0 {
+		err = &errors.HttpError{
+			Status:  http.StatusBadRequest,
+			Message: "bad request",
+			Code:    http.StatusBadRequest,
+			Details: "page should be a positive number",
+		}
 		return
 	}
-	if nFrom, err := strconv.Atoi(from); err != nil || nFrom <= 0 {
-		if err != nil || nFrom < 0 {
-			err = errors.New("from should be a positive number")
+	if nFrom, Err := strconv.Atoi(from); Err != nil || nFrom <= 0 {
+		if Err != nil || nFrom < 0 {
+			err = &errors.HttpError{
+				Status:  http.StatusBadRequest,
+				Message: "bad request",
+				Code:    http.StatusBadRequest,
+				Details: "from should be a positive number",
+			}
 			return "", "", 0, err
 		}
 		from = ""
@@ -61,7 +83,7 @@ func ValidQueries(queries url.Values) (categories, from string, page int, err er
 	return
 }
 
-func fetchPostsByCategories(categories []string, from string, page int, db *sql.DB) ([]modules.Post, error) {
+func fetchPostsByCategories(categories []string, from string, page int, db *sql.DB) ([]modules.Post, *errors.HttpError) {
 	posts := []modules.Post{}
 	const limit = 10
 	params := make([]interface{}, len(categories))
@@ -81,21 +103,25 @@ WHERE category.name IN (` + strings.Join(placeholders, ", ") + `)`
 ORDER BY posts.created_at DESC LIMIT ? OFFSET ?`
 	params = append(params, limit, page*limit)
 	rows, err := db.Query(query, params...)
+	herr := &errors.HttpError{}
 	if err != nil {
-		return nil, fmt.Errorf("error querying all posts: %v", err)
+		if err != sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, errors.HttpInternalServerError
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var post modules.Post
 		if err := rows.Scan(&post.Publisher.Id, &post.ID, &post.Title, &post.Text, &post.CreationTime); err != nil {
-			return nil, fmt.Errorf("error scanning post: %v", err)
+			return nil, errors.HttpInternalServerError
 		}
 
 		err := GetPublicUser(&post.Publisher, db)
 		if err != nil {
 			log.Warn(err)
 		}
-		err = GetPostCategories(&post.Categories, post.ID, db)
+		herr = GetPostCategories(&post.Categories, post.ID, db)
 		if err != nil {
 			log.Warn(err)
 		}
@@ -103,12 +129,12 @@ ORDER BY posts.created_at DESC LIMIT ? OFFSET ?`
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return nil, errors.HttpInternalServerError
 	}
-	return posts, nil
+	return posts, herr
 }
 
-func fetchPosts(page int, from string, forumDB *sql.DB) (posts []modules.Post, err error) {
+func fetchPosts(page int, from string, forumDB *sql.DB) (posts []modules.Post, herr *errors.HttpError) {
 	const limit = 10
 	offset := (page - 1) * limit
 	query := `SELECT  user_id, id, title, content, created_at FROM posts`
@@ -118,20 +144,23 @@ func fetchPosts(page int, from string, forumDB *sql.DB) (posts []modules.Post, e
 	query += ` ORDER BY created_at DESC OFFSET ? LIMIT ?`
 	rows, err := forumDB.Query(query, offset, limit)
 	if err != nil {
-		return nil, fmt.Errorf("error querying all posts: %v", err)
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, errors.HttpInternalServerError
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var post modules.Post
 		if err := rows.Scan(&post.Publisher.Id, &post.ID, &post.Title, &post.Text, &post.CreationTime); err != nil {
-			return nil, fmt.Errorf("error scanning post: %v", err)
+			return nil, errors.HttpInternalServerError
 		}
 
 		err := GetPublicUser(&post.Publisher, forumDB)
 		if err != nil {
 			log.Warn(err)
 		}
-		err = GetPostCategories(&post.Categories, post.ID, forumDB)
+		herr = GetPostCategories(&post.Categories, post.ID, forumDB)
 		if err != nil {
 			log.Warn(err)
 		}
@@ -139,16 +168,19 @@ func fetchPosts(page int, from string, forumDB *sql.DB) (posts []modules.Post, e
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return nil, errors.HttpInternalServerError
 	}
 	return posts, nil
 }
 
-func GetPostCategories(categories *[]string, postID string, db *sql.DB) error {
+func GetPostCategories(categories *[]string, postID string, db *sql.DB) *errors.HttpError {
 	query := `SELECT category_id FROM post_categories where post_id =`
 	res, err := db.Query(query, postID)
 	if err != nil {
-		return errors.New("wrong category")
+		if err == sql.ErrNoRows {
+			return  nil
+		}
+		return  errors.HttpInternalServerError
 	}
 	defer res.Close()
 	for res.Next() {
@@ -166,7 +198,7 @@ func GetPostCategories(categories *[]string, postID string, db *sql.DB) error {
 		}
 	}
 	if err := res.Err(); err != nil {
-		return err
+		return errors.HttpInternalServerError
 	}
 	return nil
 }

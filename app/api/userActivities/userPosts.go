@@ -66,9 +66,9 @@ func GetUserReactions(conn *modules.Connection, uId, reaction string, db *sql.DB
 		if err != nil {
 			log.Warn(err)
 		}
-		err = posts.GetPostCategories(&post.Categories, post.ID, db)
-		if err != nil {
-			log.Warn(err)
+		herr := posts.GetPostCategories(&post.Categories, post.ID, db)
+		if herr != nil {
+			log.Warn(herr)
 		}
 		Posts = append(Posts, post)
 	}
@@ -100,9 +100,9 @@ func GetUSerPosts(conn *modules.Connection, userId string, db *sql.DB) {
 		if err != nil {
 			log.Warn(err)
 		}
-		err = posts.GetPostCategories(&post.Categories, post.ID, db)
-		if err != nil {
-			log.Warn(err)
+		herr := posts.GetPostCategories(&post.Categories, post.ID, db)
+		if herr != nil {
+			log.Warn(herr)
 		}
 		userPosts = append(userPosts, post)
 	}

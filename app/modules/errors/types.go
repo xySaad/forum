@@ -2,7 +2,8 @@ package errors
 
 import "net/http"
 
-type HttpError struct {
+type HttpError struct 
+{
 	Status  int    `json:"status"`
 	Code    int    `json:"code"`
 	Message string `json:"message"`
@@ -22,6 +23,12 @@ var HttpNotFound = &HttpError{
 	http.StatusNotFound, http.StatusNotFound,
 	"404 - page not found",
 	"The Page you are trying to access doesn't not exists",
+}
+
+var HttpUnauthorized = &HttpError{
+	http.StatusUnauthorized, http.StatusUnauthorized,
+	"unauthorized",
+	"only loged-in members can performe this action",
 }
 
 var HttpMethodNotAllowed = &HttpError{

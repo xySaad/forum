@@ -26,9 +26,7 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		auth.Entry(conn, forumDB)
 	case "posts":
 		if req.Method == http.MethodGet {
-			err := posts.GetPosts(conn, forumDB)
-			if err != nil {
-			}
+			posts.GetPosts(conn, forumDB)
 			return
 		}
 		if req.Method == http.MethodPost {
