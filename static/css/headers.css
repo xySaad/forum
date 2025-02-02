@@ -104,11 +104,6 @@ h3 {
     display: none;
 }
 
-p {
-    display: none;
-    cursor: pointer;
-}
-
 .close {
     display: none;
 }
@@ -221,14 +216,6 @@ p {
         color: red;
     }
 
-    p {
-        display: inline-block;
-        margin: 0px 10px;
-        font-family: sans-serif;
-        font-size: 13px;
-        font-style: normal;
-        font-weight: 400;
-    }
 
     .close {
         display: block;

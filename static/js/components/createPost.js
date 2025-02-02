@@ -19,7 +19,6 @@ export const CreatePost = () => {
 
     formGroup.appendChild(label);
     formGroup.appendChild(inputElement);
-
     return formGroup;
   };
 
@@ -78,6 +77,10 @@ export const CreatePost = () => {
 
   const postForm = document.createElement("div");
   postForm.className = "postForm";
+  let HeaderText =  document.createElement("div")
+  HeaderText.className = "HeaderText"
+  HeaderText.textContent ="Create Post"
+  postForm.appendChild(HeaderText)
   postForm.appendChild(createLabeledInput("Title", titleInput));
   postForm.appendChild(createLabeledInput("Description", textInput));
   postForm.appendChild(createLabeledInput("Upload Image", imageInput));
