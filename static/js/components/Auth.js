@@ -2,6 +2,7 @@ import img from "./native/img.js";
 import { importSvg } from "../utils/index.js";
 import div from "./native/div.js";
 import { appendUserHeader } from "./Headers.js";
+import { changeAuthState } from "../utils/ensureAuth.js";
 let context = "register";
 let authElement = null;
 
@@ -16,11 +17,19 @@ const input = (type, confirm) => {
 
 const createRegisterForm = () => {
   const form = document.createElement("form");
-
   const username = input("name");
-  const email = input("email");
   const password = input("password");
+  const email = input("email");
   const confirmPassword = input("password", true);
+  const loginButton = document.createElement("button");
+  loginButton.textContent = "Login";
+
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "secondary";
+  cancelButton.textContent = "Cancel";
+  cancelButton.onclick = () => {
+    authElement.cleanup();
+  };
 
   form.onsubmit = async (e) => {
     e.preventDefault();
@@ -33,22 +42,11 @@ const createRegisterForm = () => {
       }),
     });
     if (resp.ok) {
-      appendUserHeader()
-      authElement.remove();
-      authElement = null;
+      changeAuthState(true)
+      appendUserHeader();
+      authElement.cleanup();
+      cancelButton.onclick = null;
     }
-    console.log(await resp.text());
-  };
-
-  const loginButton = document.createElement("button");
-  loginButton.textContent = "Login";
-
-  const cancelButton = document.createElement("button");
-  cancelButton.className = "secondary";
-  cancelButton.textContent = "Cancel";
-  cancelButton.onclick = () => {
-    authElement.remove();
-    authElement = null;
   };
 
   form.append(
@@ -91,32 +89,42 @@ const changeContext = (registerForm) => {
 };
 
 const Auth = (authType) => {
-  context = authType
-  if (authElement != null) {
-    return authElement;
-  }
   const registerForm = createRegisterForm();
-
   const loginSpan = document.createElement("span");
   loginSpan.className = "login";
   loginSpan.textContent = "login";
-  loginSpan.onclick = () => {if (context!="login") {changeContext(registerForm)}};
+  loginSpan.onclick = () =>
+    context == "register" ? changeContext(registerForm) : null;
+
   registerForm.loginSpan = loginSpan;
 
   const registerSpan = document.createElement("span");
   registerSpan.className = "register clicked";
   registerSpan.textContent = "register";
-  registerSpan.onclick = () => {if(context!= "register") {changeContext(registerForm)}};
+  registerSpan.onclick = () =>
+    context == "login" ? changeContext(registerForm) : null;
   registerForm.registerSpan = registerSpan;
 
   authElement = div("auth");
+  authElement.cleanup = () => {
+    context = "register";
+    loginSpan.onclick = null;
+    registerSpan.onclick = null;
+    authElement.remove();
+    authElement = null;
+  };
+
   const authentication = div("authentication");
   authentication.onclick = (e) => {
     if (e.target == authentication) {
-      authElement.remove();
-      authElement = null;
+      authElement.cleanup();
     }
   };
+
+  if (authType && authType != context) {
+    changeContext(registerForm);
+  }
+
   return authElement.add(
     div("full-screen-background"),
     div("blur-layer"),
