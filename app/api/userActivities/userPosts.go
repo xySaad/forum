@@ -6,9 +6,11 @@ import (
 	"net/http"
 	"strings"
 
+	"forum/app/api/posts"
 	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
+	"forum/app/modules/log"
 )
 
 func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
@@ -23,7 +25,7 @@ func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 	userId, httpErr := handlers.GetUserIDByToken(token.Value, forumDB)
-	if err != nil {
+	if httpErr != nil {
 		conn.Error(httpErr)
 		return
 	}
@@ -40,11 +42,7 @@ func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
 }
 
 func GetUserReactions(conn *modules.Connection, uId, reaction string, db *sql.DB) {
-	user, err := GetUser(uId, db)
-	if err != nil {
-		conn.NewError(http.StatusNotFound, errors.CodeUserNotFound, "user not found", "")
-	}
-	posts := []modules.Post{}
+	Posts := []modules.Post{}
 	query := `SELECT SUBSTRING_INDEX(item_id,'_',-1) FROM reactions WHERE user_id=? AND SUBSTRING_INDEX(item_id,'_',1='posts') AND reaction_type=?`
 	rows, err := db.Query(query, uId, reaction)
 	if err != nil {
@@ -59,44 +57,53 @@ func GetUserReactions(conn *modules.Connection, uId, reaction string, db *sql.DB
 			return
 		}
 		var post modules.Post
-		query = `SELECT content, title,categories, created_at FROM posts WHERE id= ? ORDER BY updated_at DESC`
-		if err = db.QueryRow(query, postID).Scan(&post.Text, &post.Title, &post.Categories, &post.CreationTime); err != nil {
+		query = `SELECT id, user_id, content, title, created_at FROM posts WHERE id= ? ORDER BY updated_at DESC`
+		if err = db.QueryRow(query, postID).Scan(&post.ID, &post.Publisher.Id, &post.Text, &post.Title, &post.Categories, &post.CreationTime); err != nil {
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 			return
 		}
-		post.Publisher = user
-		posts = append(posts, post)
+		err := posts.GetPublicUser(&post.Publisher, db)
+		if err != nil {
+			log.Warn(err)
+		}
+		err = posts.GetPostCategories(&post.Categories, post.ID, db)
+		if err != nil {
+			log.Warn(err)
+		}
+		Posts = append(Posts, post)
 	}
-	err = json.NewEncoder(conn.Resp).Encode(posts)
+	err = json.NewEncoder(conn.Resp).Encode(Posts)
 	if err != nil {
 		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 	}
 }
 
-func GetUser(uID string, db *sql.DB) (user modules.User, err error) {
-	query := `SELECT username FROM users WHERE id=?`
-	err = db.QueryRow(query, uID).Scan(&user.Username)
-	return
-}
-
 func GetUSerPosts(conn *modules.Connection, userId string, db *sql.DB) {
 	userPosts := []modules.Post{}
-	user, err := GetUser(userId, db)
-	if err != nil {
-		conn.NewError(http.StatusNotFound, errors.CodeUserNotFound, "user not found", "")
-	}
-	query := `SELECT content, title,categories, created_at FROM posts WHERE user_id = ? ORDER BY updated_at DESC LIMIT 10 OFFSET ?`
+	query := `SELECT id, user_id, content, title, created_at FROM posts WHERE user_id = ? ORDER BY updated_at DESC LIMIT 10 OFFSET ?`
 	rows, err := db.Query(query, userId)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			conn.NewError(http.StatusUnauthorized, 401, "unauthorized", "")
+			return
+		}
+		conn.Error(errors.HttpInternalServerError)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var post modules.Post
-		if err := rows.Scan(&post.Text, &post.Title, &post.Categories, &post.CreationTime); err != nil {
+		if err := rows.Scan(&post.ID, &post.Publisher.Id, &post.Text, &post.Title, &post.CreationTime); err != nil {
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 		}
-		post.Publisher = user
+		err := posts.GetPublicUser(&post.Publisher, db)
+		if err != nil {
+			log.Warn(err)
+		}
+		err = posts.GetPostCategories(&post.Categories, post.ID, db)
+		if err != nil {
+			log.Warn(err)
+		}
 		userPosts = append(userPosts, post)
 	}
 	err = json.NewEncoder(conn.Resp).Encode(userPosts)

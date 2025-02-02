@@ -3,10 +3,12 @@ package posts
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"net/http"
+
 	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
-	"net/http"
 )
 
 type postRequestBody struct {
@@ -49,6 +51,7 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 
 	postID, err := CreatePost(&request.body, userID, forumDB)
 	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again later.")
 		return
 	}
@@ -63,7 +66,6 @@ func ValidatePostContent(req *postRequest) (isValid bool) {
 	if len(req.body.Title) == 0 || len([]rune(req.body.Title)) > 50 {
 		req.NewError(http.StatusBadRequest, errors.CodeInvalidRequestFormat, "Title can't be empty or more than 50 character", "Post title too long")
 	}
-
 	if len(req.body.Content) == 0 || len([]rune(req.body.Content)) > 5000 {
 		req.NewError(http.StatusBadRequest, errors.CodeInvalidRequestFormat, "Content can't be empty or more than 5000 character", "Post content too long")
 		return
@@ -71,31 +73,8 @@ func ValidatePostContent(req *postRequest) (isValid bool) {
 	return true
 }
 
-func GetCategoryMask(categories []string) string {
-	categoryMap := map[string]int{
-		"Sport":      0,
-		"Technology": 1,
-		"Finance":    2,
-		"Science":    3,
-	}
-
-	mask := [4]rune{'0', '0', '0', '0'}
-
-	for _, category := range categories {
-		if index, exists := categoryMap[category]; exists {
-			mask[index] = '1'
-		} else {
-
-		}
-	}
-
-	return string(mask[:])
-}
-
 func CreatePost(body *postRequestBody, userID string, forumDB *sql.DB) (int64, error) {
-	categoryMask := GetCategoryMask(body.Categories)
-
-	result, err := forumDB.Exec("INSERT INTO posts (title, content, user_id, categories) VALUES (?, ?, ?, ?)", body.Title, body.Content, userID, categoryMask)
+	result, err := forumDB.Exec("INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)", body.Title, body.Content, userID)
 	if err != nil {
 		return 0, err
 	}
@@ -105,5 +84,19 @@ func CreatePost(body *postRequestBody, userID string, forumDB *sql.DB) (int64, e
 		return 0, err
 	}
 
+	for _, category := range body.Categories {
+		categoryID := ""
+		err := forumDB.QueryRow("SELECT id FROM categories WHERE name = ?", category).Scan(&categoryID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				// return error not found
+			}
+			// return internal pointer error
+		}
+		_, err = forumDB.Exec("INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)", postID, categoryID)
+		if err != nil {
+			return 0, err
+		}
+	}
 	return postID, nil
 }
