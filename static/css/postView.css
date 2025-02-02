@@ -44,23 +44,14 @@
     max-height: 80%;
     position: relative;
     width: 50%;
+    min-width: 10vw;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid rgba(255, 255, 255, 0.16);
-
-    gap: 0px;
-    margin: 28px 0px;
+    gap: 24px;
     background: none;
     overflow-y: scroll;
     overflow-x: hidden;
     text-overflow: ellipsis;
-    border-radius: 0px;
-    align-items: flex-start;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-
 }
 .commentsWrap .inputwrap {
     width: 100%;
@@ -109,6 +100,7 @@
 }
 
 .commentsWrap {
+    width: 40%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -116,9 +108,9 @@
     align-self: stretch;
     padding: 24px;
     gap: 24px;
-    
 }
 .commentsList {
+    width: 100%;
     flex-grow: 1;
     overflow: auto; 
 }
@@ -150,7 +142,7 @@
     line-height: 17px;
     letter-spacing: 0.2px;
     color: #FFFFFF;
-
+    overflow: hidden;
 }
 
 .reactions {
