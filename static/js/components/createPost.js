@@ -1,4 +1,5 @@
 import { checkPost } from "../creatposts.js";
+import { back } from "../router.js";
 
 export const CreatePost = () => {
   const postCreateView = document.createElement("div");
@@ -6,6 +7,7 @@ export const CreatePost = () => {
   postCreateView.onclick = (e) => {
     if (e.target === postCreateView) {
       postCreateView.remove();
+      back();
     }
   };
 
@@ -69,6 +71,7 @@ export const CreatePost = () => {
   cancelButton.textContent = "Cancel";
   cancelButton.onclick = () => {
     postCreateView.remove();
+    back();
   };
 
   const buttonContainer = document.createElement("div");
@@ -89,6 +92,7 @@ export const CreatePost = () => {
   document.body.prepend(postCreateView);
 
   checkPost();
+  return postCreateView;
 };
 
 export default CreatePost;
