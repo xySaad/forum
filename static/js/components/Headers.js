@@ -1,6 +1,7 @@
 import div from "./native/div.js";
 import img from "./native/img.js";
 import Auth from "./Auth.js";
+import { changeAuthState } from "../utils/ensureAuth.js";
 function getPosts(type) {
   console.log(type);
   
@@ -27,6 +28,7 @@ async function  Logout() {
     console.log("haven't logged out!");
     return;
   }else{
+    changeAuthState(false)
     appendGuestHeader()
   }
 }
