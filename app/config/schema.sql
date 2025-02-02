@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS reactions (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE (user_id, item_id)
 );
-INSERT OR IGNORE INTO categories (id, name) VALUES (1,"Sport");
-INSERT OR IGNORE INTO categories (id, name) VALUES (2,"Finance");
-INSERT OR IGNORE INTO categories (id, name) VALUES (3,"Technology");
-INSERT OR IGNORE INTO categories (id, name) VALUES (4,"Science");
+INSERT OR IGNORE INTO categories (name) VALUES ("Sport");
+INSERT OR IGNORE INTO categories (name) VALUES ("Finance");
+INSERT OR IGNORE INTO categories (name) VALUES ("Technology");
+INSERT OR IGNORE INTO categories (name) VALUES ("Science");
