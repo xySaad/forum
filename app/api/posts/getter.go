@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"forum/app/modules"
 	"forum/app/modules/log"
@@ -13,11 +14,16 @@ import (
 
 func GetPosts(conn *modules.Connection, forumDB *sql.DB) error {
 	qeuries := conn.Req.URL.Query()
+	posts := []modules.Post{}
 	categories, from, page, err := ValidQueries(qeuries)
 	if err != nil {
 		return err
 	}
-	posts, err := fetchPosts(categories, page, from, forumDB)
+	if categories == "" {
+		posts, err = fetchPosts(page, from, forumDB)
+	} else {
+		posts, err = fetchPostsByCategories(strings.Split(categories, ","), from, page, forumDB)
+	}
 	if err == nil {
 		conn.Respond(posts)
 	}
@@ -26,8 +32,9 @@ func GetPosts(conn *modules.Connection, forumDB *sql.DB) error {
 
 func ValidQueries(queries url.Values) (categories, from string, page int, err error) {
 	if _, exits := queries["categories"]; !exits {
-		err = errors.New("categories missing")
-		return
+		categories = ""
+	} else {
+		categories = queries["categories"][0]
 	}
 	if _, exits := queries["from"]; !exits {
 		err = errors.New("from missing")
@@ -39,49 +46,56 @@ func ValidQueries(queries url.Values) (categories, from string, page int, err er
 		return
 	}
 	from = queries["from"][0]
-	categories = queries["categories"][0]
-	if categories == "" || len(categories) != 4 {
-		err = errors.New("invalid categories")
-		return
-	}
-	for _, v := range categories {
-		if !(v == '0' || v == '1') {
-			err = errors.New("invalid categories")
-			return
-		}
-	}
 	page, err = strconv.Atoi(queries["page"][0])
-	if err != nil || page <= 0 {
-		err = errors.New("page should be greater than 0")
+	if err != nil || page < 0 {
+		err = errors.New("page should be greater or equal to 0")
 		return
 	}
-	if nFrom, err := strconv.Atoi(from); err != nil || nFrom < 0 {
-		if err != nil {
+	if nFrom, err := strconv.Atoi(from); err != nil || nFrom <= 0 {
+		if err != nil || nFrom < 0 {
 			err = errors.New("from should be a positive number")
 			return "", "", 0, err
 		}
 		from = ""
 	}
-
 	return
 }
 
-func fetchPosts(categories string, page int, from string, forumDB *sql.DB) (posts []modules.Post, err error) {
+func fetchPostsByCategories(categories []string, from string, page int, db *sql.DB) ([]modules.Post, error) {
+	posts := []modules.Post{}
 	const limit = 10
-	offset := (page - 1) * limit
-	query := GenerateQuery(categories, from)
-	rows, err := forumDB.Query(query, limit, offset)
+	params := make([]interface{}, len(categories))
+	placeholders := []string{}
+	for i, category := range categories {
+		params[i] = category
+		placeholders = append(placeholders, "?")
+	}
+	query := `SELECT DISTINCT user_id, id, title, content, created_at FROM posts
+INNER JOIN posts_categories on posts_categories.post_id = posts.post_id
+INNER JOIN categories on posts_categories.category_id = categories.id
+WHERE category.name IN (` + strings.Join(placeholders, ", ") + `)`
+	if from != "" {
+		query += ` AND posts.id <= ` + from
+	}
+	query += `
+ORDER BY posts.created_at DESC LIMIT ? OFFSET ?`
+	params = append(params, limit, page*limit)
+	rows, err := db.Query(query, params...)
 	if err != nil {
 		return nil, fmt.Errorf("error querying all posts: %v", err)
 	}
 	defer rows.Close()
-
 	for rows.Next() {
 		var post modules.Post
-		if err := rows.Scan(&post.Publisher.Id, &post.ID, &post.Title, &post.Text, &post.Categories, &post.CreationTime); err != nil {
+		if err := rows.Scan(&post.Publisher.Id, &post.ID, &post.Title, &post.Text, &post.CreationTime); err != nil {
 			return nil, fmt.Errorf("error scanning post: %v", err)
 		}
-		err := GetPublicUser(&post.Publisher, forumDB)
+
+		err := GetPublicUser(&post.Publisher, db)
+		if err != nil {
+			log.Warn(err)
+		}
+		err = GetPostCategories(&post.Categories, post.ID, db)
 		if err != nil {
 			log.Warn(err)
 		}
@@ -94,29 +108,67 @@ func fetchPosts(categories string, page int, from string, forumDB *sql.DB) (post
 	return posts, nil
 }
 
-func GenerateQuery(categories string, from string) string {
-	query := `SELECT user_id, id, title, content, categories, created_at 
-              FROM posts`
-	first := true
+func fetchPosts(page int, from string, forumDB *sql.DB) (posts []modules.Post, err error) {
+	const limit = 10
+	offset := (page - 1) * limit
+	query := `SELECT  user_id, id, title, content, created_at FROM posts`
 	if from != "" {
-		query += `WHERE id<=` + from + ` `
-		first = false
+		query += ` WHERE id <= ` + from
 	}
-	for i, v := range categories {
-		if v == '1' {
-			if first {
-				query += `WHERE `
-				first = false
-			} else {
-				query += `AND `
-			}
-			idx := strconv.Itoa(i)
-			query += `SUBSTRING(categories,` + idx + `,1)='1' `
+	query += ` ORDER BY created_at DESC OFFSET ? LIMIT ?`
+	rows, err := forumDB.Query(query, offset, limit)
+	if err != nil {
+		return nil, fmt.Errorf("error querying all posts: %v", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var post modules.Post
+		if err := rows.Scan(&post.Publisher.Id, &post.ID, &post.Title, &post.Text, &post.CreationTime); err != nil {
+			return nil, fmt.Errorf("error scanning post: %v", err)
+		}
+
+		err := GetPublicUser(&post.Publisher, forumDB)
+		if err != nil {
+			log.Warn(err)
+		}
+		err = GetPostCategories(&post.Categories, post.ID, forumDB)
+		if err != nil {
+			log.Warn(err)
+		}
+		posts = append(posts, post)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
+
+func GetPostCategories(categories *[]string, postID string, db *sql.DB) error {
+	query := `SELECT category_id FROM post_categories where post_id =`
+	res, err := db.Query(query, postID)
+	if err != nil {
+		return errors.New("wrong category")
+	}
+	defer res.Close()
+	for res.Next() {
+		id := ""
+		err = res.Scan(id)
+		if err != nil {
+			log.Warn(err)
+		}
+		category := ""
+		err = db.QueryRow(`SELECT name FROM categories WHERE id = ?`, id).Scan(&category)
+		if err != nil {
+			log.Warn(err)
+		} else {
+			*categories = append(*categories, category)
 		}
 	}
-	query += `ORDER BY created_at DESC 
-	LIMIT ? OFFSET ?`
-	return query
+	if err := res.Err(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetPublicUser(user *modules.User, db *sql.DB) error {
