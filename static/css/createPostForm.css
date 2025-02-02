@@ -91,13 +91,16 @@ textarea {
   backdrop-filter: blur(60px);
   border-radius: 24px;
   padding: 40px;
-  width: 400px;
+  width: 80%;
+  max-width: 600px;
 }
+
+
 
 .postForm input,
 .postForm textarea {
   padding: 18px 20px;
-  background: rgba(255, 255, 255, 0.1);
+
   outline: none;
   color: #fff;
   font-size: 16px;
@@ -127,24 +130,13 @@ textarea {
   display: flex;
   flex-direction: column;
   align-items: center;
+
   gap: 12px;
   color: #fff;
 }
 
-.postForm button {
-  width: 100%;
-  padding: 20px;
-  background: #FD5F49;
-  color: #fff;
-  font-size: 18px;
-  border: none;
-  border-radius: 24px;
-  cursor: pointer;
-}
 
-.postForm button:hover {
-  opacity: 0.9;
-}
+
 
 .categ {
   display: flex;
@@ -160,16 +152,37 @@ textarea {
   justify-content: center;
   align-items: center;
   padding: 16px 24px;
+  gap: 4px;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(59.8px);
   border-radius: 76px;
 }
 
-.categ input[type="checkbox"] {
-  margin-right: 8px;
-  /* Space between checkbox and label */
+input[type="checkbox"] {
+  appearance: none;
   width: 20px;
   height: 20px;
+  padding: 0px;
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+label.clicket {
+  background-color: none;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #FD5F49;
+}
+
+input[type="checkbox"]:checked::before {
+  content: "✔";
+  position: absolute;
+  left: 4px;
+  top: -2px;
+  font-size: 18px;
+  color: white;
 }
 
 .categ input[type="checkbox"]:checked+label {
@@ -178,13 +191,26 @@ textarea {
   border: 1px solid #FD5F49;
 }
 
+label.clicked {
+  background-color: none;
+}
+
 .categ label {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  padding: 10px 20px;
-  border-radius: 16px;
+  padding: 10px 16px;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 60px;
+
+}
+
+.categ label {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 60px;
+
 }
 
 label {
@@ -193,38 +219,54 @@ label {
   font-weight: 400;
   font-size: 14px;
   line-height: 17px;
-  /* identical to box height */
 
   color: #FFFFFF;
 }
 
 .buttonContainer {
   display: flex;
-  /* Use flexbox to align buttons side by side */
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  align-self: stretch;
   gap: 12px;
-  /* Space between buttons */
 }
 
 .submitButton {
   background: #FD5F49;
-  /* Red background for the submit button */
+  flex-grow: 1;
   color: #fff;
+  min-width: 200px;
+  height: 56px;
+  border-radius: 24px;
+  color: #101218;
+
 }
 
 .submitButton:hover {
-  opacity: 0.9;
+  background: #ff6a56;
+}
+button {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 19px;
+  color: rgba(255, 255, 255, 0.8);
+}
+#cancelButton {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  flex-grow: 1;
+  min-width: 200px;
+  background: none;
+  min-height: 40px;
+  height: 56px;
+  border-radius: 24px;
 }
 
-.cancelButton {
-  background: #fff;
-  /* White background for the cancel button */
-  color: #000;
-  /* Black text color */
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  /* Light border for the cancel button */
-}
-
-.cancelButton:hover {
+#cancelButton:hover {
+  background-color: #ffffff09;
   opacity: 0.9;
 }
 

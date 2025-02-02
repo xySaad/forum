@@ -66,6 +66,7 @@ export const CreatePost = () => {
   const cancelButton = document.createElement("button");
   cancelButton.className = "cancelButton";
   cancelButton.textContent = "Cancel";
+  cancelButton.id = "cancelButton"
   cancelButton.onclick = () => {
     postCreateView.remove();
   };
