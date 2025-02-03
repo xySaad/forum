@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"forum/app/api/posts"
+	reactions "forum/app/api/reaction"
 	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
@@ -62,6 +63,8 @@ func GetUserReactions(conn *modules.Connection, uId, reaction string, db *sql.DB
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 			return
 		}
+		post.Dislikes, post.Likes, post.Reaction = reactions.GetReactions("post-"+post.ID, uId, db)
+
 		err := posts.GetPublicUser(&post.Publisher, db)
 		if err != nil {
 			log.Warn(err)
@@ -96,6 +99,7 @@ func GetUSerPosts(conn *modules.Connection, userId string, db *sql.DB) {
 		if err := rows.Scan(&post.ID, &post.Publisher.Id, &post.Text, &post.Title, &post.CreationTime); err != nil {
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 		}
+		post.Dislikes, post.Likes, post.Reaction = reactions.GetReactions("post-"+post.ID, userId, db)
 		err := posts.GetPublicUser(&post.Publisher, db)
 		if err != nil {
 			log.Warn(err)

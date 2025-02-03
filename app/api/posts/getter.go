@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	reactions "forum/app/api/reaction"
+	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
@@ -20,10 +22,15 @@ func GetPosts(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(err)
 		return
 	}
+	uuid := ""
+	cookie, Err := conn.Req.Cookie("token")
+	if Err == nil && cookie.Value != "" {
+		uuid, _ = handlers.GetUserIDByToken(cookie.Value, forumDB)
+	}
 	if categories == "" {
-		posts, err = fetchPosts(page, from, forumDB)
+		posts, err = fetchPosts(uuid, page, from, forumDB)
 	} else {
-		posts, err = fetchPostsByCategories(strings.Split(categories, ","), from, page, forumDB)
+		posts, err = fetchPostsByCategories(uuid, strings.Split(categories, ","), from, page, forumDB)
 	}
 	if err == nil {
 		conn.Respond(posts)
@@ -83,9 +90,10 @@ func ValidQueries(queries url.Values) (categories, from string, page int, err *e
 	return
 }
 
-func fetchPostsByCategories(categories []string, from string, page int, db *sql.DB) ([]modules.Post, *errors.HttpError) {
+func fetchPostsByCategories(uuid string, categories []string, from string, page int, db *sql.DB) ([]modules.Post, *errors.HttpError) {
 	posts := []modules.Post{}
 	const limit = 10
+
 	params := make([]interface{}, len(categories))
 	placeholders := []string{}
 	for i, category := range categories {
@@ -134,15 +142,16 @@ ORDER BY posts.created_at DESC LIMIT ? OFFSET ?`
 	return posts, herr
 }
 
-func fetchPosts(page int, from string, forumDB *sql.DB) (posts []modules.Post, herr *errors.HttpError) {
+func fetchPosts(uuid string, page int, from string, forumDB *sql.DB) (posts []modules.Post, herr *errors.HttpError) {
 	const limit = 10
 	offset := (page - 1) * limit
 	query := `SELECT  user_id, id, title, content, created_at FROM posts`
 	if from != "" {
 		query += ` WHERE id <= ` + from
 	}
-	query += ` ORDER BY created_at DESC OFFSET ? LIMIT ?`
-	rows, err := forumDB.Query(query, offset, limit)
+	query += ` ORDER BY created_at DESC  LIMIT ? OFFSET ?`
+
+	rows, err := forumDB.Query(query, limit, offset)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -155,7 +164,7 @@ func fetchPosts(page int, from string, forumDB *sql.DB) (posts []modules.Post, h
 		if err := rows.Scan(&post.Publisher.Id, &post.ID, &post.Title, &post.Text, &post.CreationTime); err != nil {
 			return nil, errors.HttpInternalServerError
 		}
-
+		post.Dislikes, post.Likes, post.Reaction = reactions.GetReactions("post-"+post.ID, uuid, forumDB)
 		err := GetPublicUser(&post.Publisher, forumDB)
 		if err != nil {
 			log.Warn(err)
@@ -178,9 +187,9 @@ func GetPostCategories(categories *[]string, postID string, db *sql.DB) *errors.
 	res, err := db.Query(query, postID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return  nil
+			return nil
 		}
-		return  errors.HttpInternalServerError
+		return errors.HttpInternalServerError
 	}
 	defer res.Close()
 	for res.Next() {
