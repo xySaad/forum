@@ -49,10 +49,10 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	postID, err := CreatePost(&request.body, userID, forumDB)
-	if err != nil {
+	postID, herr := CreatePost(&request.body, userID, forumDB)
+	if herr != nil {
 		fmt.Printf("err: %v\n", err)
-		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again later.")
+		conn.Error(herr)
 		return
 	}
 
@@ -65,6 +65,7 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 func ValidatePostContent(req *postRequest) (isValid bool) {
 	if len(req.body.Title) == 0 || len([]rune(req.body.Title)) > 50 {
 		req.NewError(http.StatusBadRequest, errors.CodeInvalidRequestFormat, "Title can't be empty or more than 50 character", "Post title too long")
+		return
 	}
 	if len(req.body.Content) == 0 || len([]rune(req.body.Content)) > 5000 {
 		req.NewError(http.StatusBadRequest, errors.CodeInvalidRequestFormat, "Content can't be empty or more than 5000 character", "Post content too long")
@@ -73,15 +74,15 @@ func ValidatePostContent(req *postRequest) (isValid bool) {
 	return true
 }
 
-func CreatePost(body *postRequestBody, userID string, forumDB *sql.DB) (int64, error) {
+func CreatePost(body *postRequestBody, userID string, forumDB *sql.DB) (int64, *errors.HttpError) {
 	result, err := forumDB.Exec("INSERT INTO posts (title, content, user_id) VALUES (?, ?, ?)", body.Title, body.Content, userID)
 	if err != nil {
-		return 0, err
+		return 0, errors.HttpInternalServerError
 	}
 
 	postID, err := result.LastInsertId()
 	if err != nil {
-		return 0, err
+		return 0, errors.HttpInternalServerError
 	}
 
 	for _, category := range body.Categories {
@@ -89,13 +90,18 @@ func CreatePost(body *postRequestBody, userID string, forumDB *sql.DB) (int64, e
 		err := forumDB.QueryRow("SELECT id FROM categories WHERE name = ?", category).Scan(&categoryID)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				// return error not found
+				return 0, &errors.HttpError{
+					Code:    404,
+					Status:  http.StatusNotFound,
+					Message: "not found",
+					Details: "no such category as " + category,
+				}
 			}
-			// return internal pointer error
+			return 0, errors.HttpInternalServerError
 		}
 		_, err = forumDB.Exec("INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)", postID, categoryID)
 		if err != nil {
-			return 0, err
+			return 0, errors.HttpInternalServerError
 		}
 	}
 	return postID, nil
