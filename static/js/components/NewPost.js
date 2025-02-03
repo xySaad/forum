@@ -25,17 +25,17 @@ const getPosts = async (PostsArea, isfetch, offset, categories,lastPostId) => {
 };
 const getcategories = () => {
 
-  let selectedCategories = ["0", "0", "0", "0"];
+  let selectedCategories = [];
   const categories = document.querySelectorAll(".category");
-  categories.forEach((child, index) => {
+  categories.forEach((child, value) => {
     if (child.classList.contains("Selected")) {
       if (index == 0) {
         return selectedCategories.join("")
       }
-      selectedCategories[index - 1] = "1"
+      selectedCategories.push(value)
     }
   })
-  return selectedCategories.join("")
+  return selectedCategories.join(",")
 }
 
 export const CreatePostsArea = () => {
