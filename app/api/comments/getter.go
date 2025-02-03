@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"forum/app/api/posts"
+	reactions "forum/app/api/reaction"
+	"forum/app/handlers"
 	"forum/app/modules"
 )
 
@@ -14,6 +16,11 @@ func GetComents(conn *modules.Connection, forumDB *sql.DB) {
 	post_id := URL.Query().Get("p_id")
 	Offset := URL.Query().Get("offset")
 	from := URL.Query().Get("from")
+	uid := ""
+	cookie, err := conn.Req.Cookie("token")
+	if err == nil && cookie.Value != "" {
+		uid, _ = handlers.GetUserIDByToken(cookie.Value, forumDB)
+	}
 	if from == "" {
 		conn.NewError(http.StatusBadRequest, 400, "invalid data", "")
 		return
@@ -64,7 +71,7 @@ func GetComents(conn *modules.Connection, forumDB *sql.DB) {
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 			return
 		}
-
+		comment.Dislikes, comment.Likes, comment.Reaction = reactions.GetReactions("comment-"+comment.ItemID, uid, forumDB)
 		err = posts.GetPublicUser(&comment.Publisher, forumDB)
 		if err != nil {
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
