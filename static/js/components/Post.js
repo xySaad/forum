@@ -5,7 +5,7 @@ import Frame from "./Frame.js";
 import { importSvg } from "../utils/index.js";
 import PostView from "./PostView.js";
 
-export const Post = (postData) =>{
+export const Post = (postData) => {
   return div("post").add(
     div("publisher").add(
       img(postData.publisher.profilePicture, "no-profile"),
@@ -15,10 +15,10 @@ export const Post = (postData) =>{
       )
     ),
     div("title", postData.title),
-    div("text", postData.text),
-  )
-}
-const PostCard = (postData) => {
+    div("text", postData.text)
+  );
+};
+export const PostCard = (postData) => {
   const showPost = () => {
     document.body.prepend(PostView(postData));
   };
@@ -29,9 +29,7 @@ const PostCard = (postData) => {
   comment.onclick = showPost;
 
   return div("postContainer").add(
-    Frame(
-      Post(postData).add(readMore)
-    ),
+    Frame(Post(postData).add(readMore)),
     div("leftBar").add(
       img(importSvg("arrow-up"), "arrow-up", "reaction-arrow", postData.ID),
       comment,
@@ -39,4 +37,5 @@ const PostCard = (postData) => {
     )
   );
 };
+
 export default PostCard;

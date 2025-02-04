@@ -3,8 +3,7 @@ import { importSvg } from "../utils/index.js";
 import div from "./native/div.js";
 import { appendUserHeader } from "./Headers.js";
 import { changeAuthState } from "../utils/ensureAuth.js";
-let context = "register";
-let authElement = null;
+import { back, replacePath } from "../router.js";
 
 const input = (type, confirm) => {
   const input = document.createElement("input");
@@ -15,7 +14,7 @@ const input = (type, confirm) => {
   return input;
 };
 
-const createRegisterForm = () => {
+const createRegisterForm = (authElement, context) => {
   const form = document.createElement("form");
   const username = input("name");
   const password = input("password");
@@ -42,7 +41,7 @@ const createRegisterForm = () => {
       }),
     });
     if (resp.ok) {
-      changeAuthState(true)
+      changeAuthState(true);
       appendUserHeader();
       authElement.cleanup();
       cancelButton.onclick = null;
@@ -73,40 +72,54 @@ const createRegisterForm = () => {
     },
   };
 };
-const changeContext = (registerForm) => {
-  if (context == "register") {
-    context = "login";
-    registerForm.email.remove();
-    registerForm.confirmPassword.remove();
-    registerForm.registerSpan.classList.remove("clicked");
-    registerForm.loginSpan.classList.add("clicked");
-  } else {
-    registerForm.loginSpan.classList.remove("clicked");
-    registerForm.registerSpan.classList.add("clicked");
-    context = "register";
-    registerForm.reset();
-  }
-};
 
 const Auth = (authType) => {
-  const registerForm = createRegisterForm();
+  let context = "register";
+
+  let authElement = div("auth");
+
+  const registerForm = createRegisterForm(authElement);
+  const changeContext = (registerForm) => {
+    if (context == "register") {
+      context = "login";
+      registerForm.email.remove();
+      registerForm.confirmPassword.remove();
+      registerForm.registerSpan.classList.remove("clicked");
+      registerForm.loginSpan.classList.add("clicked");
+    } else {
+      registerForm.loginSpan.classList.remove("clicked");
+      registerForm.registerSpan.classList.add("clicked");
+      context = "register";
+      registerForm.reset();
+    }
+  };
+
   const loginSpan = document.createElement("span");
   loginSpan.className = "login";
   loginSpan.textContent = "login";
-  loginSpan.onclick = () =>
-    context == "register" ? changeContext(registerForm) : null;
+  loginSpan.onclick = () => {
+    if (context != "login") {
+      replacePath("/login");
+      changeContext(registerForm);
+    }
+  };
 
   registerForm.loginSpan = loginSpan;
 
   const registerSpan = document.createElement("span");
-  registerSpan.className = "register clicked";
-  registerSpan.textContent = "register";
-  registerSpan.onclick = () =>
-    context == "login" ? changeContext(registerForm) : null;
   registerForm.registerSpan = registerSpan;
 
-  authElement = div("auth");
+  registerSpan.className = "register clicked";
+  registerSpan.textContent = "register";
+  registerSpan.onclick = () => {
+    if (context != "register") {
+      replacePath("/register");
+      changeContext(registerForm);
+    }
+  };
+
   authElement.cleanup = () => {
+    back();
     context = "register";
     loginSpan.onclick = null;
     registerSpan.onclick = null;

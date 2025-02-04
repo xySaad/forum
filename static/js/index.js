@@ -1,23 +1,27 @@
-import { Home } from "./home.js";
 import { appendUserHeader } from "./components/Headers.js";
 import { appendGuestHeader } from "./components/Headers.js";
 import ensureAuth from "./utils/ensureAuth.js";
-import { go } from "./router.js";
+import { AddRoute, go } from "./router.js";
+import { Home } from "./home.js";
+import CreatePost from "./components/createPost.js";
+import Auth from "./components/Auth.js";
+fetch("/api/auth/session/");
 
-const addPostIcon = document.querySelector(".addPost");
-addPostIcon?.addEventListener("click", () => {
-  if (!addPostIcon.classList.contains("active")) {
-    addPostIcon.classList.add("active");
-    setTimeout(() => {
-      addPostIcon.classList.remove("active");
-    }, 1000);
-  }
-});
-if (await ensureAuth()) {
+if (ensureAuth()) {
   appendUserHeader();
 } else {
   appendGuestHeader();
 }
 
-Home();
-go(location.pathname.split("/")[1]);
+AddRoute("/", Home);
+AddRoute("/create-post", CreatePost);
+AddRoute("/login", Auth, "login");
+AddRoute("/register", Auth, "register");
+
+window.onpopstate = () => {
+  go(window.location.pathname);
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  go(window.location.pathname);
+});
