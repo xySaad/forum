@@ -4,15 +4,15 @@ import Auth from "./Auth.js";
 import { changeAuthState } from "../utils/ensureAuth.js";
 function getPosts(type) {
   console.log(type);
-  
-  let icns = document.querySelectorAll("svg")
-  icns.forEach((icn) => icn.classList.remove("active"))
-  let clicked = document.querySelector(type)
-  clicked.classList.add("active")
+
+  let icns = document.querySelectorAll("svg");
+  icns.forEach((icn) => icn.classList.remove("active"));
+  let clicked = document.querySelector(type);
+  clicked.classList.add("active");
 }
 function toggleIt() {
-  let ul = document.querySelector(".icons")
-  ul.classList.toggle("active")
+  let ul = document.querySelector(".icons");
+  ul.classList.toggle("active");
 }
 function ToggleDisplay() {
   let item = document.querySelector(".profileCard");
@@ -22,28 +22,29 @@ function ToggleDisplay() {
     item.style.display = "none";
   }
 }
-async function  Logout() {
-  const resp = await fetch(`/api/auth/logout`,{method:"POST"});
+async function Logout() {
+  const resp = await fetch(`/api/auth/logout`, { method: "POST" });
   if (!resp.ok) {
     console.log("haven't logged out!");
     return;
-  }else{
-    changeAuthState(false)
-    appendGuestHeader()
+  } else {
+    changeAuthState(false);
+    appendGuestHeader();
   }
 }
 export function appendUserHeader() {
-  let head = document.querySelector("header")
-  head.innerHTML = ""
-  let icn1 = div("contain")
-  let icn2 = div("contain")
-  let icn3 = div("contain")
-  let logout = div("logoutBtn")
-  let h2 = document.createElement("h2")
-  h2.innerText = "chakir Ben"
-  let h4 = document.createElement("h4")
-  h4.innerText = "chakir.benlafkih@gmail.com"
-  logout.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  let head = document.querySelector("header");
+  head.innerHTML = "";
+  let icn1 = div("contain");
+  let icn2 = div("contain");
+  let icn3 = div("contain");
+  let logout = div("logoutBtn");
+  let h2 = document.createElement("h2");
+  h2.innerText = "chakir Ben";
+  let h4 = document.createElement("h4");
+  h4.innerText = "chakir.benlafkih@gmail.com";
+  logout.innerHTML =
+    `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M22.4206 11.5898L19.4926 8.67383C19.1986 8.38183 18.7246 8.38183 18.4326 8.67583C18.1406 8.96983 18.1416 9.44383 18.4346 9.73583L20.0746 11.3698H17.1396C17.1496 11.8698 17.1496 12.3698 17.1396 12.8698H20.0766L18.4346 14.5058C18.1416 14.7978 18.1406 15.2728 18.4326 15.5668C18.5786 15.7138 18.7716 15.7868 18.9636 15.7868C19.1546 15.7868 19.3466 15.7138 19.4926 15.5688L22.4206 12.6518C22.5626 12.5118 22.6416 12.3198 22.6416 12.1208C22.6416 11.9218 22.5626 11.7308 22.4206 11.5898Z" fill="#FD5F49"/>
           <path fill-rule="evenodd" clip-rule="evenodd" d="M8.88938 12.12C8.88938 11.71 9.21938 11.37 9.63938 11.37L17.1397 11.3698C17.1297 10.1098 17.0594 8.85 16.9594 7.59V7.58C16.5894 3.55 14.7594 2.25 9.45937 2.25C1.85938 2.25 1.85938 5.1 1.85938 12C1.85938 18.9 1.85938 21.75 9.45937 21.75C14.7594 21.75 16.5894 20.45 16.9594 16.41C17.0594 15.24 17.1197 14.0598 17.1397 12.8698L9.63938 12.87C9.21938 12.87 8.88938 12.54 8.88938 12.12Z" fill="#FD5F49"/>
         </svg>` + "<h3>Logout</h3>  ";
@@ -63,54 +64,62 @@ export function appendUserHeader() {
   let h = div("header").add(
     img("../../static/svg/logo.svg", "logo"),
     div("close", "☰"),
-    div("icons").add(
-      icn1, icn2, icn3
-    ),
-    div("profileContainer").add(
-      img("avatar", "avatar", "profile")
-    ),
+    div("icons").add(icn1, icn2, icn3),
+    div("profileContainer").add(img("avatar", "avatar", "profile")),
     div("profileCard").add(
-      div("textContainer").add(
-        h2, h4
-      ),
+      div("textContainer").add(h2, h4),
       div("line"),
       logout
     )
-  )
-  
-  head.append(h)
-  document.querySelector(".profileContainer").addEventListener("click", ()=>{ToggleDisplay()})
-  document.querySelector(".home").addEventListener("click", ()=>{getPosts('.home')})
-  document.querySelector(".liked").addEventListener("click", ()=>{getPosts('.liked')})
-  document.querySelector(".created").addEventListener("click", ()=>{getPosts('.created')})
-  document.querySelector(".close").addEventListener("click", ()=>{toggleIt()})
-  document.querySelector(".logoutBtn").addEventListener("click", ()=> {Logout()})
+  );
+
+  head.append(h);
+  document.querySelector(".profileContainer").addEventListener("click", () => {
+    ToggleDisplay();
+  });
+  document.querySelector(".home").addEventListener("click", () => {
+    getPosts(".home");
+  });
+  document.querySelector(".liked").addEventListener("click", () => {
+    getPosts(".liked");
+  });
+  document.querySelector(".created").addEventListener("click", () => {
+    getPosts(".created");
+  });
+  document.querySelector(".close").addEventListener("click", () => {
+    toggleIt();
+  });
+  document.querySelector(".logoutBtn").addEventListener("click", () => {
+    Logout();
+  });
 }
 
 export function appendGuestHeader() {
-  let head =  document.querySelector("header")
-  head.innerHTML = ""
-  let Content = div("content")
-  let Buttons = div("buttons")
-  
-  Content.innerHTML=`<svg width="44" height="40" viewBox="0 0 44 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  let head = document.querySelector("header");
+  head.innerHTML = "";
+  let Content = div("content");
+  let Buttons = div("buttons");
+
+  Content.innerHTML =
+    `<svg width="44" height="40" viewBox="0 0 44 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M28.1087 4.32368C34.0784 4.32368 38.9189 9.16427 38.9189 15.1339C38.9189 16.8123 38.5398 18.3955 37.8608 19.8063C37.5648 20.4245 37.4472 21.1563 37.5993 21.8921L38.3168 25.3908L34.6276 24.6996C33.9242 24.5698 33.233 24.6793 32.6411 24.953C31.2648 25.5895 29.7323 25.9462 28.1086 25.9462C22.1389 25.9462 17.2984 21.1057 17.2984 15.1339C17.2984 9.1642 22.139 4.32368 28.1087 4.32368ZM43.2447 15.1339C43.2447 6.77664 36.468 0 28.1087 0C19.7493 0 12.9727 6.77664 12.9727 15.1339C12.9727 23.4933 19.7493 30.2699 28.1087 30.2699C30.2553 30.2699 32.3026 29.822 34.1572 29.0111L39.1032 29.9375C41.3674 30.3612 43.3398 28.3544 42.8755 26.0963L41.9046 21.3651C42.7661 19.4637 43.2447 17.3516 43.2447 15.1339Z" fill="white"/>
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M9.73134 15.498C6.49413 17.371 4.32518 20.8658 4.32518 24.863C4.32518 26.5415 4.70424 28.1246 5.38332 29.5354C5.67927 30.1536 5.79684 30.8854 5.64481 31.6212L4.92724 35.1199L8.61649 34.4287C9.31989 34.299 10.0111 34.4084 10.603 34.6821C11.9793 35.3186 13.5118 35.6754 15.1355 35.6754C17.9064 35.6754 20.428 34.6355 22.3418 32.9226L25.2263 36.1436C22.5506 38.5396 19.0111 39.999 15.1358 39.999C12.9892 39.999 10.9418 39.5511 9.0872 38.7402L4.14123 39.6666C1.877 40.0903 -0.0953263 38.0835 0.368904 35.8254L1.33986 31.0942C0.478345 29.1908 0 27.0807 0 24.863C0 19.2581 3.04868 14.3688 7.56696 11.7539L9.73134 15.498Z" fill="#FD5F49"/>
-                </svg>`+ ` <div class="texts">
+                </svg>` +
+    ` <div class="texts">
                     <p>👋 welcome Guest</p>
                     <h2>Join Speak to connect with others</h2>
-                </div>`
+                </div>`;
   Buttons.innerHTML = `<button class="secondary">Register</button>
-                <button class="primary">login</button>`
-    
-    let header2 =  div("toCenter").add(
-      div("headerContainer").add(
-        Content,Buttons
-      )
-    )
-    head.append(header2)
-    document.querySelector(".primary").addEventListener("click" , ()=> {
-      document.body.append(Auth("login"))})
-    document.querySelector(".secondary").addEventListener("click" , ()=> {
-      document.body.append(Auth("register"))})
+                <button class="primary">login</button>`;
+
+  let header2 = div("toCenter").add(
+    div("headerContainer").add(Content, Buttons)
+  );
+  head.append(header2);
+  document.querySelector(".primary").addEventListener("click", () => {
+    document.body.append(Auth("login"));
+  });
+  document.querySelector(".secondary").addEventListener("click", () => {
+    document.body.append(Auth("register"));
+  });
 }

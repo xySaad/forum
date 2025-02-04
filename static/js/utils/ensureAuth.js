@@ -1,6 +1,4 @@
-import Auth from "../components/Auth.js";
-import { Fetch } from "./fetch.js";
-
+import { go } from "../router.js";
 let isAuthenticated = null;
 
 /**
@@ -15,18 +13,10 @@ export const changeAuthState = (state = null) => {
   }
 };
 
-const ensureAuth = async () => {
-  if (isAuthenticated === null) {
-    await Fetch("/api/auth/session/");
+export const ensureAuth = (force) => {
+  if (force && !isAuthenticated) {
+    go("/login", true);
   }
-
-  if (!isAuthenticated) {
-    const homePage = document.querySelector(".homePage");
-    if (!homePage.querySelector(".auth")) {
-      homePage.prepend(Auth("login"));
-    }
-  }
-
   return isAuthenticated;
 };
 

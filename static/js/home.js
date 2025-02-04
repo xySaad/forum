@@ -1,20 +1,15 @@
 import { onResize } from "./utils/events.js";
 import { Reaction } from "./reactions.js";
 import { filterCat } from "./filter.js";
-import ensureAuth from "./utils/ensureAuth.js";
 import { CreatePostsArea } from "./components/NewPost.js";
-import { go } from "./router.js";
-export const Home = async () => {
-  document.body.querySelector(".homePage").append(CreatePostsArea());
+import div from "./components/native/div.js";
+import { PostCreationBar } from "./components/createPost.js";
+
+export const Home = () => {
   onResize(AdjustPostLines);
   Reaction();
-  document.getElementById("create-post-btn").onclick = async () => {
-    if (!(await ensureAuth())) {
-      return;
-    }
-    go("create-post");
-  };
   filterCat();
+  return div("homePage").add(PostCreationBar(), CreatePostsArea());
 };
 
 const AdjustPostLines = () => {

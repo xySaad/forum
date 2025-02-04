@@ -1,5 +1,23 @@
 import { checkPost } from "../creatposts.js";
-import { back } from "../router.js";
+import { back, go } from "../router.js";
+import ensureAuth from "../utils/ensureAuth.js";
+import div from "./native/div.js";
+import { input } from "./native/input.js";
+
+export const PostCreationBar = () => {
+  const placeholder = "want to share a story?! write here...";
+  const createButton = div("create-post");
+  createButton.onclick = async () => {
+    if (!ensureAuth(true)) {
+      return;
+    }
+    go("/create-post", true);
+  };
+  return createButton.add(
+    input("post-input", placeholder),
+    div("create-post-button", "+ Create a Post")
+  );
+};
 
 export const CreatePost = () => {
   const postCreateView = document.createElement("div");
@@ -88,9 +106,6 @@ export const CreatePost = () => {
   postForm.appendChild(buttonContainer);
 
   postCreateView.appendChild(postForm);
-
-  document.body.prepend(postCreateView);
-
   checkPost();
   return postCreateView;
 };
