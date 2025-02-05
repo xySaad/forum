@@ -13,7 +13,7 @@ export const CommentInput = (postID) => {
       post_id: postID,
       content: input.value,
     };
-    const resp = await fetch("/api/coments", {
+    const resp = await fetch(`/api/coments?p_id=${postID}`, {
       method: "post",
       body: JSON.stringify(body),
     });

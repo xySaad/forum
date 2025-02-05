@@ -1,4 +1,5 @@
 .create-post {
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
@@ -11,7 +12,16 @@
   width: 900px;
   margin: auto;
 }
-
+.create-post:hover {
+  height: 68px;
+  .create-post-button {
+    position: absolute;
+    width: 98%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
 input {
 
   background: rgba(255, 255, 255, 0.05);
@@ -47,22 +57,16 @@ textarea {
   align-items: center;
   padding: 8px 21px;
   gap: 10px;
-
   font-weight: 600;
-
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(6px);
   border-radius: 18px;
-
+  width: max-content;
   flex: none;
   order: 1;
   align-self: stretch;
   flex-grow: 0;
   cursor: pointer;
-}
-
-.create-post-button:hover {
-  background-color: #444;
 }
 
 .postCreateView {

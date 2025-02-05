@@ -51,11 +51,11 @@ func ValidQueries(queries url.Values) (categories, from string, page int, err er
 		}
 	}
 	page, err = strconv.Atoi(queries["page"][0])
-	if err != nil || page <= 0 {
+	if err != nil || page < 0 {
 		err = errors.New("page should be greater than 0")
 		return
 	}
-	if nFrom, err := strconv.Atoi(from); err != nil || nFrom < 0 {
+	if nFrom, err := strconv.Atoi(from); err != nil || nFrom <= 0 {
 		if err != nil {
 			err = errors.New("from should be a positive number")
 			return "", "", 0, err
@@ -70,6 +70,7 @@ func fetchPosts(categories string, page int, from string, forumDB *sql.DB) (post
 	const limit = 10
 	offset := (page - 1) * limit
 	query := GenerateQuery(categories, from)
+	fmt.Println(query)
 	rows, err := forumDB.Query(query, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("error querying all posts: %v", err)
@@ -96,10 +97,10 @@ func fetchPosts(categories string, page int, from string, forumDB *sql.DB) (post
 
 func GenerateQuery(categories string, from string) string {
 	query := `SELECT user_id, id, title, content, categories, created_at 
-              FROM posts`
+              FROM posts `
 	first := true
 	if from != "" {
-		query += `WHERE id<=` + from + ` `
+		query += ` WHERE id<=` + from + ` `
 		first = false
 	}
 	for i, v := range categories {
