@@ -15,7 +15,7 @@
     height: 100%;
     background: rgba(217, 217, 217, 0.02);
     box-shadow: 0px 40px 140px rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(60px);
+    backdrop-filter: blur(24px);
     display: flex;
 }
 
