@@ -150,7 +150,6 @@ func fetchPosts(uuid string, page int, from string, forumDB *sql.DB) (posts []mo
 		query += ` WHERE id <= ` + from
 	}
 	query += ` ORDER BY created_at DESC  LIMIT ? OFFSET ?`
-
 	rows, err := forumDB.Query(query, limit, offset)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -183,7 +182,9 @@ func fetchPosts(uuid string, page int, from string, forumDB *sql.DB) (posts []mo
 }
 
 func GetPostCategories(categories *[]string, postID string, db *sql.DB) *errors.HttpError {
+
 	query := `SELECT category_id FROM post_categories where post_id =`
+	// use QueryRow() for single Row Resullts
 	res, err := db.Query(query, postID)
 	if err != nil {
 		if err == sql.ErrNoRows {

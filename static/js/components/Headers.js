@@ -1,13 +1,24 @@
 import div from "./native/div.js";
 import img from "./native/img.js";
 import Auth from "./Auth.js";
-function getPosts(type) {
+import Post from "./Post.js";
+async function getPosts(type) {
   console.log(type);
-  
   let icns = document.querySelectorAll("svg")
   icns.forEach((icn) => icn.classList.remove("active"))
   let clicked = document.querySelector(type)
   clicked.classList.add("active")
+  /* document.body.innerHTML =""
+  let n = document.createElement("div")
+
+    const resp = await fetch(`/api/posts`);
+    if (!resp.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const json = await resp.json();
+    json.forEach(post => {
+      n.append(Post(post))
+    }) */
 }
 function toggleIt() {
   let ul = document.querySelector(".icons")

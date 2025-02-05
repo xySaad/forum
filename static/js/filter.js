@@ -8,9 +8,7 @@ export const filterCat = (page = 1) => {
     document.addEventListener("click", async (event) => {
         if (event.target.classList.contains("category")) {
             let value = event.target.textContent;
-
             if (value === "All") {
-                
                 selectedCategories = [];
                 categories.forEach((btn) => btn.classList.remove("Selected", "active"));
                 event.target.classList.add("Selected", "active");
@@ -36,7 +34,6 @@ export const filterCat = (page = 1) => {
             let url = selectedCategories.length > 0 
                 ? `/api/posts/${page}/categories=${selectedCategories.join("&")}` 
                 : `/api/posts/${page}`;
-
             try {
                 const resp = await fetch(url);
 
