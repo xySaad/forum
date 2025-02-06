@@ -1,5 +1,4 @@
 import div from "./native/div.js";
-import img from "./native/img.js";
 import { CommentInput } from "./CommentInput.js";
 import { CommentsList } from "./CommentsList.js";
 import { Post } from "./Post.js";
