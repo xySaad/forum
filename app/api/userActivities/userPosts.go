@@ -2,9 +2,7 @@ package useractivities
 
 import (
 	"database/sql"
-	"encoding/json"
 	"net/http"
-	"strings"
 
 	"forum/app/api/posts"
 	reactions "forum/app/api/reaction"
@@ -14,12 +12,7 @@ import (
 	"forum/app/modules/log"
 )
 
-func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
-	SpUrl := strings.Split(conn.Req.URL.String(), "/")
-	if len(SpUrl) != 3 {
-		conn.NewError(http.StatusNotFound, 404, "not found", "")
-		return
-	}
+func GetUSerLiked(conn *modules.Connection, forumDB *sql.DB) {
 	token, err := conn.Req.Cookie("token")
 	if err != nil || token.Value == "" {
 		conn.NewError(http.StatusUnauthorized, http.StatusUnauthorized, "unauthorized", "")
@@ -30,21 +23,12 @@ func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(httpErr)
 		return
 	}
-	switch SpUrl[2] {
-	case "posts":
-		GetUSerPosts(conn, userId, forumDB)
-	case "like":
-		GetUserReactions(conn, userId, "like", forumDB)
-	case "dislike":
-		GetUserReactions(conn, userId, "dislike", forumDB)
-	default:
-		conn.NewError(http.StatusNotFound, 404, "not found", "")
-	}
+	GetUserReactions(conn, userId, "like", forumDB)
 }
 
 func GetUserReactions(conn *modules.Connection, uId, reaction string, db *sql.DB) {
 	Posts := []modules.Post{}
-	query := `SELECT SUBSTRING_INDEX(item_id,'_',-1) FROM reactions WHERE user_id=? AND SUBSTRING_INDEX(item_id,'_',1='posts') AND reaction_type=?`
+	query := `SELECT SUBSTRING(item_id,'_',-1) FROM reactions WHERE user_id=? AND SUBSTRING(item_id,'_',1='posts') AND reaction_type=?`
 	rows, err := db.Query(query, uId, reaction)
 	if err != nil {
 		conn.NewError(http.StatusInternalServerError, 500, "internal pointer variable", "")
@@ -75,13 +59,20 @@ func GetUserReactions(conn *modules.Connection, uId, reaction string, db *sql.DB
 		}
 		Posts = append(Posts, post)
 	}
-	err = json.NewEncoder(conn.Resp).Encode(Posts)
-	if err != nil {
-		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
-	}
+	conn.Respond(Posts)
 }
 
-func GetUSerPosts(conn *modules.Connection, userId string, db *sql.DB) {
+func GetUSerPosts(conn *modules.Connection, db *sql.DB) {
+	token, err := conn.Req.Cookie("token")
+	if err != nil || token.Value == "" {
+		conn.NewError(http.StatusUnauthorized, http.StatusUnauthorized, "unauthorized", "")
+		return
+	}
+	userId, httpErr := handlers.GetUserIDByToken(token.Value, db)
+	if httpErr != nil {
+		conn.Error(httpErr)
+		return
+	}
 	userPosts := []modules.Post{}
 	query := `SELECT id, user_id, content, title, created_at FROM posts WHERE user_id = ? ORDER BY updated_at DESC LIMIT 10 OFFSET ?`
 	rows, err := db.Query(query, userId)
@@ -110,8 +101,30 @@ func GetUSerPosts(conn *modules.Connection, userId string, db *sql.DB) {
 		}
 		userPosts = append(userPosts, post)
 	}
-	err = json.NewEncoder(conn.Resp).Encode(userPosts)
-	if err != nil {
-		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
+	conn.Respond(userPosts)
+}
+
+func Profile(conn *modules.Connection, db *sql.DB) {
+	cookie, err := conn.Req.Cookie("token")
+	if err != nil || cookie.Value == "" {
+		conn.Error(errors.HttpUnauthorized)
+		return
 	}
+
+	uuid, herr := handlers.GetUserIDByToken(cookie.Value, db)
+	if herr != nil {
+		conn.Error(herr)
+	}
+	query := `SELECT username , email,profile FROM  users WHERE uuid = ?`
+	user := modules.User{}
+	err = db.QueryRow(query, uuid).Scan(&user.Username, &user.Email, &user.ProfilePicture)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			conn.Error(errors.HttpUnauthorized)
+			return
+		}
+		conn.Error(errors.HttpInternalServerError)
+		return
+	}
+	conn.Respond(user)
 }

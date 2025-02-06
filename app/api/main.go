@@ -32,23 +32,36 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		if req.Method == http.MethodPost {
 			posts.AddPost(conn, forumDB)
 		} else {
-			conn.Error(errors.HttpNotFound)
+			conn.Error(errors.HttpMethodNotAllowed)
 		}
 	case "coments":
 		if req.Method == http.MethodPost {
 			comments.AddComment(conn, forumDB)
 		} else if req.Method == http.MethodGet {
 			comments.GetComents(conn, forumDB)
-		} else if req.Method == http.MethodPatch {
-			comments.UpdateComent(conn, forumDB)
-		} else {
+		} else{
 			conn.Error(errors.HttpMethodNotAllowed)
 			return
 		}
 	case "reactions":
+		if req.Method != http.MethodPost {
+			conn.Error(errors.HttpMethodNotAllowed)
+			return
+		}
 		reactions.HandleReactions(conn, forumDB)
-	case "activities":
-		useractivities.GetUSer(conn, forumDB)
+	case "like":
+		if req.Method != http.MethodGet {
+			conn.Error(errors.HttpMethodNotAllowed)
+			return
+		}
+		useractivities.GetUSerLiked(conn, forumDB)
+	case "post":
+		if req.Method != http.MethodGet {
+			conn.Error(errors.HttpMethodNotAllowed)
+			return
+		}
+		useractivities.GetUSerPosts(conn, forumDB)
+	case "profile":
 	default:
 		conn.Error(errors.HttpNotFound)
 	}
