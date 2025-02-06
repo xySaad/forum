@@ -1,7 +1,7 @@
 import { onResize } from "./utils/events.js";
 import { Reaction } from "./reactions.js";
 import { filterCat } from "./filter.js";
-import { CreatePostsArea } from "./components/NewPost.js";
+import { InfinitePosts } from "./components/NewPost.js";
 import div from "./components/native/div.js";
 import { PostCreationBar } from "./components/createPost.js";
 
@@ -9,7 +9,7 @@ export const Home = () => {
   onResize(AdjustPostLines);
   Reaction();
   filterCat();
-  return div("homePage").add(PostCreationBar(), CreatePostsArea());
+  return div("homePage").add(PostCreationBar(), InfinitePosts());
 };
 
 const AdjustPostLines = () => {

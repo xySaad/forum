@@ -23,10 +23,13 @@ func (conn *Connection) Error(httpError *errors.HttpError) {
 }
 
 func (conn *Connection) Respond(data any) {
-	err := json.NewEncoder(conn.Resp).Encode(data)
+	jsonResult, err := json.Marshal(data)
 	if err != nil {
-		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
+		conn.Error(errors.HttpInternalServerError)
+		return
 	}
+	conn.Resp.Header().Set("Content-Type", "application/json")
+	conn.Resp.Write(jsonResult)
 }
 
 func sendHttpError(conn *Connection, httpError *errors.HttpError) {

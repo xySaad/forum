@@ -25,33 +25,29 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 	case "auth":
 		auth.Entry(conn, forumDB)
 	case "posts":
-		if req.Method == http.MethodGet {
-			err := posts.GetPosts(conn, forumDB)
-			if err != nil {
-			}
-			return
-		}
-		if req.Method == http.MethodPost {
-
+		switch req.Method {
+		case http.MethodGet:
+			posts.GetPosts(conn, forumDB)
+		case http.MethodPost:
 			posts.AddPost(conn, forumDB)
-		} else {
-			conn.Error(errors.HttpNotFound)
+		default:
+			conn.Error(errors.HttpInternalServerError)
 		}
 	case "coments":
-		if req.Method == http.MethodPost {
-			comments.AddComment(conn, forumDB)
-		} else if req.Method == http.MethodGet {
+		switch req.Method {
+		case http.MethodGet:
 			comments.GetComents(conn, forumDB)
-		} else if req.Method == http.MethodPatch {
+		case http.MethodPost:
+			comments.AddComment(conn, forumDB)
+		case http.MethodPatch:
 			comments.UpdateComent(conn, forumDB)
-		} else {
+		default:
 			conn.Error(errors.HttpMethodNotAllowed)
-			return
 		}
 	case "reactions":
 		reactions.HandleReactions(conn, forumDB)
 	case "activities":
-		useractivities.GetUSer(conn,forumDB)	
+		useractivities.GetUSer(conn, forumDB)
 	default:
 		conn.Error(errors.HttpNotFound)
 	}

@@ -47,7 +47,7 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(httpErr)
 		return
 	}
-	err = handlers.AddOrUpdateReaction(request.ItemID, userID, request.ReactionType, forumDB)
+	err = handlers.AddOrUpdateReaction(userID, request.ItemID, request.ReactionType, forumDB)
 	if err != nil {
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again at later time.")
 		return
