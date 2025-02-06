@@ -46,7 +46,30 @@ const createRegisterForm = (authElement, context) => {
       appendUserHeader();
       authElement.cleanup();
       cancelButton.onclick = null;
+    }else{
+      const notification = document.createElement("div");
+      notification.classList.add("notification", type);
+      notification.textContent = message;
+      notification.style.position = 'fixed';
+      notification.style.maxWidth = '100px'
+      notification.style.top = '50vh';
+      notification.style.right = '35%';
+      notification.style.left = '35%';
+      notification.style.padding = '15px';
+      notification.style.background = '';
+      notification.style.color = 'white';
+      notification.style.borderRadius = '5px';
+      notification.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+      notification.style.zIndex = '1000';
+      notification.style.fontSize = '16px';
+      notification.style.fontWeight = 'bold';
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
     }
+    
   };
 
   form.append(
@@ -75,6 +98,12 @@ const createRegisterForm = (authElement, context) => {
 };
 
 const Auth = (authType) => {
+  try{
+    checkerr(authType)
+  } 
+  catch {
+    
+  }
   let authElement = div("auth");
   const context = NewReference("register");
   const registerForm = createRegisterForm(authElement, context);
