@@ -7,11 +7,13 @@ import { Home } from "./home.js";
 import { Fetch } from "./utils/fetch.js";
 import CreatePost from "./components/createPost.js";
 import Auth from "./components/Auth.js";
+import PostView from "./components/PostView.js";
 
 AddRoute("/", Home);
 AddRoute("/create-post", CreatePost);
-AddRoute("/login", Auth, "login");
-AddRoute("/register", Auth, "register");
+AddRoute("/login", () => Auth("login"));
+AddRoute("/register", () => Auth("register"));
+AddRoute("/post/:id", PostView);
 
 window.onpopstate = () => {
   go(window.location.pathname);
