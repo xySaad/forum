@@ -80,7 +80,6 @@ func fetchPosts(lastId int, categories []string, forumDB *sql.DB) (posts []modul
 			return
 		}
 		posts = append(posts, post)
-		return
 	}
 
 	err = rows.Err()
