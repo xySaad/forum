@@ -3,12 +3,14 @@ import img from "./native/img.js";
 import { timePassed } from "../utils/time.js";
 import Frame from "./Frame.js";
 import { importSvg } from "../utils/index.js";
-import PostView from "./PostView.js";
+import { go } from "../router.js";
 
 export const Post = (postData) => {
+  console.log(postData);
+
   const postImg = img(postData.image);
 
-  return div("post").add(
+  return div(`post ${postData.id}`).add(
     div("publisher").add(
       img(postData.publisher.profilePicture, "no-profile"),
       div().add(
@@ -23,7 +25,7 @@ export const Post = (postData) => {
 };
 export const PostCard = (postData) => {
   const showPost = () => {
-    document.body.prepend(PostView(postData));
+    go(`/post/${postData.id}`, true, postData);
   };
 
   const readMore = div("readmore", "Read more");
