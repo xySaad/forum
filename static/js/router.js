@@ -1,43 +1,45 @@
 import div from "./components/native/div.js";
 
-const routesByLevel = [];
+const routesByLevel = [
+  {
+    404: () => div("404", "404 - page not found"),
+  },
+];
 
-const routes = {
-  "/404": () => div("404", "404 - page not found"),
+const trimSlash = (str) => {
+  if (str[0] === "/") {
+    if (str[str.length - 1] === "/") {
+      return str.slice(1, str.length - 1);
+    }
+    return str.slice(1);
+  } else if (str[str.length - 1] === "/") {
+    return str.slice(0, str.length - 1);
+  }
 };
 
 export const AddRoute = (route, page) => {
-  const splitedRoute = route.split("/");
+  const splitedRoute = trimSlash(route).split("/");
+
   for (let i = 0; i < splitedRoute.length; i++) {
     let path = splitedRoute[i];
-    if (i == 0 && path == "") {
-      continue;
-    }
-    if (!routesByLevel[i - 1]) {
-      routesByLevel[i - 1] = [];
+    if (!routesByLevel[i]) {
+      routesByLevel[i] = [];
     }
 
     const isArg = path[0] == ":";
     const pageToAdd = i === splitedRoute.length - 1 ? page : null;
-    let args = {};
 
-    // const isOptional = path[0] == "?";
-    // const isArg = (isOptional && path[1] == ":") || path[0] == ":";
-    // if (isOptional) {
-    //   // set the page component to the previous path that is not optional
-    //   routesByLevel[i - 2][splitedRoute[i - 1]].page = page;
-    // }
+    let args = routesByLevel[i - 1]
+      ? { ...routesByLevel[i - 1][splitedRoute[i - 1]].args }
+      : {};
 
-    if (isArg && routesByLevel[i - 2]) {
-      args = { ...routesByLevel[i - 2][splitedRoute[i - 1]].args };
+    if (isArg) {
       args[path.slice(1)] = i;
-      path = splitedRoute[i - 1] + "*";
+      path = splitedRoute[i - 1] + "/*";
     }
 
-    routesByLevel[i - 1][path] = { page: pageToAdd, args };
+    routesByLevel[i][path] = { page: pageToAdd, args };
   }
-
-  routes[route] = page;
 };
 
 /** 
@@ -46,28 +48,26 @@ export const AddRoute = (route, page) => {
 */
 
 const routeLookup = (route) => {
-  const splitedRoute = route.split("/");
+  const splitedRoute = trimSlash(route).split("/");
+
   for (let i = 0; i < splitedRoute.length; i++) {
     const path = splitedRoute[i];
-    if (i == 0 && path == "") {
-      continue;
-    }
 
     if (i === splitedRoute.length - 1) {
-      if (!routesByLevel[i - 1][path]) {
-        if (routesByLevel[i - 1][splitedRoute[i - 1] + "*"]) {
+      if (!routesByLevel[i][path] || !routesByLevel[i][path].page) {
+        if (routesByLevel[i][splitedRoute[i - 1] + "/*"]) {
           return {
             found: true,
-            page: routesByLevel[i - 1][splitedRoute[i - 1] + "*"].page,
+            page: routesByLevel[i][splitedRoute[i - 1] + "/*"].page,
           };
         }
-        return { found: false, page: routes["/404"] };
+        return { found: false, page: routesByLevel[0]["404"] };
       }
-      return { found: true, page: routesByLevel[i - 1][path].page };
+      return { found: true, page: routesByLevel[i][path].page };
     }
 
-    if (!routesByLevel[i - 1][path]) {
-      return { found: false, page: routes["/404"] };
+    if (!routesByLevel[i][path]) {
+      return { found: false, page: routesByLevel[0]["404"] };
     }
   }
 };
