@@ -7,6 +7,7 @@ import ensureAuth from "./utils/ensureAuth.js";
 import { CreatePostsArea } from "./components/NewPost.js";
 export const Home = async () => {
   document.body.querySelector(".homePage").append(CreatePostsArea())
+ 
   onResize(AdjustPostLines);
   Reaction();
   document.getElementById("create-post-btn").onclick = async () => {
@@ -17,11 +18,10 @@ export const Home = async () => {
     CreatePost();
   };
   filterCat();
+ 
 };
-
 const AdjustPostLines = () => {
   const post = document.querySelectorAll(".post");
-
   post.forEach((elm) => {
     const text = elm.querySelector(".text");
     text.style["-webkit-line-clamp"] = "unset";

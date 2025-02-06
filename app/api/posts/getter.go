@@ -93,17 +93,17 @@ func ValidQueries(queries url.Values) (categories, from string, page int, err *e
 func fetchPostsByCategories(uuid string, categories []string, from string, page int, db *sql.DB) ([]modules.Post, *errors.HttpError) {
 	posts := []modules.Post{}
 	const limit = 10
-
 	params := make([]interface{}, len(categories))
 	placeholders := []string{}
 	for i, category := range categories {
 		params[i] = category
 		placeholders = append(placeholders, "?")
 	}
-	query := `SELECT DISTINCT user_id, id, title, content, created_at FROM posts
-INNER JOIN posts_categories on posts_categories.post_id = posts.post_id
-INNER JOIN categories on posts_categories.category_id = categories.id
-WHERE category.name IN (` + strings.Join(placeholders, ", ") + `)`
+	query := `SELECT DISTINCT posts.user_id, posts.id, posts.title, posts.content, posts.created_at
+	FROM posts
+	INNER JOIN post_categories ON post_categories.post_id = posts.id
+	INNER JOIN categories ON post_categories.category_id = categories.id
+	WHERE categories.name IN (` + strings.Join(placeholders, ", ") + ` )`
 	if from != "" {
 		query += ` AND posts.id <= ` + from
 	}
@@ -125,13 +125,15 @@ ORDER BY posts.created_at DESC LIMIT ? OFFSET ?`
 			return nil, errors.HttpInternalServerError
 		}
 
+		post.Dislikes, post.Likes, post.Reaction = reactions.GetReactions("post-"+post.ID, uuid, db)
+
 		err := GetPublicUser(&post.Publisher, db)
 		if err != nil {
 			log.Warn(err)
 		}
 		herr = GetPostCategories(&post.Categories, post.ID, db)
-		if err != nil {
-			log.Warn(err)
+		if herr != nil {
+			log.Warn(herr.Message)
 		}
 		posts = append(posts, post)
 	}
@@ -139,7 +141,7 @@ ORDER BY posts.created_at DESC LIMIT ? OFFSET ?`
 	if err := rows.Err(); err != nil {
 		return nil, errors.HttpInternalServerError
 	}
-	return posts, herr
+	return posts, nil
 }
 
 func fetchPosts(uuid string, page int, from string, forumDB *sql.DB) (posts []modules.Post, herr *errors.HttpError) {
@@ -182,7 +184,6 @@ func fetchPosts(uuid string, page int, from string, forumDB *sql.DB) (posts []mo
 }
 
 func GetPostCategories(categories *[]string, postID string, db *sql.DB) *errors.HttpError {
-
 	query := `SELECT category_id FROM post_categories where post_id =`
 	// use QueryRow() for single Row Resullts
 	res, err := db.Query(query, postID)

@@ -1,3 +1,4 @@
+import { CreatePostsArea } from "./components/NewPost.js";
 import Post from "./components/Post.js";
 
 export const filterCat = (page = 1) => {
@@ -30,30 +31,7 @@ export const filterCat = (page = 1) => {
             }
 
             console.log("Selected categories:", selectedCategories);
-
-            let url = selectedCategories.length > 0 
-                ? `/api/posts/${page}/categories=${selectedCategories.join("&")}` 
-                : `/api/posts/${page}`;
-            try {
-                const resp = await fetch(url);
-
-                if (!resp.ok) {
-                    console.log("Didn't get posts from API");
-                    return;
-                }
-
-                const posts = await resp.json();
-                console.log(posts);
-
-                const postsElement = document.querySelector(".posts");
-                postsElement.innerHTML = "";  
-
-                posts.forEach((post) => {
-                    postsElement.append(Post(post));
-                });
-            } catch (error) {
-                console.error("Error fetching posts:", error);
-            }
+            document.body.querySelector(".homePage").append(CreatePostsArea())
         }
     });
 };
