@@ -3,6 +3,7 @@ package useractivities
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -16,7 +17,9 @@ import (
 
 func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
 	SpUrl := strings.Split(conn.Req.URL.String(), "/")
-	if len(SpUrl) != 3 {
+	fmt.Println(222)
+	fmt.Printf("SpUrl: %v\n", len(SpUrl))
+	if len(SpUrl) != 4 {
 		conn.NewError(http.StatusNotFound, 404, "not found", "")
 		return
 	}
@@ -25,12 +28,13 @@ func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
 		conn.NewError(http.StatusUnauthorized, http.StatusUnauthorized, "unauthorized", "")
 		return
 	}
+	fmt.Printf("token.Value: %v\n", token.Value)
 	userId, httpErr := handlers.GetUserIDByToken(token.Value, forumDB)
 	if httpErr != nil {
 		conn.Error(httpErr)
 		return
 	}
-	switch SpUrl[2] {
+	switch SpUrl[3] {
 	case "posts":
 		GetUSerPosts(conn, userId, forumDB)
 	case "like":
@@ -44,9 +48,13 @@ func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
 
 func GetUserReactions(conn *modules.Connection, uId, reaction string, db *sql.DB) {
 	Posts := []modules.Post{}
-	query := `SELECT SUBSTRING_INDEX(item_id,'_',-1) FROM reactions WHERE user_id=? AND SUBSTRING_INDEX(item_id,'_',1='posts') AND reaction_type=?`
+	query := `SELECT SUBSTRING(item_id,'_',-1) FROM reactions WHERE user_id=? AND SUBSTRING(item_id,'_',1='posts') AND reaction_type=?`
 	rows, err := db.Query(query, uId, reaction)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			conn.Respond("not posts yet")
+			return
+		}
 		conn.NewError(http.StatusInternalServerError, 500, "internal pointer variable", "")
 		return
 	}
