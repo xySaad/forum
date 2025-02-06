@@ -7,6 +7,7 @@ import (
 
 	"forum/app/api/posts"
 	"forum/app/modules"
+	"forum/app/modules/log"
 )
 
 func GetComents(conn *modules.Connection, forumDB *sql.DB) {
@@ -61,12 +62,14 @@ func GetComents(conn *modules.Connection, forumDB *sql.DB) {
 	for rows.Next() {
 		var comment Comment
 		if err := rows.Scan(&comment.ItemID, &comment.PostID, &comment.Publisher.Id, &comment.Content, &comment.Likes, &comment.Dislikes, &comment.CreationTime); err != nil {
+			log.Warn(err)
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 			return
 		}
 
-		err = posts.GetPublicUser(&comment.Publisher, forumDB)
+		comment.Publisher, err = posts.GetPublicUser(-1, forumDB)
 		if err != nil {
+			log.Warn(err)
 			conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 			return
 		}

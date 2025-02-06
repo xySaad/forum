@@ -30,12 +30,12 @@ func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(httpErr)
 		return
 	}
-	if request.ReactionType == "" || request.ItemID == "" || userID == "" {
+	if request.ReactionType == "" || request.ItemID == "" || userID == 0 {
 		http.Error(conn.Resp, "400 - Bad Request: Missing fields", 400)
 		return
 	}
 
-	err = handlers.RemoveReaction(request.ItemID, userID, forumDB)
+	err = handlers.RemoveReaction(userID, request.ItemID, forumDB)
 	if err != nil {
 		http.Error(conn.Resp, "500 - Internal Server Error", 500)
 		return

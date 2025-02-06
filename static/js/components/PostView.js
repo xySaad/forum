@@ -13,13 +13,12 @@ const PostView = (postData) => {
   };
 
   const commentsWrap = div("commentsWrap");
-  const postImg = img(postData.image);
 
+  postView.id = postData.id;
 
-  postView.id = postData.ID;
   return postView.add(
     div("postCard").add(
-      Post(postData).add(postImg),
+      Post(postData),
       commentsWrap.add(CommentsList(postData.ID), CommentInput(postData.ID))
     )
   );

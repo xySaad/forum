@@ -4,6 +4,7 @@ import div from "./native/div.js";
 import { appendUserHeader } from "./Headers.js";
 import { changeAuthState } from "../utils/ensureAuth.js";
 import { back, replacePath } from "../router.js";
+import { NewReference } from "../utils/reference.js";
 
 const input = (type, confirm) => {
   const input = document.createElement("input");
@@ -32,7 +33,7 @@ const createRegisterForm = (authElement, context) => {
 
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const resp = await fetch("/api/auth/" + context, {
+    const resp = await fetch("/api/auth/" + context(), {
       method: "POST",
       body: JSON.stringify({
         username: username.value,
@@ -74,14 +75,13 @@ const createRegisterForm = (authElement, context) => {
 };
 
 const Auth = (authType) => {
-  let context = "register";
-
   let authElement = div("auth");
+  const context = NewReference("register");
+  const registerForm = createRegisterForm(authElement, context);
 
-  const registerForm = createRegisterForm(authElement);
   const changeContext = (registerForm) => {
-    if (context == "register") {
-      context = "login";
+    if (context() == "register") {
+      context("login");
       registerForm.email.remove();
       registerForm.confirmPassword.remove();
       registerForm.registerSpan.classList.remove("clicked");
@@ -89,7 +89,7 @@ const Auth = (authType) => {
     } else {
       registerForm.loginSpan.classList.remove("clicked");
       registerForm.registerSpan.classList.add("clicked");
-      context = "register";
+      context("register");
       registerForm.reset();
     }
   };
@@ -98,7 +98,7 @@ const Auth = (authType) => {
   loginSpan.className = "login";
   loginSpan.textContent = "login";
   loginSpan.onclick = () => {
-    if (context != "login") {
+    if (context() != "login") {
       replacePath("/login");
       changeContext(registerForm);
     }
@@ -112,7 +112,7 @@ const Auth = (authType) => {
   registerSpan.className = "register clicked";
   registerSpan.textContent = "register";
   registerSpan.onclick = () => {
-    if (context != "register") {
+    if (context() != "register") {
       replacePath("/register");
       changeContext(registerForm);
     }
@@ -120,7 +120,6 @@ const Auth = (authType) => {
 
   authElement.cleanup = () => {
     back();
-    context = "register";
     loginSpan.onclick = null;
     registerSpan.onclick = null;
     authElement.remove();
@@ -134,7 +133,7 @@ const Auth = (authType) => {
     }
   };
 
-  if (authType && authType != context) {
+  if (authType && authType != context()) {
     changeContext(registerForm);
   }
 

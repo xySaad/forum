@@ -6,6 +6,8 @@ import { importSvg } from "../utils/index.js";
 import PostView from "./PostView.js";
 
 export const Post = (postData) => {
+  const postImg = img(postData.image);
+
   return div("post").add(
     div("publisher").add(
       img(postData.publisher.profilePicture, "no-profile"),
@@ -15,7 +17,8 @@ export const Post = (postData) => {
       )
     ),
     div("title", postData.title),
-    div("text", postData.text)
+    div("text", postData.text),
+    postImg
   );
 };
 export const PostCard = (postData) => {

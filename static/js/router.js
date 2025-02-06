@@ -15,11 +15,13 @@ export const go = (route, popup) => {
     return;
   }
 
-  if (!popup && !history.state?.popup) {
+  document.querySelector("popup").innerHTML = "";
+  if (popup || history.state?.popup) {
+    document.querySelector("popup").append(page());
+  } else {
     document.querySelector("main").innerHTML = "";
+    document.querySelector("main").append(page());
   }
-
-  document.querySelector("main").append(page());
 
   if (!history.state) {
     history.replaceState({ prev: null, path: route }, "");

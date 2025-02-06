@@ -1,6 +1,7 @@
 import { checkPost } from "../creatposts.js";
 import { back, go } from "../router.js";
 import ensureAuth from "../utils/ensureAuth.js";
+import { Fetch } from "../utils/fetch.js";
 import div from "./native/div.js";
 import { input } from "./native/input.js";
 
@@ -81,7 +82,13 @@ export const CreatePost = () => {
   submitButton.className = "submitButton";
   submitButton.textContent = "Create a Post";
   submitButton.onclick = () => {
-    console.log("Submit button clicked");
+    Fetch("/api/posts", {
+      method: "POST",
+      body: JSON.stringify({
+        title: titleInput.value,
+        content: textInput.value,
+      }),
+    });
   };
 
   const cancelButton = document.createElement("button");

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/app/modules/errors"
-	"net/http"
+	"forum/app/modules/log"
 )
 
 type Reaction struct {
@@ -19,20 +19,16 @@ type ReactionCounter struct {
 	Count        int
 }
 
-func GetUserIDByToken(token string, forumDB *sql.DB) (userID string, httpErr *errors.HttpError) {
-	err := forumDB.QueryRow("SELECT id FROM users WHERE token = ?", token).Scan(&userID)
+func GetUserIDByToken(token string, forumDB *sql.DB) (userID int, httpErr *errors.HttpError) {
+	err := forumDB.QueryRow("SELECT internal_id FROM users WHERE token = ?", token).Scan(&userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			httpErr = &errors.HttpError{
-				Status: http.StatusUnauthorized,
-			}
-			return
+			return 0, errors.HttpUnauthorized
 		}
-		httpErr = errors.HttpInternalServerError
-		return
+		log.Error(err)
+		return 0, errors.HttpInternalServerError
 	}
-
-	return userID, nil
+	return
 }
 
 // getReactions fetches reactions for either a post or a comment based on itemID
@@ -64,7 +60,7 @@ func GetReactions(itemID string, forumDB *sql.DB) ([]ReactionCounter, error) {
 	return reactions, nil
 }
 
-func AddOrUpdateReaction(itemID, userID, reactionType string, forumDB *sql.DB) error {
+func AddOrUpdateReaction(userID int, itemID, reactionType string, forumDB *sql.DB) error {
 
 	var existingReactionID int
 	err := forumDB.QueryRow(`
@@ -101,8 +97,7 @@ func AddOrUpdateReaction(itemID, userID, reactionType string, forumDB *sql.DB) e
 	return nil
 }
 
-func RemoveReaction(itemID, userID string, forumDB *sql.DB) error {
-
+func RemoveReaction(userID int, itemID string, forumDB *sql.DB) error {
 	var reactionID int
 	err := forumDB.QueryRow(`
 		SELECT id FROM reactions 

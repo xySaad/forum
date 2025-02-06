@@ -2,6 +2,7 @@ import div from "./native/div.js";
 import img from "./native/img.js";
 import Auth from "./Auth.js";
 import { changeAuthState } from "../utils/ensureAuth.js";
+import { go } from "../router.js";
 function getPosts(type) {
   console.log(type);
 
@@ -117,9 +118,9 @@ export function appendGuestHeader() {
   );
   head.append(header2);
   document.querySelector(".primary").addEventListener("click", () => {
-    document.body.append(Auth("login"));
+    go("/login", true);
   });
   document.querySelector(".secondary").addEventListener("click", () => {
-    document.body.append(Auth("register"));
+    go("/register", true);
   });
 }
