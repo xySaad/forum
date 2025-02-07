@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 
-	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
@@ -12,6 +11,10 @@ import (
 )
 
 func AddPost(conn *modules.Connection, forumDB *sql.DB) {
+	if !conn.IsAuthenticated(forumDB) {
+		return
+	}
+
 	var postContent modules.PostContent
 	err := json.NewDecoder(conn.Req.Body).Decode(&postContent)
 	if err != nil {
@@ -25,19 +28,7 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	cookie, err := conn.Req.Cookie("token")
-	if err != nil || cookie.Value == "" {
-		conn.Error(errors.HttpUnauthorized)
-		return
-	}
-
-	userID, httpErr := handlers.GetUserIDByToken(cookie.Value, forumDB)
-	if httpErr != nil {
-		conn.Error(httpErr)
-		return
-	}
-
-	postID, err := CreatePost(&postContent, userID, forumDB)
+	postID, err := CreatePost(&postContent, conn.InternalUserId, forumDB)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Error(err)

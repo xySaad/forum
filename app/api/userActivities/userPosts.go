@@ -3,35 +3,28 @@ package useractivities
 import (
 	"database/sql"
 	"net/http"
-	"strings"
 
-	"forum/app/handlers"
 	"forum/app/modules"
+	"forum/app/modules/errors"
 )
 
 func GetUSer(conn *modules.Connection, forumDB *sql.DB) {
-	SpUrl := strings.Split(conn.Req.URL.String(), "/")
-	if len(SpUrl) != 3 {
+	if len(conn.Path) != 3 {
 		conn.NewError(http.StatusNotFound, 404, "not found", "")
 		return
 	}
-	token, err := conn.Req.Cookie("token")
-	if err != nil || token.Value == "" {
-		conn.NewError(http.StatusUnauthorized, http.StatusUnauthorized, "unauthorized", "")
+
+	if !conn.IsAuthenticated(forumDB) {
 		return
 	}
-	_, httpErr := handlers.GetUserIDByToken(token.Value, forumDB)
-	if httpErr != nil {
-		conn.Error(httpErr)
-		return
-	}
-	switch SpUrl[2] {
-	case "posts":
-		// GetUSerPosts(conn, userId, forumDB)
-	case "like", "dislike":
-		// GetUserReactions(conn, userId, SpUrl[2], forumDB)
+
+	switch conn.Path[2] {
+	// case "posts":
+	// GetUSerPosts(conn, conn.InternalUserId, forumDB)
+	// case "like", "dislike":
+	// GetUserReactions(conn, conn.Path[2], forumDB)
 	default:
-		conn.NewError(http.StatusNotFound, 404, "not found", "")
+		conn.Error(errors.HttpNotFound)
 	}
 }
 
