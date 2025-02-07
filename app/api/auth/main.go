@@ -42,16 +42,10 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 		http.Redirect(resp, req, "/", http.StatusSeeOther)
 
 	case "session":
-		cookie, err := req.Cookie("token")
-		if err != nil || cookie.Value == "" {
-			http.Error(resp, "Unauthorized", http.StatusUnauthorized)
-			return
+		if conn.IsAuthenticated(forumDB) {
+			conn.Resp.Write([]byte{'o', 'k'})
 		}
-
-		if CheckAuth(cookie.Value, forumDB) != nil {
-			http.Error(resp, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
+		return
 
 	default:
 		conn.Error(errors.HttpNotFound)

@@ -10,6 +10,9 @@ import (
 )
 
 func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
+	if !conn.IsAuthenticated(forumDB) {
+		return
+	}
 
 	validReactions := map[string]bool{
 		"like":    true,
@@ -37,17 +40,7 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	cookie, err := conn.Req.Cookie("token")
-	if err != nil || cookie.Value == "" {
-		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Missing or invalid authentication token", "")
-		return
-	}
-	userID, httpErr := handlers.GetUserIDByToken(cookie.Value, forumDB)
-	if httpErr != nil {
-		conn.Error(httpErr)
-		return
-	}
-	err = handlers.AddOrUpdateReaction(userID, request.ItemID, request.ReactionType, forumDB)
+	err = handlers.AddOrUpdateReaction(conn.InternalUserId, request.ItemID, request.ReactionType, forumDB)
 	if err != nil {
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again at later time.")
 		return

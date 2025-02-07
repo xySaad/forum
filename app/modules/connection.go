@@ -1,11 +1,35 @@
 package modules
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 
 	"forum/app/modules/errors"
 )
+
+type Connection struct {
+	Resp           http.ResponseWriter
+	Req            *http.Request
+	Path           []string
+	InternalUserId int
+}
+
+func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
+	cookie, err := conn.Req.Cookie("token")
+	if err != nil || cookie.Value == "" {
+		conn.Error(errors.HttpInternalServerError)
+		return false
+	}
+
+	err = forumDB.QueryRow("SELECT internal_id FROM users WHERE token=?", cookie).Scan(&conn.InternalUserId)
+	if err != nil {
+		conn.Error(errors.HttpInternalServerError)
+		return false
+	}
+
+	return true
+}
 
 func (conn *Connection) NewError(httpStatus, code int, message, details string) {
 	httpError := errors.HttpError{
@@ -43,10 +67,4 @@ func sendHttpError(conn *Connection, httpError *errors.HttpError) {
 	}
 
 	conn.Resp.Write(jsonError)
-}
-
-type Connection struct {
-	Resp http.ResponseWriter
-	Req  *http.Request
-	Path []string
 }
