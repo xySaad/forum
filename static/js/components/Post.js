@@ -6,8 +6,6 @@ import { importSvg } from "../utils/index.js";
 import { go } from "../router.js";
 
 export const Post = (postData) => {
-  console.log(postData);
-
   const postImg = img(postData.image);
 
   return div(`post ${postData.id}`).add(
@@ -18,11 +16,12 @@ export const Post = (postData) => {
         div("time", timePassed(postData.creationTime))
       )
     ),
-    div("title", postData.title),
-    div("text", postData.text),
+    div("title", postData.content.title),
+    div("text", postData.content.text),
     postImg
   );
 };
+
 export const PostCard = (postData) => {
   const showPost = () => {
     go(`/post/${postData.id}`, true, postData);
