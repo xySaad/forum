@@ -1,7 +1,7 @@
 "use strict";
 import { appendUserHeader } from "./components/Headers.js";
 import { appendGuestHeader } from "./components/Headers.js";
-import ensureAuth from "./utils/ensureAuth.js";
+import ensureAuth, { changeAuthState } from "./utils/ensureAuth.js";
 import { AddRoute, go } from "./router.js";
 import { Home } from "./home.js";
 import { Fetch } from "./utils/fetch.js";
@@ -24,7 +24,10 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 const main = async () => {
-  await Fetch("/api/auth/session/");
+  const resp = await fetch("/api/auth/session/");
+  if (resp.ok) {
+    changeAuthState(true);
+  }
   if (ensureAuth()) {
     appendUserHeader();
   } else {
