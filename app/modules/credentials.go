@@ -37,7 +37,7 @@ type AuthCredentials struct {
 	Password string
 }
 
-func (User *AuthCredentials) CheckAccount(db *sql.DB) *errors.HttpError {
+func (User *AuthCredentials) VerifyPassword(db *sql.DB) *errors.HttpError {
 	hashedPassWord := ""
 
 	err := db.QueryRow("SELECT password FROM users WHERE username=? ", User.Username).Scan(&hashedPassWord)

@@ -25,7 +25,7 @@ func LogIn(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	if err := potentialUser.CheckAccount(forumDB); err != nil {
+	if err := potentialUser.VerifyPassword(forumDB); err != nil {
 		conn.Error(err)
 		return
 	}
