@@ -19,6 +19,15 @@ const getPosts = async (PostsArea, isfetch, offset, categories,lastPostId) => {
       
       PostsArea.append(Post(post))
     })
+    document.querySelectorAll(".reaction.like").forEach(btn=>btn.addEventListener("click", (e)=> {
+      let mysvg = btn
+      if (!(e.target instanceof SVGElement) || !(e.target.tagName.toLowerCase() === "svg")) {
+        let mysvg = e.target.closest("svg");
+        }
+      mysvg.classList.remove("reacted")
+      console.log(mysvg.classList);
+      
+    }))
   } catch (error) {
     console.error('Error fetching comments:', error);
   } finally {
@@ -46,7 +55,6 @@ const getcategories = () => {
 
 export const CreatePostsArea = () => {
   let oldPostarea=document.querySelector(".posts")
-  
   if (oldPostarea!=null) {
     oldPostarea.remove()
   }

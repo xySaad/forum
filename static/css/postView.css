@@ -167,10 +167,14 @@
     justify-content: center;
     align-items: center;
     width: max-content;
-    padding: 4px 16px;
+    padding: 12px 20px;
     gap: 6.69px;
     background: rgba(255, 255, 255, 0.08);
     border-radius: 20.0816px;
+}
+.reaction:hover {
+    opacity: 90%;
+    border: #FD5F49 1px solid;
 }
 
 .container {
@@ -192,7 +196,14 @@
     gap: 12px;
 
 }
-
+.reacted {
+    background: rgba(253, 95, 73, 0.08);
+    border-radius: 20.0816px;
+}
+.reacted>path {
+    
+    fill: #FD5F49;
+}
 .content {
     display: flex;
     flex-direction: column;
