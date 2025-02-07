@@ -61,8 +61,8 @@ func fetchPosts(lastId int, categories []string, forumDB *sql.DB) (posts []modul
 	for rows.Next() {
 		var internalPostId, internalUserId int
 		var post modules.Post
-		err = rows.Scan(&post.ID, &internalPostId, &internalUserId,
-			&post.Title, &post.Text, &post.CreationTime)
+		err = rows.Scan(&post.Id, &internalPostId, &internalUserId,
+			&post.Content.Title, &post.Content.Text, &post.CreationTime)
 
 		if err != nil {
 			log.Error(err)
@@ -74,7 +74,7 @@ func fetchPosts(lastId int, categories []string, forumDB *sql.DB) (posts []modul
 			log.Error(err)
 			return
 		}
-		post.Categories, err = GetPostCategories(internalPostId, forumDB)
+		post.Content.Categories, err = GetPostCategories(internalPostId, forumDB)
 		if err != nil {
 			log.Error(err)
 			return
