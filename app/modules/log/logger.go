@@ -55,8 +55,7 @@ func Log(logLevel string, isMulti bool, msg ...any) {
 		_, file, line, _ := runtime.Caller(2)
 		source = fmt.Sprintf("source %v:%v\n", file, line)
 	}
-
-	_, err := fmt.Fprintf(logger, "%v [%v] %v\n%v", time.Now().Format(time.RFC3339), logLevel, fmt.Sprint(msg...), source)
+	_, err := fmt.Fprintf(logger, "%v [%v] %v\n%v", time.Now().Format(time.RFC3339), logLevel, msg, source)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "error logging error:", err)
 		return
