@@ -18,13 +18,13 @@ type Connection struct {
 func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
 	cookie, err := conn.Req.Cookie("token")
 	if err != nil || cookie.Value == "" {
-		conn.Error(errors.HttpInternalServerError)
+		conn.Error(errors.HttpUnauthorized)
 		return false
 	}
 
-	err = forumDB.QueryRow("SELECT internal_id FROM users WHERE token=?", cookie).Scan(&conn.InternalUserId)
+	err = forumDB.QueryRow("SELECT internal_id FROM users WHERE token=?", cookie.Value).Scan(&conn.InternalUserId)
 	if err != nil {
-		conn.Error(errors.HttpInternalServerError)
+		conn.Error(errors.HttpUnauthorized)
 		return false
 	}
 
