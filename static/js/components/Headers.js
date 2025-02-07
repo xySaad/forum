@@ -1,24 +1,11 @@
 import div from "./native/div.js";
 import img from "./native/img.js";
 import Auth from "./Auth.js";
-import Post from "./Post.js";
 async function getPosts(type) {
-  console.log(type);
   let icns = document.querySelectorAll("svg")
   icns.forEach((icn) => icn.classList.remove("active"))
   let clicked = document.querySelector(type)
   clicked.classList.add("active")
-  /* document.body.innerHTML =""
-  let n = document.createElement("div")
-
-    const resp = await fetch(`/api/posts`);
-    if (!resp.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const json = await resp.json();
-    json.forEach(post => {
-      n.append(Post(post))
-    }) */
 }
 function toggleIt() {
   let ul = document.querySelector(".icons")
@@ -41,7 +28,23 @@ async function  Logout() {
     appendGuestHeader()
   }
 }
-export function appendUserHeader() {
+async function  fetchProfile() {
+  try {
+    const response = await fetch("/api/profile", { method: "GET" });
+    if (!response.ok) {
+      throw new Error("Failed to fetch: " + response.statusText);
+    }
+
+    const data = await response.json();
+    return data
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+  }
+}
+export async  function appendUserHeader() {
+  let userD = await fetchProfile()
+  console.log(userD.username);
+  
   let head = document.querySelector("header")
   head.innerHTML = ""
   let icn1 = div("contain")
@@ -49,9 +52,9 @@ export function appendUserHeader() {
   let icn3 = div("contain")
   let logout = div("logoutBtn")
   let h2 = document.createElement("h2")
-  h2.innerText = "chakir Ben"
+  h2.innerText = userD.username
   let h4 = document.createElement("h4")
-  h4.innerText = "chakir.benlafkih@gmail.com"
+  h4.innerText = userD.email
   logout.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" clip-rule="evenodd" d="M22.4206 11.5898L19.4926 8.67383C19.1986 8.38183 18.7246 8.38183 18.4326 8.67583C18.1406 8.96983 18.1416 9.44383 18.4346 9.73583L20.0746 11.3698H17.1396C17.1496 11.8698 17.1496 12.3698 17.1396 12.8698H20.0766L18.4346 14.5058C18.1416 14.7978 18.1406 15.2728 18.4326 15.5668C18.5786 15.7138 18.7716 15.7868 18.9636 15.7868C19.1546 15.7868 19.3466 15.7138 19.4926 15.5688L22.4206 12.6518C22.5626 12.5118 22.6416 12.3198 22.6416 12.1208C22.6416 11.9218 22.5626 11.7308 22.4206 11.5898Z" fill="#FD5F49"/>
           <path fill-rule="evenodd" clip-rule="evenodd" d="M8.88938 12.12C8.88938 11.71 9.21938 11.37 9.63938 11.37L17.1397 11.3698C17.1297 10.1098 17.0594 8.85 16.9594 7.59V7.58C16.5894 3.55 14.7594 2.25 9.45937 2.25C1.85938 2.25 1.85938 5.1 1.85938 12C1.85938 18.9 1.85938 21.75 9.45937 21.75C14.7594 21.75 16.5894 20.45 16.9594 16.41C17.0594 15.24 17.1197 14.0598 17.1397 12.8698L9.63938 12.87C9.21938 12.87 8.88938 12.54 8.88938 12.12Z" fill="#FD5F49"/>

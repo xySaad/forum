@@ -61,7 +61,8 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 			return
 		}
 		useractivities.GetUSerPosts(conn, forumDB)
-	case "profile":
+	case "profile" : 
+		auth.GetUserData(conn, forumDB)
 	default:
 		conn.Error(errors.HttpNotFound)
 	}

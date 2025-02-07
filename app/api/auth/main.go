@@ -52,7 +52,6 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 			conn.Error(errors.HttpUnauthorized)
 			return
 		}
-
 	default:
 		conn.Error(errors.HttpNotFound)
 		return
