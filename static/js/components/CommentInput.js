@@ -2,7 +2,7 @@ import { importSvg } from "../utils/index.js";
 import div from "./native/div.js";
 import img from "./native/img.js";
 
-export const CommentInput = (postID) => {
+export const CommentInput = (postId) => {
   const input = document.createElement("input");
   input.placeholder = "Write a comment...";
   const sendComment = async () => {
@@ -10,13 +10,13 @@ export const CommentInput = (postID) => {
       return;
     }
     const body = {
-      post_id: postID,
       content: input.value,
     };
-    const resp = await fetch("/api/coments", {
+    const resp = await fetch(`/api/posts/${postId}/comments/`, {
       method: "post",
       body: JSON.stringify(body),
     });
+
     if (resp.ok) {
       input.value = "";
     }

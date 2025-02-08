@@ -9,10 +9,10 @@ import (
 )
 
 type Connection struct {
-	Resp           http.ResponseWriter
-	Req            *http.Request
-	Path           []string
-	InternalUserId int
+	Resp   http.ResponseWriter
+	Req    *http.Request
+	Path   []string
+	UserId int
 }
 
 func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
@@ -22,7 +22,7 @@ func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
 		return false
 	}
 
-	err = forumDB.QueryRow("SELECT internal_id FROM users WHERE token=?", cookie.Value).Scan(&conn.InternalUserId)
+	err = forumDB.QueryRow("SELECT id FROM users WHERE token=?", cookie.Value).Scan(&conn.UserId)
 	if err != nil {
 		conn.Error(errors.HttpUnauthorized)
 		return false

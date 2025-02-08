@@ -1,0 +1,52 @@
+package comments
+
+import (
+	"database/sql"
+	"net/http"
+
+	"forum/app/modules"
+	"forum/app/modules/errors"
+	"forum/app/modules/log"
+)
+
+func GetPostComments(conn *modules.Connection, forumDB *sql.DB) {
+	queries := conn.Req.URL.Query()
+	postId := conn.Path[2]
+	lastId := queries.Get("lastId")
+	params := []any{postId}
+	query := "SELECT id,post_id,user_id,content,created_at FROM comments WHERE post_id = ? "
+	if lastId != "" {
+		params = append(params, lastId)
+		query += "AND created_at > (SELECT created_at from comments where id = ?)"
+	}
+
+	query += "ORDER BY created_at LIMIT 10;"
+	rows, err := forumDB.Query(query, params...)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			conn.Error(errors.HttpNotFound)
+			return
+		}
+		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
+		return
+	}
+	defer rows.Close()
+	var comments []modules.Comment
+
+	for rows.Next() {
+		var comment modules.Comment
+		err = rows.Scan(&comment.Id, &comment.PostId, &comment.Publisher.Id, &comment.Content, &comment.CreationTime)
+		if err != nil {
+			conn.Error(errors.HttpInternalServerError)
+			return
+		}
+		err := comment.Publisher.GetPublicUser(forumDB)
+		if err != nil {
+			conn.Error(errors.HttpInternalServerError)
+			return
+		}
+		comments = append(comments, comment)
+	}
+	log.Debug(query, params)
+	conn.Respond(comments)
+}

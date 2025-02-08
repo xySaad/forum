@@ -1,7 +1,7 @@
 import { onResize } from "./utils/events.js";
 import { Reaction } from "./reactions.js";
 import { filterCat } from "./filter.js";
-import { InfinitePosts } from "./components/NewPost.js";
+import { InfinitePosts } from "./components/InfinitePosts.js";
 import div from "./components/native/div.js";
 import { PostCreationBar } from "./components/createPost.js";
 

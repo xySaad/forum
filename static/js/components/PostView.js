@@ -19,7 +19,7 @@ const PostView = (postData) => {
   return postView.add(
     div("postCard").add(
       Post(postData),
-      commentsWrap.add(CommentsList(postData.ID), CommentInput(postData.ID))
+      commentsWrap.add(CommentsList(postData.id), CommentInput(postData.id))
     )
   );
 };
