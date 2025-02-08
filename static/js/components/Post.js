@@ -4,6 +4,7 @@ import { timePassed } from "../utils/time.js";
 import Frame from "./Frame.js";
 import { importSvg } from "../utils/index.js";
 import { go } from "../router.js";
+import { Fetch } from "../utils/fetch.js";
 
 export const Post = (postData) => {
   const postImg = img(postData.image);
@@ -33,7 +34,16 @@ export const PostCard = (postData) => {
   comment.onclick = showPost;
 
   const like = img(importSvg("like"));
+  like.onclick = () => {
+    Fetch(`/api/reactions/posts/${postData.id}/like`, {
+      method: "post",
+    });
+  };
+
   const dislike = img(importSvg("dislike"));
+  dislike.onclick = async () => {
+    Fetch(`/api/reactions/posts/${postData.id}/dislike`, { method: "post" });
+  };
 
   return div("postContainer").add(
     Frame(Post(postData).add(readMore)),

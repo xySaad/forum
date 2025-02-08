@@ -2,79 +2,81 @@ package posts
 
 import (
 	"database/sql"
-	"strconv"
+	"fmt"
+	"strings"
 
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
 )
 
-func GetPosts(conn *modules.Connection, forumDB *sql.DB) {
-	queries := conn.Req.URL.Query()
-	categories := queries["categories"]
-	lastIdQuery := queries["lastId"]
-	lastId := 0
-	if lastIdQuery != nil {
-		n, err := strconv.Atoi(lastIdQuery[0])
-		if err != nil {
-			conn.Error(errors.BadRequestError("invalid lastId"))
-			return
+func GenerateGetPostSqlQuery(categories []string, lastId string) (sqlQuery string, params []any) {
+	sqlQuery = "SELECT p.id,user_id,title,content,created_at FROM posts p "
+	if categories != nil {
+		var placeholders []string
+		for _, category := range categories {
+			if category != "" {
+				params = append(params, category)
+				placeholders = append(placeholders, "?")
+			}
 		}
-		lastId = n
+		if placeholders != nil {
+			sqlQuery += "JOIN post_categories pc ON p.id=pc.post_id JOIN categories c ON c.id=pc.category_id WHERE c.name in"
+			sqlQuery += fmt.Sprintf(" (%v) ", strings.Join(placeholders, ","))
+		}
 	}
-	posts := []modules.Post{}
 
-	posts, httpErr := fetchPosts(lastId, categories, forumDB)
-	if httpErr == nil {
-		conn.Respond(posts)
-	} else {
-		conn.Error(httpErr)
+	if lastId != "" {
+		params = append(params, lastId)
+		if categories != nil {
+			sqlQuery += "AND "
+		} else {
+			sqlQuery += "WHERE "
+		}
+		sqlQuery += "p.created_at > (SELECT created_at FROM posts WHERE id = ?) "
 	}
+
+	sqlQuery += "ORDER BY p.created_at DESC LIMIT 10;"
+	return
 }
 
-func fetchPosts(lastId int, categories []string, forumDB *sql.DB) (posts []modules.Post, httpErr *errors.HttpError) {
-	sqlQuery := `SELECT 
-	id,
-	internal_id,
-	user_internal_id,
-	title, 
-	content, 
-	created_at 
-	FROM posts `
+func GetPosts(conn *modules.Connection, forumDB *sql.DB) {
+	queries := conn.Req.URL.Query()
+	categories := queries["category"]
+	lastId := queries.Get("lastId")
 
-	if lastId > 0 {
-		sqlQuery += "where posts.created_at > (select created_at from posts where id = ?) "
-	}
-
-	sqlQuery += "ORDER BY posts.created_at DESC LIMIT 10;"
-
-	if categories != nil {
-
-	}
-
-	rows, err := forumDB.Query(sqlQuery, lastId)
+	sqlQuery, params := GenerateGetPostSqlQuery(categories, lastId)
+	posts, err := fetchPosts(sqlQuery, params, conn.UserId, forumDB)
 	if err != nil {
-		log.Error(sqlQuery, err)
-		return nil, errors.HttpInternalServerError
+		conn.Error(errors.HttpInternalServerError)
+		return
+	}
+
+	conn.Respond(posts)
+}
+
+func fetchPosts(sqlQuery string, params []any, user_id int, forumDB *sql.DB) (posts []modules.Post, err error) {
+	rows, err := forumDB.Query(sqlQuery, params...)
+	if err != nil {
+		log.Error(sqlQuery, params, err)
+		return
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var internalPostId, internalUserId int
 		var post modules.Post
-		err = rows.Scan(&post.Id, &internalPostId, &internalUserId,
+		err = rows.Scan(&post.Id, &post.Publisher.Id,
 			&post.Content.Title, &post.Content.Text, &post.CreationTime)
-
 		if err != nil {
 			log.Error(err)
 			return
 		}
-
-		post.Publisher, err = GetPublicUser(internalUserId, forumDB)
-		if err != nil {
-			log.Error(err)
-			return
-		}
-		post.Content.Categories, err = GetPostCategories(internalPostId, forumDB)
+		// post.Likes, post.Dislikes, post.Reaction = handlers.GetReactions(post.Id, 1, user_id, forumDB)
+		// err = post.Publisher.GetPublicUser(forumDB)
+		// if err != nil {
+		// 	log.Error(err)
+		// 	return
+		// }
+		post.Content.Categories, err = GetPostCategories(post.Id, forumDB)
 		if err != nil {
 			log.Error(err)
 			return
@@ -85,39 +87,32 @@ func fetchPosts(lastId int, categories []string, forumDB *sql.DB) (posts []modul
 	err = rows.Err()
 	if err != nil {
 		log.Error(err)
-		return posts, errors.HttpInternalServerError
+		return
 	}
-	return posts, nil
+	return
 }
-func GetPostCategories(postInternalID int, forumDB *sql.DB) (categories []string, err error) {
+
+func GetPostCategories(postId int, forumDB *sql.DB) (categories []string, err error) {
+	categories = make([]string, 4)
 	sqlQuery := `
         SELECT categories.name 
         FROM post_categories 
         INNER JOIN categories ON post_categories.category_id = categories.id
-        WHERE post_categories.post_internal_id = ?
+        WHERE post_categories.post_id = ?
     `
 
-	rows, err := forumDB.Query(sqlQuery, postInternalID)
+	rows, err := forumDB.Query(sqlQuery, postId)
 	if err != nil {
 		return
 	}
 	defer rows.Close()
 
-	for i := 0; rows.Next(); i++ {
-		if i == len(categories) {
-			categories = append(categories, "")
-		}
+	for i := 0; rows.Next() && i < len(categories); i++ {
 		err = rows.Scan(&categories[i])
 		if err != nil {
 			return
 		}
 	}
 	err = rows.Err()
-	return
-}
-
-func GetPublicUser(internalUserID int, db *sql.DB) (user modules.User, err error) {
-	qreury := `SELECT id, username,profile_picture FROM users WHERE internal_id=?`
-	err = db.QueryRow(qreury, internalUserID).Scan(&user.Id, &user.Username, &user.ProfilePicture)
 	return
 }

@@ -1,4 +1,3 @@
-import { NewReference } from "../utils/reference.js";
 import { PostCard } from "./Post.js";
 import div from "./native/div.js";
 

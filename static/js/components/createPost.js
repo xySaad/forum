@@ -86,7 +86,7 @@ export const CreatePost = () => {
       method: "POST",
       body: JSON.stringify({
         title: titleInput.value,
-        content: textInput.value,
+        text: textInput.value,
       }),
     });
   };

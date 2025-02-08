@@ -21,14 +21,13 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(errors.HttpInternalServerError)
 		return
 	}
-
 	httpErr := postContent.ValidatePostContent()
 	if httpErr != nil {
 		conn.Error(httpErr)
 		return
 	}
 
-	postID, err := CreatePost(&postContent, conn.InternalUserId, forumDB)
+	postID, err := CreatePost(&postContent, conn.UserId, forumDB)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Error(err)
@@ -44,7 +43,7 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 func CreatePost(content *modules.PostContent, userID int, forumDB *sql.DB) (int64, error) {
 	postID := snowflake.Default.Generate()
 
-	sqlQuery := "INSERT INTO posts (id, title, content, user_internal_id) VALUES (?, ?, ?, ?)"
+	sqlQuery := "INSERT INTO posts (id, title, content, user_id) VALUES (?, ?, ?, ?)"
 	result, err := forumDB.Exec(sqlQuery, postID, content.Title, content.Text, userID)
 	if err != nil {
 		return 0, err
