@@ -10,7 +10,7 @@ import (
 	"forum/app/modules/log"
 )
 
-func GetComents(conn *modules.Connection, forumDB *sql.DB) {
+func GetComments(conn *modules.Connection, forumDB *sql.DB) {
 	URL := conn.Req.URL
 	post_id := URL.Query().Get("p_id")
 	Offset := URL.Query().Get("offset")
