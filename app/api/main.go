@@ -33,14 +33,14 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		default:
 			conn.Error(errors.HttpInternalServerError)
 		}
-	case "coments":
+	case "comments":
 		switch req.Method {
 		case http.MethodGet:
-			comments.GetComents(conn, forumDB)
+			comments.GetComments(conn, forumDB)
 		case http.MethodPost:
 			comments.AddComment(conn, forumDB)
 		case http.MethodPatch:
-			comments.UpdateComent(conn, forumDB)
+			comments.UpdateComment(conn, forumDB)
 		default:
 			conn.Error(errors.HttpMethodNotAllowed)
 		}

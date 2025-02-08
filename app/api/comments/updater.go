@@ -9,7 +9,7 @@ import (
 	"forum/app/modules/errors"
 )
 
-func UpdateComent(conn *modules.Connection, forumdb *sql.DB) {
+func UpdateComment(conn *modules.Connection, forumdb *sql.DB) {
 	var newcomment Comment
 	err := json.NewDecoder(conn.Req.Body).Decode(&newcomment)
 	if err != nil {
