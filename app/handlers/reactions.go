@@ -2,23 +2,10 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
 
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
 )
-
-type Reaction struct {
-	UserID       string `json:"user_id"`
-	ReactionType string `json:"reaction_type"`
-	Timestamp    string `json:"timestamp"`
-}
-
-type ReactionCounter struct {
-	Item_id      string
-	ReactionType string `json:"reaction_type"`
-	Count        int
-}
 
 func GetUserIDByToken(token string, forumDB *sql.DB) (userID int, httpErr *errors.HttpError) {
 	err := forumDB.QueryRow("SELECT internal_id FROM users WHERE token = ?", token).Scan(&userID)
@@ -33,31 +20,35 @@ func GetUserIDByToken(token string, forumDB *sql.DB) (userID int, httpErr *error
 }
 
 // getReactions fetches reactions for either a post or a comment based on itemID
-func GetReactions(itemID string, forumDB *sql.DB) ([]ReactionCounter, error) {
-	if itemID == "" {
-		return nil, fmt.Errorf("itemID must be provided")
-	}
-	// Query reactions for both posts and comments using the same itemID
-	rows, err := forumDB.Query(`
-		SELECT item_id, reaction_type, count 
-		FROM reactionCount 
-		WHERE item_id = ?`, itemID)
+func GetReactions(itemID int, item_type int, user_id string, forumDB *sql.DB) (likes, dislikes, reaction int) {
+	query := `SELECT user_internal_id ,reaction_type FROM item_reactions WHERE item_internal_id =? AND item_type = ?`
+	rows, err := forumDB.Query(query, itemID, item_type)
 	if err != nil {
-		return nil, fmt.Errorf("could not fetch reactions: %w", err)
-	}
-	defer rows.Close()
-
-	// prepare a slice to store the results
-	var reactions []ReactionCounter
-	for rows.Next() {
-		var reaction ReactionCounter
-		if err := rows.Scan(&reaction.Item_id, &reaction.ReactionType, &reaction.Count); err != nil {
-			return nil, fmt.Errorf("could not scan row: %w", err)
+		if err != sql.ErrNoRows {
+			log.Warn(err)
 		}
-		reactions = append(reactions, reaction)
+		return
 	}
-
-	return reactions, nil
+	for rows.Next() {
+		cReaction := 0
+		userdID := ""
+		if err := rows.Scan(userdID, cReaction); err != nil {
+			log.Warn(err)
+			return
+		}
+		if userdID == user_id {
+			reaction = cReaction
+		}
+		switch cReaction {
+		case 1:
+			likes++
+		case 2:
+			dislikes++
+		default:
+			log.Warn("unexpected reaction")
+		}
+	}
+	return
 }
 
 func AddOrUpdateReaction(userID, item_type int, itemID string, reactionID int, forumDB *sql.DB) error {
