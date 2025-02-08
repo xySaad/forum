@@ -19,12 +19,6 @@ func HandleReactions(conn *modules.Connection, forumDB *sql.DB) {
 		AddReaction(conn, forumDB)
 	case http.MethodDelete:
 		RemoveReaction(conn, forumDB)
-	case http.MethodGet:
-		if len(conn.Path) < 3 {
-			conn.NewError(http.StatusBadRequest, errors.CodeInvalidOrMissingData, "Post ID required", "No Post ID provided")
-			return
-		}
-		GetReaction(conn, forumDB)
 	default:
 		conn.NewError(http.StatusMethodNotAllowed, errors.CodeMethodNotAllowed, "Method Not Allowed", "Only Post/Get/Delete are Allowed")
 	}
