@@ -16,19 +16,19 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	switch conn.Path[2] {
 	case "register":
 		if req.Method != http.MethodPost {
-			conn.Error(errors.HttpMethodNotAllowed)
+			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		Register(conn, forumDB)
 	case "login":
 		if req.Method != http.MethodPost {
-			conn.Error(errors.HttpMethodNotAllowed)
+			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		LogIn(conn, forumDB)
 	case "logout":
 		if req.Method != http.MethodPost {
-			conn.Error(errors.HttpMethodNotAllowed)
+			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			return
 		}
 		cookie := http.Cookie{
@@ -42,16 +42,11 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 		http.Redirect(resp, req, "/", http.StatusSeeOther)
 
 	case "session":
-		cookie, err := req.Cookie("token")
-		if err != nil || cookie.Value == "" {
-			conn.Error(errors.HttpUnauthorized)
-			return
+		if conn.IsAuthenticated(forumDB) {
+			conn.Resp.Write([]byte{'o', 'k'})
 		}
+		return
 
-		if CheckAuth(cookie.Value, forumDB) != nil {
-			conn.Error(errors.HttpUnauthorized)
-			return
-		}
 	default:
 		conn.Error(errors.HttpNotFound)
 		return

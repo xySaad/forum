@@ -2,12 +2,8 @@ package posts
 
 import (
 	"database/sql"
-	"net/http"
-	"net/url"
 	"strconv"
-	"strings"
 
-	reactions "forum/app/api/reaction"
 	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
@@ -15,206 +11,133 @@ import (
 )
 
 func GetPosts(conn *modules.Connection, forumDB *sql.DB) {
-	qeuries := conn.Req.URL.Query()
+	queries := conn.Req.URL.Query()
+	categories := queries["categories"]
+	lastIdQuery := queries["lastId"]
+	lastId := 0
+	if lastIdQuery != nil {
+		n, err := strconv.Atoi(lastIdQuery[0])
+		if err != nil {
+			conn.Error(errors.BadRequestError("invalid lastId"))
+			return
+		}
+		lastId = n
+	}
 	posts := []modules.Post{}
-	categories, from, page, err := ValidQueries(qeuries)
-	if err != nil {
-		conn.Error(err)
-		return
+	user_id := ""
+	cookie, err := conn.Req.Cookie("token")
+	if err == nil && cookie.Value != "" {
+		forumDB.QueryRow(`SELECT user_internal_id FROM users WHERE token =?`, cookie.Value).Scan(&user_id)
 	}
-	uuid := ""
-	cookie, Err := conn.Req.Cookie("token")
-	if Err == nil && cookie.Value != "" {
-		uuid, _ = handlers.GetUserIDByToken(cookie.Value, forumDB)
-	}
-	if categories == "" {
-		posts, err = fetchPosts(uuid, page, from, forumDB)
-	} else {
-		posts, err = fetchPostsByCategories(uuid, strings.Split(categories, ","), from, page, forumDB)
-	}
-	if err == nil {
+	posts, httpErr := fetchPosts(lastId, user_id, categories, forumDB)
+	if httpErr == nil {
 		conn.Respond(posts)
 	} else {
-		conn.Error(err)
+		conn.Error(httpErr)
 	}
 }
 
-func ValidQueries(queries url.Values) (categories, from string, page int, err *errors.HttpError) {
-	if _, exits := queries["categories"]; !exits {
-		categories = ""
-	} else {
-		categories = queries["categories"][0]
-	}
-	if _, exits := queries["from"]; !exits {
-		err = &errors.HttpError{
-			Status:  http.StatusBadRequest,
-			Message: "bad request",
-			Code:    http.StatusBadRequest,
-			Details: "mising from",
-		}
-		return
+func fetchPosts(lastId int, user_id string, categories []string, forumDB *sql.DB) (posts []modules.Post, httpErr *errors.HttpError) {
+	sqlQuery := `SELECT DISTINCT
+	id,
+	internal_id,
+	user_internal_id,
+	title, 
+	content, 
+	created_at 
+	FROM posts `
+
+	if lastId > 0 {
+		sqlQuery += "WHERE posts.created_at > (SELECT created_at FROM posts WHERE id = ?) "
 	}
 
-	if _, exits := queries["page"]; !exits {
-		err = &errors.HttpError{
-			Status:  http.StatusBadRequest,
-			Message: "bad request",
-			Code:    http.StatusBadRequest,
-			Details: "mising page",
+	if categories != nil {
+		if lastId > 0 {
+			sqlQuery += " AND "
+		} else {
+			sqlQuery += " WHERE "
 		}
-		return
-	}
-	from = queries["from"][0]
-	page, Err := strconv.Atoi(queries["page"][0])
-	if Err != nil || page < 0 {
-		err = &errors.HttpError{
-			Status:  http.StatusBadRequest,
-			Message: "bad request",
-			Code:    http.StatusBadRequest,
-			Details: "page should be a positive number",
-		}
-		return
-	}
-	if nFrom, Err := strconv.Atoi(from); Err != nil || nFrom <= 0 {
-		if Err != nil || nFrom < 0 {
-			err = &errors.HttpError{
-				Status:  http.StatusBadRequest,
-				Message: "bad request",
-				Code:    http.StatusBadRequest,
-				Details: "from should be a positive number",
+
+		sqlQuery += `
+		INNER JOIN post_categories ON post_categories.post_id =posts.post_internal_id
+		INNER JOIN categories ON categories.id = post_categories.category_id
+		categories.name in(`
+		for i := range categories {
+			sqlQuery += "?"
+			if i != len(categories)-1 {
+				sqlQuery += ", "
 			}
-			return "", "", 0, err
 		}
-		from = ""
+		sqlQuery += ") "
 	}
+	sqlQuery += "ORDER BY posts.created_at DESC LIMIT 10;"
+
+	rows, err := forumDB.Query(sqlQuery, lastId)
+	if err != nil {
+		log.Error(sqlQuery, err)
+		return nil, errors.HttpInternalServerError
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var internalPostId, internalUserId int
+		var post modules.Post
+		err = rows.Scan(&post.Id, &internalPostId, &internalUserId,
+			&post.Content.Title, &post.Content.Text, &post.CreationTime)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		post.Likes, post.Dislikes, post.Reaction = handlers.GetReactions(internalPostId, 1, user_id, forumDB)
+		post.Publisher, err = GetPublicUser(internalUserId, forumDB)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		post.Content.Categories, err = GetPostCategories(internalPostId, forumDB)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		posts = append(posts, post)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		log.Error(err)
+		return posts, errors.HttpInternalServerError
+	}
+	return posts, nil
+}
+
+func GetPostCategories(postInternalID int, forumDB *sql.DB) (categories []string, err error) {
+	sqlQuery := `
+        SELECT categories.name 
+        FROM post_categories 
+        INNER JOIN categories ON post_categories.category_id = categories.id
+        WHERE post_categories.post_internal_id = ?
+    `
+
+	rows, err := forumDB.Query(sqlQuery, postInternalID)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for i := 0; rows.Next(); i++ {
+		if i == len(categories) {
+			categories = append(categories, "")
+		}
+		err = rows.Scan(&categories[i])
+		if err != nil {
+			return
+		}
+	}
+	err = rows.Err()
 	return
 }
 
-func fetchPostsByCategories(uuid string, categories []string, from string, page int, db *sql.DB) ([]modules.Post, *errors.HttpError) {
-	posts := []modules.Post{}
-	const limit = 10
-	params := make([]interface{}, len(categories))
-	placeholders := []string{}
-	for i, category := range categories {
-		params[i] = category
-		placeholders = append(placeholders, "?")
-	}
-	query := `SELECT DISTINCT posts.user_id, posts.id, posts.title, posts.content, posts.created_at
-	FROM posts
-	INNER JOIN post_categories ON post_categories.post_id = posts.id
-	INNER JOIN categories ON post_categories.category_id = categories.id
-	WHERE categories.name IN (` + strings.Join(placeholders, ", ") + ` )`
-	if from != "" {
-		query += ` AND posts.id <= ` + from
-	}
-	query += `
-ORDER BY posts.created_at DESC LIMIT ? OFFSET ?`
-	params = append(params, limit, page*limit)
-	rows, err := db.Query(query, params...)
-	herr := &errors.HttpError{}
-	if err != nil {
-		if err != sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, errors.HttpInternalServerError
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var post modules.Post
-		if err := rows.Scan(&post.Publisher.Id, &post.ID, &post.Title, &post.Text, &post.CreationTime); err != nil {
-			return nil, errors.HttpInternalServerError
-		}
-
-		post.Dislikes, post.Likes, post.Reaction = reactions.GetReactions("post-"+post.ID, uuid, db)
-
-		err := GetPublicUser(&post.Publisher, db)
-		if err != nil {
-			log.Warn(err)
-		}
-		herr = GetPostCategories(&post.Categories, post.ID, db)
-		if herr != nil {
-			log.Warn(herr.Message)
-		}
-		posts = append(posts, post)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, errors.HttpInternalServerError
-	}
-	return posts, nil
-}
-
-func fetchPosts(uuid string, page int, from string, forumDB *sql.DB) (posts []modules.Post, herr *errors.HttpError) {
-	const limit = 10
-	offset := (page - 1) * limit
-	query := `SELECT  user_id, id, title, content, created_at FROM posts`
-	if from != "" {
-		query += ` WHERE id <= ` + from
-	}
-	query += ` ORDER BY created_at DESC  LIMIT ? OFFSET ?`
-	rows, err := forumDB.Query(query, limit, offset)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
-		return nil, errors.HttpInternalServerError
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var post modules.Post
-		if err := rows.Scan(&post.Publisher.Id, &post.ID, &post.Title, &post.Text, &post.CreationTime); err != nil {
-			return nil, errors.HttpInternalServerError
-		}
-		post.Dislikes, post.Likes, post.Reaction = reactions.GetReactions("post-"+post.ID, uuid, forumDB)
-		err := GetPublicUser(&post.Publisher, forumDB)
-		if err != nil {
-			log.Warn(err)
-		}
-		herr = GetPostCategories(&post.Categories, post.ID, forumDB)
-		if err != nil {
-			log.Warn(err)
-		}
-		posts = append(posts, post)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, errors.HttpInternalServerError
-	}
-	return posts, nil
-}
-
-func GetPostCategories(categories *[]string, postID string, db *sql.DB) *errors.HttpError {
-	query := `SELECT category_id FROM post_categories where post_id =`
-	// use QueryRow() for single Row Resullts
-	res, err := db.Query(query, postID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil
-		}
-		return errors.HttpInternalServerError
-	}
-	defer res.Close()
-	for res.Next() {
-		id := ""
-		err = res.Scan(id)
-		if err != nil {
-			log.Warn(err)
-		}
-		category := ""
-		err = db.QueryRow(`SELECT name FROM categories WHERE id = ?`, id).Scan(&category)
-		if err != nil {
-			log.Warn(err)
-		} else {
-			*categories = append(*categories, category)
-		}
-	}
-	if err := res.Err(); err != nil {
-		return errors.HttpInternalServerError
-	}
-	return nil
-}
-
-func GetPublicUser(user *modules.User, db *sql.DB) error {
-	qreury := `SELECT username,profile FROM users WHERE id=?`
-	return db.QueryRow(qreury, user.Id).Scan(&user.Username, &user.ProfilePicture)
+func GetPublicUser(internalUserID int, db *sql.DB) (user modules.User, err error) {
+	qreury := `SELECT id, username,profile_picture FROM users WHERE internal_id=?`
+	err = db.QueryRow(qreury, internalUserID).Scan(&user.Id, &user.Username, &user.ProfilePicture)
+	return
 }

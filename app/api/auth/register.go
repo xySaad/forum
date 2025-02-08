@@ -6,13 +6,14 @@ import (
 
 	"forum/app/modules"
 	"forum/app/modules/errors"
+	"forum/app/modules/log"
 )
 
 func Register(conn *modules.Connection, forumDB *sql.DB) {
 	var potentialuser modules.AuthCredentials
 	err := json.NewDecoder(conn.Req.Body).Decode(&potentialuser)
 	if err != nil {
-		conn.NewError(500, errors.CodeParsingError, "Internal Server Error", "Request is not valid JSON")
+		conn.Error(errors.BadRequestError("Request is not valid JSON"))
 		return
 	}
 
@@ -22,9 +23,10 @@ func Register(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	httpErr = potentialuser.CreateUser(forumDB, conn.Resp)
+	err = potentialuser.CreateUser(forumDB, conn.Resp)
 	if err != nil {
-		conn.Error(httpErr)
+		log.Error(err)
+		conn.Error(errors.HttpInternalServerError)
 		return
 	}
 

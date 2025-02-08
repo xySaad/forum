@@ -8,7 +8,7 @@ import (
 	"forum/app/api/auth"
 	"forum/app/api/comments"
 	"forum/app/api/posts"
-	reactions "forum/app/api/reaction"
+	"forum/app/api/reactions"
 	useractivities "forum/app/api/userActivities"
 	"forum/app/modules"
 	"forum/app/modules/errors"
@@ -25,40 +25,29 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 	case "auth":
 		auth.Entry(conn, forumDB)
 	case "posts":
-		if req.Method == http.MethodGet {
+		switch req.Method {
+		case http.MethodGet:
 			posts.GetPosts(conn, forumDB)
-			return
-		}
-		if req.Method == http.MethodPost {
+		case http.MethodPost:
 			posts.AddPost(conn, forumDB)
-		} else {
-			conn.Error(errors.HttpMethodNotAllowed)
+		default:
+			conn.Error(errors.HttpInternalServerError)
 		}
 	case "coments":
-		if req.Method == http.MethodPost {
+		switch req.Method {
+		case http.MethodGet:
+			comments.GetComments(conn, forumDB)
+		case http.MethodPost:
 			comments.AddComment(conn, forumDB)
-		} else if req.Method == http.MethodGet {
-			comments.GetComents(conn, forumDB)
-		} else{
+		case http.MethodPatch:
+			comments.UpdateComent(conn, forumDB)
+		default:
 			conn.Error(errors.HttpMethodNotAllowed)
-			return
 		}
 	case "reactions":
 		reactions.HandleReactions(conn, forumDB)
-	case "like":
-		if req.Method != http.MethodGet {
-			conn.Error(errors.HttpMethodNotAllowed)
-			return
-		}
-		useractivities.GetUSerLiked(conn, forumDB)
-	case "post":
-		if req.Method != http.MethodGet {
-			conn.Error(errors.HttpMethodNotAllowed)
-			return
-		}
-		useractivities.GetUSerPosts(conn, forumDB)
-	case "profile" : 
-		auth.GetUserData(conn, forumDB)
+	case "activities":
+		useractivities.GetUSer(conn, forumDB)
 	default:
 		conn.Error(errors.HttpNotFound)
 	}

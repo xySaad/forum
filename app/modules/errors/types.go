@@ -2,21 +2,11 @@ package errors
 
 import "net/http"
 
-type HttpError struct 
-{
+type HttpError struct {
 	Status  int    `json:"status"`
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 	Details string `json:"details,omitempty"`
-}
-
-func NewError(status, code int, msg, details string) *HttpError {
-	return &HttpError{
-		Status:  status,
-		Code:    code,
-		Message: msg,
-		Details: details,
-	}
 }
 
 var HttpNotFound = &HttpError{

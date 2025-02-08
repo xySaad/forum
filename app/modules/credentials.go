@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"forum/app/modules/errors"
+	"forum/app/modules/snowflake"
 
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -36,7 +37,7 @@ type AuthCredentials struct {
 	Password string
 }
 
-func (User *AuthCredentials) CheckAccount(db *sql.DB) *errors.HttpError {
+func (User *AuthCredentials) VerifyPassword(db *sql.DB) *errors.HttpError {
 	hashedPassWord := ""
 
 	err := db.QueryRow("SELECT password FROM users WHERE username=? ", User.Username).Scan(&hashedPassWord)
@@ -52,22 +53,20 @@ func (User *AuthCredentials) CheckAccount(db *sql.DB) *errors.HttpError {
 	return nil
 }
 
-func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) *errors.HttpError {
+func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) error {
 	hashedPassWord, err := bcrypt.GenerateFromPassword([]byte(User.Password), 12)
 	if err != nil {
-		return errors.NewError(500, 500, "internal server error", "")
+		return err
 	}
-	token, err := uuid.NewV7()
+	token, err := uuid.NewV4()
 	if err != nil {
-		return errors.NewError(500, 500, "internal server error", "")
+		return err
 	}
-	id, err := uuid.NewV6()
+	id := snowflake.Default.Generate()
+
+	_, err = db.Exec("INSERT INTO users (id,username,token,password,email) VALUES (?, ? ,? ,? ,?)", id, User.Username, token, hashedPassWord, User.Email)
 	if err != nil {
-		return errors.NewError(500, 500, "internal server error", "")
-	}
-	_, err = db.Exec("INSERT INTO users (id,username,token,password,email) VALUES (?, ? ,? ,? ,?)", id.String(), User.Username, token, hashedPassWord, User.Email)
-	if err != nil {
-		//handle later
+		return err
 	}
 	cookie := http.Cookie{
 		SameSite: http.SameSiteStrictMode,

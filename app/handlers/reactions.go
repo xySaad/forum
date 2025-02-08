@@ -2,147 +2,79 @@ package handlers
 
 import (
 	"database/sql"
-	"fmt"
+
 	"forum/app/modules/errors"
-	"net/http"
+	"forum/app/modules/log"
 )
 
-type Reaction struct {
-	UserID       string `json:"user_id"`
-	ReactionType string `json:"reaction_type"`
-	Timestamp    string `json:"timestamp"`
-}
-
-type ReactionCounter struct {
-	Item_id      string
-	ReactionType string `json:"reaction_type"`
-	Count        int
-}
-
-func GetUserIDByToken(token string, forumDB *sql.DB) (userID string, httpErr *errors.HttpError) {
-	err := forumDB.QueryRow("SELECT id FROM users WHERE token = ?", token).Scan(&userID)
+func GetUserIDByToken(token string, forumDB *sql.DB) (userID int, httpErr *errors.HttpError) {
+	err := forumDB.QueryRow("SELECT internal_id FROM users WHERE token = ?", token).Scan(&userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			httpErr = &errors.HttpError{
-				Status: http.StatusUnauthorized,
-			}
-			return
+			return 0, errors.HttpUnauthorized
 		}
-		httpErr = errors.HttpInternalServerError
-		return
+		log.Error(err)
+		return 0, errors.HttpInternalServerError
 	}
-
-	return userID, nil
+	return
 }
 
 // getReactions fetches reactions for either a post or a comment based on itemID
-func GetReactions(itemID string, forumDB *sql.DB) ([]ReactionCounter, error) {
-	if itemID == "" {
-		return nil, fmt.Errorf("itemID must be provided")
-	}
-	// Query reactions for both posts and comments using the same itemID
-	rows, err := forumDB.Query(`
-		SELECT item_id, reaction_type, count 
-		FROM reactionCount 
-		WHERE item_id = ?`, itemID)
-
+func GetReactions(itemID int, item_type int, user_id string, forumDB *sql.DB) (likes, dislikes, reaction int) {
+	query := `SELECT user_internal_id ,reaction_type FROM item_reactions WHERE item_internal_id =? AND item_type = ?`
+	rows, err := forumDB.Query(query, itemID, item_type)
 	if err != nil {
-		return nil, fmt.Errorf("could not fetch reactions: %w", err)
+		if err != sql.ErrNoRows {
+			log.Warn(err)
+		}
+		return
 	}
-	defer rows.Close()
-
-	//prepare a slice to store the results
-	var reactions []ReactionCounter
 	for rows.Next() {
-		var reaction ReactionCounter
-		if err := rows.Scan(&reaction.Item_id, &reaction.ReactionType, &reaction.Count); err != nil {
-			return nil, fmt.Errorf("could not scan row: %w", err)
+		cReaction := 0
+		userdID := ""
+		if err := rows.Scan(userdID, cReaction); err != nil {
+			log.Warn(err)
+			return
 		}
-		reactions = append(reactions, reaction)
+		if userdID == user_id {
+			reaction = cReaction
+		}
+		switch cReaction {
+		case 1:
+			likes++
+		case 2:
+			dislikes++
+		default:
+			log.Warn("unexpected reaction")
+		}
 	}
-
-	return reactions, nil
+	return
 }
 
-func AddOrUpdateReaction(itemID, userID, reactionType string, forumDB *sql.DB) error {
-
-	var existingReactionID int
-	err := forumDB.QueryRow(`
-		SELECT id FROM reactions db
-		WHERE item_id = ?
-		AND user_id = ?`, itemID, userID).Scan(&existingReactionID)
-
-	if err != nil && err != sql.ErrNoRows {
-		return fmt.Errorf("could not check for existing reaction: %w", err)
-	}
-
-	if existingReactionID > 0 {
-		_, err = forumDB.Exec(`
-			UPDATE reactions 
-			SET reaction_type = ? 
-			WHERE id = ?`, reactionType, existingReactionID)
-		if err != nil {
-			return fmt.Errorf("could not update reaction: %w", err)
-		}
-	} else {
-		_, err = forumDB.Exec(`
-			INSERT INTO reactions (user_id, item_id, reaction_type) 
-			VALUES (?, ?, ?)`, userID, itemID, reactionType)
-
-		if err != nil {
-			return fmt.Errorf("could not insert reaction: %w", err)
-		}
-	}
-
+func AddOrUpdateReaction(userID, item_type int, itemID string, reactionID int, forumDB *sql.DB) error {
+	query := `SELECT * FROM item_reactions WHERE item_internal_id = ? AND user_internal_id = ? AND item_t`
+	_, err := forumDB.Query(query, itemID, userID)
 	if err != nil {
-		return fmt.Errorf("could not update reaction count: %w", err)
+		if err != sql.ErrNoRows {
+			log.Warn(err)
+			return err
+		}
+		query = `INSERT INTO item_reactions (item_internal_id,user_internal_id,item_type,reaction_type) VALUES (?,?,?,?)`
+		_, err := forumDB.Exec(query, itemID, userID, item_type, reactionID)
+		return err
 	}
+	query = `UPDATE item_reactions SET  reaction_type = ? WHERE item_internal_id = ? AND user_internal_id = ? AND item_type = ?`
+	_, err = forumDB.Exec(query, reactionID, itemID, userID, item_type)
 
-	return nil
+	return err
 }
 
-func RemoveReaction(itemID, userID string, forumDB *sql.DB) error {
-
-	var reactionID int
-	err := forumDB.QueryRow(`
-		SELECT id FROM reactions 
-		WHERE (item_id = ?) 
-		AND user_id = ?`, itemID, userID).Scan(&reactionID)
-
+func RemoveReaction(userID, item_type int, itemID string, forumDB *sql.DB) error {
+	query := `DELETE FROM item_reactions WHERE user_internal_id = ? AND item_internal_id =? AND item_type = ?`
+	_, err := forumDB.Exec(query, userID, itemID, item_type)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return fmt.Errorf("reaction not found for the given user and item")
-		}
-		return fmt.Errorf("could not check for existing reaction: %w", err)
+		log.Warn(err)
+		return err
 	}
-
-	_, err = forumDB.Exec(`
-		DELETE FROM reactions 
-		WHERE id = ?`, reactionID)
-
-	if err != nil {
-		return fmt.Errorf("could not delete reaction: %w", err)
-	}
-
-	_, err = forumDB.Exec(`
-		UPDATE reactionCount 
-		SET count = count - 1 
-		WHERE (item_id = ?) 
-		AND reaction_type = (SELECT reaction_type FROM reactions WHERE id = ?)`,
-		itemID, reactionID)
-
-	if err != nil {
-		return fmt.Errorf("could not update reaction count: %w", err)
-	}
-
-	_, err = forumDB.Exec(`
-		DELETE FROM reactionCount 
-		WHERE (item_id = ?) 
-		AND count = 0`, itemID)
-
-	if err != nil {
-		return fmt.Errorf("could not delete reaction count: %w", err)
-	}
-
 	return nil
 }
