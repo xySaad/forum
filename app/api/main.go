@@ -36,7 +36,7 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 	case "coments":
 		switch req.Method {
 		case http.MethodGet:
-			comments.GetComents(conn, forumDB)
+			comments.GetComments(conn, forumDB)
 		case http.MethodPost:
 			comments.AddComment(conn, forumDB)
 		case http.MethodPatch:
