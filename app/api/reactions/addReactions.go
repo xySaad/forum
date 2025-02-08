@@ -3,10 +3,11 @@ package reactions
 import (
 	"database/sql"
 	"encoding/json"
+	"net/http"
+
 	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
-	"net/http"
 )
 
 func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
@@ -14,14 +15,15 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	validReactions := map[string]bool{
-		"like":    true,
-		"dislike": true,
+	validReactions := map[string]int{
+		"like":    1,
+		"dislike": 2,
 	}
 
 	var request struct {
 		ItemID       string `json:"item_id"`
 		ReactionType string `json:"reaction_type"`
+		Item_type    int `json:"item_type"`
 	}
 
 	err := json.NewDecoder(conn.Req.Body).Decode(&request)
@@ -30,17 +32,17 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	if request.ItemID == "" || request.ReactionType == "" {
+	if request.ItemID == "" || request.ReactionType == "" || request.Item_type == 0 {
 		conn.NewError(http.StatusBadRequest, errors.CodeInvalidOrMissingData, "Empty Post ID/Comment ID", "")
 		return
 	}
-
-	if !validReactions[request.ReactionType] {
+	reactionID, exist := validReactions[request.ReactionType]
+	if !exist {
 		conn.NewError(http.StatusBadRequest, errors.CodeInvalidOrMissingData, "Invalid Reaction Type", "")
 		return
 	}
 
-	err = handlers.AddOrUpdateReaction(conn.InternalUserId, request.ItemID, request.ReactionType, forumDB)
+	err = handlers.AddOrUpdateReaction(conn.InternalUserId, request.Item_type, request.ItemID, reactionID, forumDB)
 	if err != nil {
 		conn.NewError(http.StatusInternalServerError, errors.CodeInternalServerError, "Internal Server Error", "The server encountered an error, please try again at later time.")
 		return
@@ -48,5 +50,4 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 
 	conn.Resp.WriteHeader(http.StatusOK)
 	json.NewEncoder(conn.Resp).Encode(map[string]string{"message": "Reaction added/updated successfully"})
-
 }

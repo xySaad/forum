@@ -3,9 +3,10 @@ package reactions
 import (
 	"database/sql"
 	"encoding/json"
+	"net/http"
+
 	"forum/app/handlers"
 	"forum/app/modules"
-	"net/http"
 )
 
 func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
@@ -15,6 +16,7 @@ func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
 	var request struct {
 		ItemID       string `json:"item_id"`
 		ReactionType string `json:"reaction_type"`
+		Item_type    int    `json:"item_type"`
 	}
 
 	err := json.NewDecoder(conn.Req.Body).Decode(&request)
@@ -23,12 +25,12 @@ func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	if request.ReactionType == "" || request.ItemID == "" {
+	if request.ReactionType == "" || request.ItemID == "" || request.Item_type == 0 {
 		http.Error(conn.Resp, "400 - Bad Request: Missing fields", 400)
 		return
 	}
 
-	err = handlers.RemoveReaction(conn.InternalUserId, request.ItemID, forumDB)
+	err = handlers.RemoveReaction(conn.InternalUserId, request.Item_type, request.ItemID, forumDB)
 	if err != nil {
 		http.Error(conn.Resp, "500 - Internal Server Error", 500)
 		return
