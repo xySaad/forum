@@ -32,13 +32,12 @@ export const PostCard = (postData) => {
   const comment = img(importSvg("comment-bubble"), "comment-bubble");
   comment.onclick = showPost;
 
+  const like = img(importSvg("like"));
+  const dislike = img(importSvg("dislike"));
+
   return div("postContainer").add(
     Frame(Post(postData).add(readMore)),
-    div("leftBar").add(
-      img(importSvg("arrow-up"), "arrow-up", "reaction-arrow", postData.ID),
-      comment,
-      img(importSvg("arrow-down"), "arrow-down", "reaction-arrow", postData.ID)
-    )
+    div("leftBar").add(like, comment, dislike)
   );
 };
 
