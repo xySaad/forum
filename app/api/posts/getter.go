@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"strconv"
 
+	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
@@ -23,8 +24,12 @@ func GetPosts(conn *modules.Connection, forumDB *sql.DB) {
 		lastId = n
 	}
 	posts := []modules.Post{}
-
-	posts, httpErr := fetchPosts(lastId, categories, forumDB)
+	user_id := ""
+	cookie, err := conn.Req.Cookie("token")
+	if err == nil && cookie.Value != "" {
+		forumDB.QueryRow(`SELECT user_internal_id FROM users WHERE token =?`, cookie.Value).Scan(&user_id)
+	}
+	posts, httpErr := fetchPosts(lastId, user_id, categories, forumDB)
 	if httpErr == nil {
 		conn.Respond(posts)
 	} else {
@@ -32,8 +37,8 @@ func GetPosts(conn *modules.Connection, forumDB *sql.DB) {
 	}
 }
 
-func fetchPosts(lastId int, categories []string, forumDB *sql.DB) (posts []modules.Post, httpErr *errors.HttpError) {
-	sqlQuery := `SELECT 
+func fetchPosts(lastId int, user_id string, categories []string, forumDB *sql.DB) (posts []modules.Post, httpErr *errors.HttpError) {
+	sqlQuery := `SELECT DISTINCT
 	id,
 	internal_id,
 	user_internal_id,
@@ -43,14 +48,29 @@ func fetchPosts(lastId int, categories []string, forumDB *sql.DB) (posts []modul
 	FROM posts `
 
 	if lastId > 0 {
-		sqlQuery += "where posts.created_at > (select created_at from posts where id = ?) "
+		sqlQuery += "WHERE posts.created_at > (SELECT created_at FROM posts WHERE id = ?) "
 	}
-
-	sqlQuery += "ORDER BY posts.created_at DESC LIMIT 10;"
 
 	if categories != nil {
+		if lastId > 0 {
+			sqlQuery += " AND "
+		} else {
+			sqlQuery += " WHERE "
+		}
 
+		sqlQuery += `
+		INNER JOIN post_categories ON post_categories.post_id =posts.post_internal_id
+		INNER JOIN categories ON categories.id = post_categories.category_id
+		categories.name in(`
+		for i := range categories {
+			sqlQuery += "?"
+			if i != len(categories)-1 {
+				sqlQuery += ", "
+			}
+		}
+		sqlQuery += ") "
 	}
+	sqlQuery += "ORDER BY posts.created_at DESC LIMIT 10;"
 
 	rows, err := forumDB.Query(sqlQuery, lastId)
 	if err != nil {
@@ -63,12 +83,11 @@ func fetchPosts(lastId int, categories []string, forumDB *sql.DB) (posts []modul
 		var post modules.Post
 		err = rows.Scan(&post.Id, &internalPostId, &internalUserId,
 			&post.Content.Title, &post.Content.Text, &post.CreationTime)
-
 		if err != nil {
 			log.Error(err)
 			return
 		}
-
+		post.Likes, post.Dislikes, post.Reaction = handlers.GetReactions(internalPostId, 1, user_id, forumDB)
 		post.Publisher, err = GetPublicUser(internalUserId, forumDB)
 		if err != nil {
 			log.Error(err)
@@ -89,6 +108,7 @@ func fetchPosts(lastId int, categories []string, forumDB *sql.DB) (posts []modul
 	}
 	return posts, nil
 }
+
 func GetPostCategories(postInternalID int, forumDB *sql.DB) (categories []string, err error) {
 	sqlQuery := `
         SELECT categories.name 
