@@ -8,6 +8,25 @@
     margin: auto;
 }
 
+.categoriesInPost {
+    display: flex;
+    gap: 6px;
+
+}
+
+.cat {
+    margin: 12px 0px;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    color: rgba(255, 255, 255, 0.8);
+}
 
 .post {
     position: relative;
@@ -50,6 +69,7 @@
     justify-content: space-between;
     align-items: center;
 }
+
 .reactionsContainer {
     display: flex;
     width: max-content;

@@ -44,10 +44,6 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 			return
 		}
 	case "reactions":
-		if req.Method != http.MethodPost {
-			conn.Error(errors.HttpMethodNotAllowed)
-			return
-		}
 		reactions.HandleReactions(conn, forumDB)
 	case "like":
 		if req.Method != http.MethodGet {

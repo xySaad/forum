@@ -13,7 +13,6 @@ export const Home = async () => {
     if (!(await ensureAuth())) {
       return;
     }
-
     CreatePost();
   };
   filterCat();

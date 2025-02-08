@@ -26,7 +26,13 @@ const PostView = (postData) => {
   // onResize(adjustCommentsListSize);
 
   postView.id = postData.id;
-
+  if (!postData.categories) {
+    postData.categories = ["sport" , "art"]
+  }
+  let cts = div("categoriesInPost")
+  postData.categories.forEach(cat => {
+    cts.append(div("cat","#"+ cat))
+  })
   return postView.add(
     div("postCard").add(
       div("post").add(
@@ -35,6 +41,7 @@ const PostView = (postData) => {
           div(null, postData.publisher.username),
           div(null, timePassed(postData.creationTime))
         ),
+        cts , 
         div("title", postData.title),
         div("text", postData.text),
         postImg

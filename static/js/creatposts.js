@@ -29,7 +29,6 @@ export function checkPost() {
                         content: input,
                         categories: selectedCategories,
                     };
-
                     try {
                         const resp = await fetch('/api/posts/', {
                             method: 'POST',

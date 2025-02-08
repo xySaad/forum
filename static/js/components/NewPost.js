@@ -1,6 +1,7 @@
 import { NewReference } from "../utils/reference.js";
 import Post from "./Post.js";
 import div from "./native/div.js";
+import HandleReactions from "../handleReactions.js"
 const getPosts = async (PostsArea, isfetch, offset, categories,lastPostId) => {
   isfetch(true)
   try {
@@ -13,21 +14,12 @@ const getPosts = async (PostsArea, isfetch, offset, categories,lastPostId) => {
       lastPostId(json[0].id)
     }
     offset((prev) => prev + 1)
-
+    
+    
     json.forEach(post => {
-      console.log(post.categories);
-      
+      console.log(post);
       PostsArea.append(Post(post))
     })
-    document.querySelectorAll(".reaction.like").forEach(btn=>btn.addEventListener("click", (e)=> {
-      let mysvg = btn
-      if (!(e.target instanceof SVGElement) || !(e.target.tagName.toLowerCase() === "svg")) {
-        let mysvg = e.target.closest("svg");
-        }
-      mysvg.classList.remove("reacted")
-      console.log(mysvg.classList);
-      
-    }))
   } catch (error) {
     console.error('Error fetching comments:', error);
   } finally {

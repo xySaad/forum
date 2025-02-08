@@ -173,6 +173,7 @@
     border-radius: 20.0816px;
 }
 .reaction:hover {
+    cursor: pointer;
     opacity: 90%;
     border: #FD5F49 1px solid;
 }
@@ -188,20 +189,28 @@
     min-width: 300px;
 }
 
-.comment {
+.comntBtn {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    padding: 0px;
     gap: 12px;
-
+    padding: 0px 20px;
+    gap: 6.69px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20.0816px;
+}
+.comntBtn:hover {
+    cursor: pointer;
+    opacity: 90%;
+    border: #FD5F49 1px solid;
 }
 .reacted {
     background: rgba(253, 95, 73, 0.08);
-    border-radius: 20.0816px;
+    color: #FD5F49;
+    font-weight: bold;
 }
-.reacted>path {
-    
+.reacted>svg>path {
     fill: #FD5F49;
 }
 .content {
