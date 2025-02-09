@@ -183,20 +183,13 @@
 
  .comment {
      display: flex;
-     flex-direction: row;
-     align-items: flex-start;
-     padding: 0px;
-     gap: 12px;
-
- }
-
- .comment .content {
-     display: flex;
      flex-direction: column;
      align-items: flex-start;
      padding: 0px;
-     gap: 6px;
+     gap: 12px;
  }
+
+
 
  .texts {
      display: flex;
