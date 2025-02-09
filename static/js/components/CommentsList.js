@@ -34,8 +34,8 @@ console.log(lastPostId()," ",json[0].id)
             div("publisher").add(
               img(comment.publisher.profilePicture, "no-profile"),
             ),
-            div("content").add(
-              div("texts").add(
+            div("content2").add(
+              div("texts2").add(
                 div("commentCreator", comment.publisher.username),
                 div("creationTime", ` • ${timePassed(comment.creationTime)}`)
               ),

@@ -26,7 +26,7 @@ const PostView = (postData) => {
   // onResize(adjustCommentsListSize);
 
   postView.id = postData.id;
-
+  let comTitle = div("commentTitle" , "Comments")
   return postView.add(
     div("postCard").add(
       div("post").add(
@@ -36,11 +36,11 @@ const PostView = (postData) => {
           div(null, timePassed(postData.creationTime))
         ),
         div("title", postData.title),
-        div("text", postData.text),
+        div("textWrap").add(div("text", postData.text)),
         postImg
       ),
       
-      commentsWrap.add(CommentsList(postView.id), CommentInput(postData.id))
+      commentsWrap.add(comTitle , CommentsList(postView.id), CommentInput(postData.id))
     )
   );
 };
