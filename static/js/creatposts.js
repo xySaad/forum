@@ -42,6 +42,7 @@ export function checkPost() {
 
                         if (resp.ok) {
                             const responseData = await resp.json();
+                            document.querySelector(".postCreateView").remove()
                             console.log('Post created successfully:', responseData);
                         } else {
                             console.error('Failed to create post:', resp.statusText);
