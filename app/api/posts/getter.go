@@ -70,6 +70,7 @@ func fetchPosts(sqlQuery string, params []any, user_id int, forumDB *sql.DB) (po
 			log.Error(err)
 			return
 		}
+		post.Publisher.GetPublicUser(forumDB)
 		// post.Likes, post.Dislikes, post.Reaction = handlers.GetReactions(post.Id, 1, user_id, forumDB)
 		// err = post.Publisher.GetPublicUser(forumDB)
 		// if err != nil {
