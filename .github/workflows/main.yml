@@ -1,0 +1,17 @@
+# .github/workflows/block-direct-pushes.yml
+name: Block Direct Pushes
+
+on:
+  push:
+    branches: [ "master" ] # Replace with your branch
+
+jobs:
+  block-direct-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR
+        run: |
+          if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
+            echo "Direct pushes to main are blocked. Use a pull request."
+            exit 1
+          fi
