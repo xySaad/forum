@@ -21,7 +21,8 @@ const createRegisterForm = () => {
   const email = input("email");
   const password = input("password");
   const confirmPassword = input("password", true);
-
+  password.minLength = "6"
+  confirmPassword.minLength = "6"
   form.onsubmit = async (e) => {
     e.preventDefault();
     const resp = await fetch("/api/auth/" + context, {
@@ -36,8 +37,11 @@ const createRegisterForm = () => {
       appendUserHeader()
       authElement.remove();
       authElement = null;
+    }else {
+     let nn =  await resp.json()
+     console.log(nn);
+      document.querySelector(".errors").innerText = nn.details
     }
-    console.log(await resp.text());
   };
 
   const loginButton = document.createElement("button");
@@ -57,6 +61,7 @@ const createRegisterForm = () => {
     email,
     password,
     confirmPassword,
+    div("errors"),
     div("btns").add(loginButton, cancelButton)
   );
 
@@ -71,6 +76,7 @@ const createRegisterForm = () => {
         email,
         password,
         confirmPassword,
+        
         div("btns").add(loginButton, cancelButton)
       );
     },
