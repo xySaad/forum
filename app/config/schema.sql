@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS users (
   id BIGINT PRIMARY KEY NOT NULL,
   token TEXT NOT NULL UNIQUE,
@@ -16,8 +18,8 @@ INSERT OR IGNORE INTO items (name) VALUES ("post");
 INSERT OR IGNORE INTO items (name) VALUES ("comment");
 
 CREATE TABLE IF NOT EXISTS posts (
-  id BIGINT PRIMARY KEY NOT NULL,          -- Exposed Snowflake ID
-  user_id BIGINT NOT NULL,        -- References users.id
+  id BIGINT PRIMARY KEY NOT NULL,          
+  user_id BIGINT NOT NULL,        
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -41,9 +43,9 @@ CREATE TABLE IF NOT EXISTS post_categories (
 );
 
 CREATE TABLE IF NOT EXISTS comments (
-  id BIGINT PRIMARY KEY NOT NULL,          -- Exposed Snowflake ID
-  post_id BIGINT NOT NULL,        -- References posts.id
-  user_id BIGINT NOT NULL,        -- References users.id
+  id BIGINT PRIMARY KEY NOT NULL, 
+  post_id BIGINT NOT NULL,        
+  user_id BIGINT NOT NULL,        
   content TEXT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (post_id) REFERENCES posts(id),
