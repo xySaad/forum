@@ -9,6 +9,8 @@ import (
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
 	"forum/app/modules/snowflake"
+
+	"github.com/mattn/go-sqlite3"
 )
 
 func AddComment(conn *modules.Connection, forumDB *sql.DB) {
@@ -20,20 +22,23 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 	postId := conn.Path[2]
 	err := json.NewDecoder(conn.Req.Body).Decode(&comment)
 	if err != nil {
-		log.Debug(err)
-		conn.NewError(http.StatusBadRequest, 400, "ivalid format", "")
+		conn.Error(errors.BadRequestError("invalid format"))
 		return
 	}
 	if comment.Content == "" {
-		conn.NewError(http.StatusBadRequest, 400, "missing data", "")
+		conn.Error(errors.BadRequestError("missing content"))
 		return
 	}
 
 	query := `INSERT INTO comments (id, post_id, user_id, content) VALUES (?, ?, ?, ?)`
 	_, err = forumDB.Exec(query, snowflake.Default.Generate(), postId, conn.UserId, comment.Content)
 	if err != nil {
+		if sqlErr, ok := err.(sqlite3.Error); ok && sqlErr.ExtendedCode == sqlite3.ErrConstraintForeignKey {
+			conn.Error(errors.BadRequestError("invalid post id"))
+			return
+		}
 		log.Error(err)
-		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
+		conn.Error(errors.HttpInternalServerError)
 		return
 	}
 	conn.Resp.Write([]byte{'o', 'k'})
