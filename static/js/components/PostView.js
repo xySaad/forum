@@ -26,7 +26,13 @@ const PostView = (postData) => {
   // onResize(adjustCommentsListSize);
 
   postView.id = postData.id;
-  let comTitle = div("commentTitle" , "Comments")
+  if (!postData.categories) {
+    postData.categories = ["sport" , "art"]
+  }
+  let cts = div("categoriesInPost")
+  postData.categories.forEach(cat => {
+    cts.append(div("cat","#"+ cat))
+  })
   return postView.add(
     div("postCard").add(
       div("post").add(
@@ -35,12 +41,13 @@ const PostView = (postData) => {
           div(null, postData.publisher.username),
           div(null, timePassed(postData.creationTime))
         ),
+        cts , 
         div("title", postData.title),
-        div("textWrap").add(div("text", postData.text)),
+        div("text", postData.text),
         postImg
       ),
       
-      commentsWrap.add(comTitle , CommentsList(postView.id), CommentInput(postData.id))
+      commentsWrap.add(CommentsList(postView.id), CommentInput(postData.id))
     )
   );
 };

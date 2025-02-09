@@ -13,8 +13,10 @@ const getPosts = async (PostsArea, isfetch, offset, categories,lastPostId) => {
       lastPostId(json[0].id)
     }
     offset((prev) => prev + 1)
-
+    
+    
     json.forEach(post => {
+      console.log(post);
       PostsArea.append(Post(post))
     })
   } catch (error) {
@@ -27,18 +29,26 @@ const getcategories = () => {
 
   let selectedCategories = [];
   const categories = document.querySelectorAll(".category");
-  categories.forEach((child, value) => {
+  categories.forEach((child,index) => {
     if (child.classList.contains("Selected")) {
       if (index == 0) {
         return selectedCategories.join("")
       }
-      selectedCategories.push(value)
+      console.log(child.value);
+      
+      selectedCategories.push(child.value)
     }
   })
+  console.log(selectedCategories);
+  
   return selectedCategories.join(",")
 }
 
 export const CreatePostsArea = () => {
+  let oldPostarea=document.querySelector(".posts")
+  if (oldPostarea!=null) {
+    oldPostarea.remove()
+  }
   const PostsArea = div("posts")
   let offset = NewReference(0);
   let isfetch = NewReference(false)

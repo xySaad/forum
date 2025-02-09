@@ -40,7 +40,7 @@ const createRegisterForm = () => {
     }else {
      let nn =  await resp.json()
      console.log(nn);
-      document.querySelector(".errors").innerText = nn.details
+      document.querySelector(".errors").innerText = nn.message
     }
   };
 
@@ -76,7 +76,7 @@ const createRegisterForm = () => {
         email,
         password,
         confirmPassword,
-        
+        div("errors"),
         div("btns").add(loginButton, cancelButton)
       );
     },
@@ -103,7 +103,6 @@ const Auth = (authType) => {
     return authElement;
   }
   const registerForm = createRegisterForm();
-
   const loginSpan = document.createElement("span");
   loginSpan.className = "login";
   loginSpan.textContent = "login";
