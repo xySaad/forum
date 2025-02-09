@@ -42,6 +42,7 @@ const createRegisterForm = () => {
 
   const loginButton = document.createElement("button");
   loginButton.textContent = "Login";
+  loginButton.className = "primary"
 
   const cancelButton = document.createElement("button");
   cancelButton.className = "secondary";
