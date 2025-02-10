@@ -27,11 +27,11 @@ func GetUserData(conn *modules.Connection, forumDB *sql.DB) {
 	type User struct {
 		Username string `json:"username"`
 		Email    string `json:"email"`
+		Token string `json:"token"`
 	}
 	var userD User
-	qurr := `SELECT username, email FROM users WHERE internal_id = ?`
-	fmt.Println(userID)
-	err = forumDB.QueryRow(qurr, userID).Scan(&userD.Username, &userD.Email)
+	qurr := `SELECT username, email ,token FROM users WHERE id = ?`
+	err = forumDB.QueryRow(qurr, userID).Scan(&userD.Username, &userD.Email , &userD.Token)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(conn.Resp, "Database query error", http.StatusInternalServerError)

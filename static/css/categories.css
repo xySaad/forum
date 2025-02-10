@@ -9,7 +9,12 @@
     width: 900px;
     margin: auto;
 }
-
+.filter {
+    width: 80%;
+    max-width: 900px;
+    align-self: center ;
+    overflow: scroll;
+}
 .category {
     font-size: 16px;
     font-weight: 500;

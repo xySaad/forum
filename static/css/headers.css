@@ -7,7 +7,12 @@ body {
 .profileContainer {
     cursor: pointer;
 }
+@media (max-width: 400px) {
 
+    .logo {
+        width: 60px;
+    }
+  }
 .profileCard {
     position: absolute;
     right: 8%;
@@ -93,7 +98,7 @@ h3 {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: 24px 100px;
+    padding: 24px 16%;
     position: relative;
     align-items: center;
 
