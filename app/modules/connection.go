@@ -1,11 +1,35 @@
 package modules
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 
 	"forum/app/modules/errors"
 )
+
+type Connection struct {
+	Resp   http.ResponseWriter
+	Req    *http.Request
+	Path   []string
+	UserId int
+}
+
+func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
+	cookie, err := conn.Req.Cookie("token")
+	if err != nil || cookie.Value == "" {
+		conn.Error(errors.HttpUnauthorized)
+		return false
+	}
+
+	err = forumDB.QueryRow("SELECT id FROM users WHERE token=?", cookie.Value).Scan(&conn.UserId)
+	if err != nil {
+		conn.Error(errors.HttpUnauthorized)
+		return false
+	}
+
+	return true
+}
 
 func (conn *Connection) NewError(httpStatus, code int, message, details string) {
 	httpError := errors.HttpError{
@@ -23,10 +47,13 @@ func (conn *Connection) Error(httpError *errors.HttpError) {
 }
 
 func (conn *Connection) Respond(data any) {
-	err := json.NewEncoder(conn.Resp).Encode(data)
+	jsonResult, err := json.Marshal(data)
 	if err != nil {
-		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
+		conn.Error(errors.HttpInternalServerError)
+		return
 	}
+	conn.Resp.Header().Set("Content-Type", "application/json")
+	conn.Resp.Write(jsonResult)
 }
 
 func sendHttpError(conn *Connection, httpError *errors.HttpError) {
@@ -40,10 +67,4 @@ func sendHttpError(conn *Connection, httpError *errors.HttpError) {
 	}
 
 	conn.Resp.Write(jsonError)
-}
-
-type Connection struct {
-	Resp http.ResponseWriter
-	Req  *http.Request
-	Path []string
 }

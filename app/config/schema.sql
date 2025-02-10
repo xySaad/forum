@@ -1,52 +1,72 @@
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY,
-    username TEXT NOT NULL UNIQUE,
-    email TEXT NOT NULL UNIQUE,
-    profile TEXT,
-    password TEXT NOT NULL,
-    token TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  id BIGINT PRIMARY KEY NOT NULL,
+  token TEXT NOT NULL UNIQUE,
+  username TEXT NOT NULL UNIQUE,
+  email TEXT NOT NULL UNIQUE,
+  profile_picture TEXT,
+  password TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS items (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE
+);
+INSERT OR IGNORE INTO items (name) VALUES ("post");
+INSERT OR IGNORE INTO items (name) VALUES ("comment");
+
 CREATE TABLE IF NOT EXISTS posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id TEXT,
-    title TEXT NOT NULL,
-    content TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  id BIGINT PRIMARY KEY NOT NULL,          
+  user_id BIGINT NOT NULL,        
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
-CREATE TABLE IF NOT EXISTS post_categories (
-    post_id INTEGER,
-    category_id INTEGER,
-    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-);
-CREATE TABLE IF NOT EXISTS comments (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    post_id INTEGER NOT NULL,
-    user_id TEXT NOT NULL,
-    content TEXT NOT NULL,
-    likes INTEGER NOT NULL DEFAULT 0,
-    dislikes INTEGER NOT NULL DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+
 CREATE TABLE IF NOT EXISTS categories (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE
 );
+INSERT OR IGNORE INTO categories (name) VALUES ("sport");
+INSERT OR IGNORE INTO categories (name) VALUES ("finance");
+INSERT OR IGNORE INTO categories (name) VALUES ("technology");
+INSERT OR IGNORE INTO categories (name) VALUES ("science");
+
+CREATE TABLE IF NOT EXISTS post_categories (
+  post_id BIGINT NOT NULL,        -- References posts.id
+  category_id INTEGER NOT NULL,
+  FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+  id BIGINT PRIMARY KEY NOT NULL, 
+  post_id BIGINT NOT NULL,        
+  user_id BIGINT NOT NULL,        
+  content TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (post_id) REFERENCES posts(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
 CREATE TABLE IF NOT EXISTS reactions (
-    item_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
-    reaction_type TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE (user_id, item_id)
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE
 );
-INSERT OR IGNORE INTO categories (name) VALUES ("Sport");
-INSERT OR IGNORE INTO categories (name) VALUES ("Finance");
-INSERT OR IGNORE INTO categories (name) VALUES ("Technology");
-INSERT OR IGNORE INTO categories (name) VALUES ("Science");
+INSERT OR IGNORE INTO reactions (name) VALUES ("like");
+INSERT OR IGNORE INTO reactions (name) VALUES ("dislike");
+
+CREATE TABLE IF NOT EXISTS item_reactions (
+  item_type INTEGER NOT NULL,
+  item_id BIGINT NOT NULL, 
+  user_id BIGINT NOT NULL,        
+  reaction_id INTEGER NOT NULL,   
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (item_type) REFERENCES items(id),
+  FOREIGN KEY (reaction_id) REFERENCES reactions(id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE (user_id, item_id, item_type)
+);

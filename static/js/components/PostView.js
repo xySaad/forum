@@ -42,8 +42,8 @@ const PostView = (postData) => {
           div(null, timePassed(postData.creationTime))
         ),
         cts , 
-        div("title", postData.title),
-        div("text", postData.text),
+        div("title", postData.content.title),
+        div("text", postData.content.text),
         postImg
       ),
       

@@ -6,32 +6,25 @@ import (
 	"fmt"
 	"net/http"
 
-	"forum/app/handlers"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 )
 
 func GetUserData(conn *modules.Connection, forumDB *sql.DB) {
 	cookie, err := conn.Req.Cookie("token")
-
 	if err != nil || cookie.Value == "" {
 		conn.NewError(http.StatusUnauthorized, errors.CodeUnauthorized, "Missing or invalid authentication token", "")
 		return
 	}
-	userID, httpErr := handlers.GetUserIDByToken(cookie.Value, forumDB)
-	if httpErr != nil {
-		conn.Error(httpErr)
-		return
-	}
-
 	type User struct {
 		Username string `json:"username"`
 		Email    string `json:"email"`
-		Token string `json:"token"`
+		Token    string `json:"token"`
 	}
 	var userD User
-	qurr := `SELECT username, email ,token FROM users WHERE id = ?`
-	err = forumDB.QueryRow(qurr, userID).Scan(&userD.Username, &userD.Email , &userD.Token)
+	qurr := `SELECT username, email ,token FROM users WHERE token = ?`
+	fmt.Println(cookie.Value)
+	err = forumDB.QueryRow(qurr, cookie.Value).Scan(&userD.Username, &userD.Email, &userD.Token)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(conn.Resp, "Database query error", http.StatusInternalServerError)

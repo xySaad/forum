@@ -13,7 +13,7 @@ export function checkPost() {
             const inputElement = document.querySelector('.textInput');
             const selectedCategories = Array.from(
                 document.querySelectorAll('.category-checkbox:checked')
-            ).map((checkbox) => checkbox.value);
+            ).map((checkbox) => checkbox.value.toLowerCase());
 
             console.log("Title:", title.value, "Content:", inputElement.value, "Categories:", selectedCategories);
 
@@ -26,7 +26,7 @@ export function checkPost() {
                 } else {
                     const data = {
                         title: titl,
-                        content: input,
+                        text: input,
                         categories: selectedCategories,
                     };
 

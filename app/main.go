@@ -24,7 +24,7 @@ func main() {
 	}
 	forumDB, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
-		log.Error("error opening database: " + err.Error())
+		log.Error("error opening database:", err)
 		return
 	}
 	sigChan := make(chan os.Signal, 1)
@@ -34,7 +34,7 @@ func main() {
 	defer func() {
 		err = forumDB.Close()
 		if err != nil {
-			log.Error("error closinging database: " + err.Error())
+			log.Error("error closinging database:", err)
 		} else {
 			log.Info("database closed successfully")
 		}
@@ -42,8 +42,7 @@ func main() {
 
 	err = config.CreateTables(forumDB)
 	if err != nil {
-		log.Error("error creating tables: " + err.Error())
-		return
+		log.Fatal("error creating tables:", err)
 	}
 
 	http.HandleFunc("/static/", handlers.Static)
@@ -53,12 +52,10 @@ func main() {
 	server := &http.Server{Addr: ":8080"}
 
 	go func() {
-		fmt.Println("server started: http://localhost:8080")
 		log.Info("server started: http://localhost:8080")
 		err = server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			log.Error("error starting server " + err.Error())
-
+			log.Error("error starting server:", err)
 			sigChan <- syscall.SIGTERM
 		}
 	}()
@@ -66,7 +63,7 @@ func main() {
 	log.Info("shuting down the server", <-sigChan)
 	err = server.Close()
 	if err != nil {
-		log.Error("error shuthing dowm the server: " + err.Error())
+		log.Error("error shuthing dowm the server:", err)
 	} else {
 		log.Info("server shutdown successfully")
 	}
