@@ -10,6 +10,7 @@ export const changeAuthState = (state = null) => {
     isAuthenticated = state;
   } else {
     throw new Error("state can only be null or boolean");
+
   }
 };
 

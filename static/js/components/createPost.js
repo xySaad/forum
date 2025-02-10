@@ -1,4 +1,3 @@
-import { checkPost } from "../creatposts.js";
 import { back, go } from "../router.js";
 import ensureAuth from "../utils/ensureAuth.js";
 import { Fetch } from "../utils/fetch.js";
@@ -87,12 +86,13 @@ export const CreatePost = () => {
       body: JSON.stringify({
         title: titleInput.value,
         text: textInput.value,
+        categories: Array.from(document.querySelectorAll(".category-checkbox:checked")).map((checkbox)=>checkbox.value.toLowerCase())
       }),
     });
   };
 
   const cancelButton = document.createElement("button");
-  cancelButton.className = "cancelButton";
+  cancelButton.className = "cancelButton secondary";
   cancelButton.textContent = "Cancel";
   cancelButton.onclick = () => {
     postCreateView.remove();
@@ -113,7 +113,6 @@ export const CreatePost = () => {
   postForm.appendChild(buttonContainer);
 
   postCreateView.appendChild(postForm);
-  checkPost();
   return postCreateView;
 };
 

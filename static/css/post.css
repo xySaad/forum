@@ -1,17 +1,16 @@
 .postContainer {
     position: relative;
+    width: 80%;
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 16px;
     border-radius: 24px;
-    width: 900px;
+    max-width: 900px;
     margin: auto;
 }
 
 
 .post {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
     position: relative;
     padding: 40px;
     gap: 8px;
@@ -20,7 +19,7 @@
     background: #FFFFFF14;
     overflow: hidden;
     cursor: default;
-    max-height: 35vh;
+    max-height: 40vh;
 }
 
 .post .text {
@@ -46,22 +45,17 @@
 }
 
 .leftBar {
-    padding: 10px;
-    margin-top: 1rem;
-    gap: 8px;
+    padding: 0 8px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
-
-
-.leftBar>* {
-    width: 20px;
-    height: 29px;
-    padding: 10px;
-    gap: 8px;
-    border-radius: 24px;
-    background: hsla(0, 0%, 100%, 0.08);
-    box-shadow: 0px 4px 4px 0px hsla(0, 0%, 0%, 0.42);
+.reactionsContainer {
+    display: flex;
+    width: max-content;
+    background: none;
+    gap: 12px;
 }
 
 .publisher {
@@ -70,7 +64,7 @@
     align-items: center;
     gap: 5px;
     font-weight: 500;
-    
+
 }
 
 .publisher img {
@@ -102,6 +96,24 @@
     width: fit-content;
     padding-top: 1rem;
 }
+
 .commentCreator {
     color: green;
+}
+.categoriesInPost {
+    display: flex;
+    gap: 6px;
+}
+.cat {
+    margin: 12px 0px;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    color: rgba(255, 255, 255, 0.8);
 }

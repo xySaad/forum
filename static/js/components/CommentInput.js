@@ -23,6 +23,7 @@ export const CommentInput = (postId) => {
   };
 
   const button = document.createElement("button");
+  button.className ="commentBtn"
   button.append(img(importSvg("arrow-up")));
   input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
