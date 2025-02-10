@@ -15,11 +15,18 @@ const PostView = (postData) => {
   const commentsWrap = div("commentsWrap");
 
   postView.id = postData.id;
-
+  if (!postData.categories) {
+    postData.categories = ["sport" , "art"]
+  }
+  let cts = div("categoriesInPost")
+  postData.categories.forEach(cat => {
+    cts.append(div("cat","#"+ cat))
+  })
   return postView.add(
     div("postCard").add(
       Post(postData),
       commentsWrap.add(CommentsList(postData.id), CommentInput(postData.id))
+
     )
   );
 };

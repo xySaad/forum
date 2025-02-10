@@ -44,22 +44,18 @@ func CreatePost(content *modules.PostContent, userID int, forumDB *sql.DB) (int6
 	postID := snowflake.Default.Generate()
 
 	sqlQuery := "INSERT INTO posts (id, title, content, user_id) VALUES (?, ?, ?, ?)"
-	result, err := forumDB.Exec(sqlQuery, postID, content.Title, content.Text, userID)
+	_, err := forumDB.Exec(sqlQuery, postID, content.Title, content.Text, userID)
 	if err != nil {
 		return 0, err
 	}
-	internalPostID, err := result.LastInsertId()
 
-	if err != nil {
-		return 0, err
-	}
 	for _, category := range content.Categories {
 		var categoryID string
 		err := forumDB.QueryRow("SELECT id FROM categories WHERE name = ?", category).Scan(&categoryID)
 		if err != nil {
 			return 0, err
 		}
-		_, err = forumDB.Exec("INSERT INTO post_categories (post_internal_id, category_id) VALUES (?, ?)", internalPostID, categoryID)
+		_, err = forumDB.Exec("INSERT INTO post_categories (post_id, category_id) VALUES (?, ?)", postID, categoryID)
 		if err != nil {
 			return 0, err
 		}

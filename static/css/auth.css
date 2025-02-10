@@ -131,7 +131,7 @@ span {
     gap: 20px;
 }
 
-.auth button {
+button {
     background: #FD5F49;
     display: flex;
     flex-direction: row;
@@ -147,7 +147,7 @@ span {
 
 }
 
-.secondary {
+button.secondary {
     background: none;
     border: 1px solid rgba(255, 255, 255, 0.4);
     color: white;

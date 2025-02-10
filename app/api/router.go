@@ -2,13 +2,15 @@ package api
 
 import (
 	"database/sql"
+	"net/http"
+	"strings"
+
 	"forum/app/api/auth"
 	"forum/app/api/posts"
+	"forum/app/api/profile"
 	"forum/app/api/reactions"
 	"forum/app/modules"
 	"forum/app/modules/errors"
-	"net/http"
-	"strings"
 )
 
 func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
@@ -27,6 +29,8 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		posts.Entry(conn, forumDB)
 	case "reactions":
 		reactions.Entry(conn, forumDB)
+	case "profile":
+		profile.GetUserData(conn, forumDB)
 	default:
 		conn.Error(errors.HttpNotFound)
 	}
