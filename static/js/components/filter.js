@@ -8,7 +8,6 @@ const filterByCat = (e) => {
 
     const arr = []
     const categories = document.querySelectorAll(".categories .active")
-
     categories.forEach((category) => {
         if (category === allDiv) {
             return
@@ -18,9 +17,6 @@ const filterByCat = (e) => {
         }
         arr.push("category=" + category.textContent)
     })
-    if (!document.querySelector(".categories .active")) {
-        allDiv.classList.add("active")
-    }
     const homePage = document.querySelector(".homePage")
     homePage.children[2].remove()
     homePage.append(InfinitePosts("api/posts?" + arr.join("&")))
