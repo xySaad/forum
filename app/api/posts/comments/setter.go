@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"forum/app/modules"
 	"forum/app/modules/errors"
@@ -29,9 +30,9 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(errors.BadRequestError("missing content"))
 		return
 	}
-
+	commentId := snowflake.Default.Generate()
 	query := `INSERT INTO comments (id, post_id, user_id, content) VALUES (?, ?, ?, ?)`
-	_, err = forumDB.Exec(query, snowflake.Default.Generate(), postId, conn.UserId, comment.Content)
+	_, err = forumDB.Exec(query, commentId, postId, conn.UserId, comment.Content)
 	if err != nil {
 		if sqlErr, ok := err.(sqlite3.Error); ok && sqlErr.ExtendedCode == sqlite3.ErrConstraintForeignKey {
 			conn.Error(errors.BadRequestError("invalid post id"))
@@ -41,7 +42,16 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(errors.HttpInternalServerError)
 		return
 	}
-	conn.Resp.Write([]byte{'o', 'k'})
+	comment.PostId = postId
+	comment.Publisher.Id = conn.UserId
+	comment.CreationTime = time.Now().Format(time.DateTime)
+	err = comment.Publisher.GetPublicUser(forumDB)
+	if err != nil {
+		conn.Error(errors.HttpInternalServerError)
+		return
+	}
+
+	conn.Respond(comment)
 }
 
 func UpdateComment(conn *modules.Connection, forumdb *sql.DB) {

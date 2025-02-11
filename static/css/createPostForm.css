@@ -18,6 +18,8 @@
   height: 68px;
   .create-post-button {
     position: absolute;
+    padding-left: 0px;
+    padding-right: 0px;
     width: 98%;
     top: 50%;
     left: 50%;
@@ -279,7 +281,10 @@ button {
   background-color: #ffffff09;
   opacity: 0.9;
 }
-
+.errorPlace {
+  color: rgb(237, 83, 83);
+  font-size: 14px;
+}
 .formGroup {
   align-self: stretch;
   max-width: 600px;
