@@ -4,7 +4,7 @@ import div from "./native/div.js";
 export const reaction = (type, postData, url) => {
   const reactionElement = div(`reaction ${type}`).add(
     svg(type),
-    div("", postData[type + "s"])
+    div("", postData[type + "s"]===-1 ? "": postData[type + "s"])
   );
   if (postData.reaction === type) {
     reactionElement.classList.add("reacted");
@@ -15,7 +15,9 @@ export const reaction = (type, postData, url) => {
       reactionElement.onclick = () => {
         const isReacted = reactionElement.classList.contains("reacted");
         const isAdverseReacted = adverse.classList.contains("reacted");
-        Fetch(url + type ?? `/api/reactions/posts/${postData.id}/${type}`, {
+        console.log(url, type);
+        
+        Fetch((url && url + type) ?? `/api/reactions/posts/${postData.id}/${type}`, {
           method: isReacted ? "delete" : "post",
         });
         reactionElement.classList.toggle("reacted");

@@ -281,7 +281,10 @@ button {
   background-color: #ffffff09;
   opacity: 0.9;
 }
-
+.errorPlace {
+  color: rgb(237, 83, 83);
+  font-size: 14px;
+}
 .formGroup {
   align-self: stretch;
   max-width: 600px;
