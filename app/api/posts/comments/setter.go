@@ -42,9 +42,13 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(errors.HttpInternalServerError)
 		return
 	}
-	comment.PostId = postId
-	comment.Publisher.Id = conn.UserId
-	comment.CreationTime = time.Now().Format(time.DateTime)
+	comment = modules.Comment{
+		Id:           int(commentId),
+		Content:      comment.Content,
+		PostId:       postId,
+		CreationTime: time.Now().Format(time.DateTime),
+		Publisher:    modules.User{Id: conn.UserId},
+	}
 	err = comment.Publisher.GetPublicUser(forumDB)
 	if err != nil {
 		conn.Error(errors.HttpInternalServerError)

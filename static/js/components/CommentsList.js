@@ -8,7 +8,7 @@ export const CommentContainer = (comment) => {
   const [dislike, onDislike] = reaction("dislike", comment);
 
   onLike(dislike, reactionEndpoint);
-  onDislike(like), reactionEndpoint;
+  onDislike(like, reactionEndpoint);
 
   return div("container").add(
     div("comment").add(
