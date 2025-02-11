@@ -236,3 +236,6 @@
      opacity: 90%;
      border: #FD5F49 1px solid;
  }
+ .commInput {
+    backdrop-filter: none;
+ }
