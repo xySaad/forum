@@ -16,6 +16,9 @@
     overflow: scroll;
 }
 .category {
+    font-family: 'Inter';
+    text-align: center;
+    text-transform: capitalize;
     font-size: 16px;
     font-weight: 500;
     line-height: 21.06px;

@@ -4,7 +4,6 @@ import { appendGuestHeader } from "./components/Headers.js";
 import ensureAuth, { changeAuthState } from "./utils/ensureAuth.js";
 import { AddRoute, go } from "./router.js";
 import { Home } from "./home.js";
-import { Fetch } from "./utils/fetch.js";
 import CreatePost from "./components/createPost.js";
 import Auth from "./components/Auth.js";
 import PostView from "./components/PostView.js";
