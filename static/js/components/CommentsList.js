@@ -2,7 +2,7 @@ import { timePassed } from "../utils/time.js";
 import div from "./native/div.js";
 import img from "./native/img.js";
 import { reaction } from "./reaction.js";
-const CommentContainer = (comment) => {
+export const CommentContainer = (comment) => {
   const reactionEndpoint = `/api/reactions/comments/${comment.id}/`;
   const [like, onLike] = reaction("like", comment);
   const [dislike, onDislike] = reaction("dislike", comment);
