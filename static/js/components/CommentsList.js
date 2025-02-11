@@ -10,11 +10,11 @@ export const CommentContainer = (comment) => {
   onLike(dislike, reactionEndpoint);
   onDislike(like, reactionEndpoint);
 
-  return div("container").add(
-    div("comment").add(
-      div("publisher").add(img(comment.publisher.profilePicture, "no-profile")),
-      div("commentCreator", comment.publisher.username),
-      div("creationTime", ` • ${timePassed(comment.creationTime)}`)
+  return div("comment").add(
+    div("publisher").add(
+      img(comment.publisher.profilePicture, "no-profile"),
+      div("username", comment.publisher.username),
+      div("time", ` • ${timePassed(comment.creationTime)}`)
     ),
     div("text", comment.content),
     div("reactionsContainer").add(like, dislike)
