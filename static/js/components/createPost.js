@@ -19,7 +19,7 @@ export const PostCreationBar = () => {
   );
 };
 
-export const CreatePost = () => {
+export  const  CreatePost = () => {
   const postCreateView = document.createElement("div");
   postCreateView.className = "postCreateView";
   postCreateView.onclick = (e) => {
@@ -80,8 +80,16 @@ export const CreatePost = () => {
   const submitButton = document.createElement("button");
   submitButton.className = "submitButton";
   submitButton.textContent = "Create a Post";
-  submitButton.onclick = () => {
-    Fetch("/api/posts", {
+  submitButton.onclick = async() => {
+    if(!titleInput.value) {
+      document.querySelector(".errorPlace").textContent = "please provide a valid title (minLength is 1 char)"
+      return
+    }
+    if (!textInput.value) {
+      document.querySelector(".errorPlace").textContent = "please provide a valid Description (minLength is 1 char)"
+      return
+    }
+    let resp = await Fetch("/api/posts", {
       method: "POST",
       body: JSON.stringify({
         title: titleInput.value,
@@ -89,6 +97,9 @@ export const CreatePost = () => {
         categories: Array.from(document.querySelectorAll(".category-checkbox:checked")).map((checkbox)=>checkbox.value.toLowerCase())
       }),
     });
+    if(resp.ok) {
+      back()
+    }
   };
 
   const cancelButton = document.createElement("button");
@@ -110,6 +121,7 @@ export const CreatePost = () => {
   postForm.appendChild(createLabeledInput("Description", textInput));
   postForm.appendChild(createLabeledInput("Upload Image", imageInput));
   postForm.appendChild(categoryDiv);
+  postForm.appendChild(div("errorPlace"));
   postForm.appendChild(buttonContainer);
 
   postCreateView.appendChild(postForm);

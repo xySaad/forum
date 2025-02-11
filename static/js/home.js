@@ -5,7 +5,7 @@ import { PostCreationBar } from "./components/createPost.js";
 import { FilterSearch } from "./components/filter.js";
 
 export const Home = () => {
-  Reaction();
+  // Reaction();
   return div("homePage").add(
     PostCreationBar(),
     FilterSearch(),
