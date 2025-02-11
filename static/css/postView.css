@@ -55,7 +55,6 @@
      align-items: flex-start;
      padding: 0px;
      gap: 8px;
-
      min-width: 300px;
      width: 100%;
      max-width: 600px;
@@ -65,8 +64,6 @@
      flex: none;
      order: 0;
      flex-grow: 1;
-
-
  }
 
  .commentsWrap {
@@ -120,7 +117,7 @@
 
  .postView .text {
      display: flex;
-     overflow: visible;
+     overflow: scroll;
      text-overflow: ellipsis;
      font-family: 'Inter';
      font-style: normal;

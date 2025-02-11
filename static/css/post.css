@@ -23,13 +23,10 @@
 }
 
 .post .text {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: clamp(1rem, 1vw, 1.5rem);
-    line-height: 1.5rem;
-    max-height: calc(80% - 2rem);
+   height: 80%;
+    font-size: 12px;
+    overflow: scroll;
+     text-overflow: ellipsis;
 }
 
 .post .title {
