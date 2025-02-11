@@ -131,7 +131,8 @@ span {
     gap: 20px;
 }
 
-button {
+.buttonContainer button,
+.btns button {
     background: #FD5F49;
     display: flex;
     flex-direction: row;
