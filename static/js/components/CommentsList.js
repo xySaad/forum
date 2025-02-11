@@ -2,13 +2,13 @@ import { timePassed } from "../utils/time.js";
 import div from "./native/div.js";
 import img from "./native/img.js";
 import { reaction } from "./reaction.js";
-const CommentContainer = (comment, postId) => {
-  const reactionEndpoint = `/api/reactions/posts/${postId}/comments/`;
-  const [like, onLike] = reaction("like", reactionEndpoint);
-  const [dislike, onDislike] = reaction("dislike", reactionEndpoint);
+const CommentContainer = (comment) => {
+  const reactionEndpoint = `/api/reactions/comments/${comment.id}/`;
+  const [like, onLike] = reaction("like", comment);
+  const [dislike, onDislike] = reaction("dislike", comment);
 
-  onLike(dislike);
-  onDislike(like);
+  onLike(dislike, reactionEndpoint);
+  onDislike(like), reactionEndpoint;
 
   return div("container").add(
     div("comment").add(

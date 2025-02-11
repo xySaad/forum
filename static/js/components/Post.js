@@ -36,11 +36,11 @@ export const PostCard = (postData) => {
   readMore.onclick = showPost;
   const comment = img(importSvg("comment-bubble"));
   comment.onclick = showPost;
-
+  const reactionEndpoint = `/api/reactions/posts/${postData.id}/`;
   const [like, likeOnClick] = reaction("like", postData);
   const [dislike, dislikeOnClick] = reaction("dislike", postData);
-  likeOnClick(dislike);
-  dislikeOnClick(like);
+  likeOnClick(dislike, reactionEndpoint);
+  dislikeOnClick(like, reactionEndpoint);
 
   return div("postContainer").add(
     Frame(Post(postData).add(readMore)),
