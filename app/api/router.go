@@ -36,6 +36,8 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		reactions.Entry(conn, forumDB)
 	case "profile":
 		profile.GetUserData(conn, forumDB)
+	case "categories":
+		GetAllCategories(conn, forumDB)
 	default:
 		conn.Error(errors.HttpNotFound)
 	}
