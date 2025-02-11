@@ -15,19 +15,25 @@ type Connection struct {
 	UserId int
 }
 
-func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
+func (conn *Connection) GetUserId(forumDB *sql.DB) bool {
 	cookie, err := conn.Req.Cookie("token")
 	if err != nil || cookie.Value == "" {
-		conn.Error(errors.HttpUnauthorized)
 		return false
 	}
 
 	err = forumDB.QueryRow("SELECT id FROM users WHERE token=?", cookie.Value).Scan(&conn.UserId)
 	if err != nil {
+		return false
+	}
+	return true
+}
+
+func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
+	validToken := conn.GetUserId(forumDB)
+	if !validToken {
 		conn.Error(errors.HttpUnauthorized)
 		return false
 	}
-
 	return true
 }
 

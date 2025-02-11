@@ -2,31 +2,42 @@ import div from "./native/div.js";
 import { CommentInput } from "./CommentInput.js";
 import { CommentsList } from "./CommentsList.js";
 import { Post } from "./Post.js";
-import { back } from "../router.js";
+import { back, GetParams } from "../router.js";
 
 const PostView = (postData) => {
   const postView = div("postView");
+
   postView.onclick = (e) => {
     if (e.target == postView) {
       back();
     }
   };
 
-  const commentsWrap = div("commentsWrap");
+  if (!postData) {
+    const { id } = GetParams();
+    fetch(`/api/posts/${id}`).then(async (res) => {
+      const postData = await res.json();
+      postView.append(
+        div("postCard").add(
+          Post(postData),
+          div("commentsWrap").add(
+            CommentsList(postData.id),
+            CommentInput(postData.id)
+          )
+        )
+      );
+    });
 
-  postView.id = postData.id;
-  if (!postData.categories) {
-    postData.categories = ["sport" , "art"]
+    return postView;
   }
-  let cts = div("categoriesInPost")
-  postData.categories.forEach(cat => {
-    cts.append(div("cat","#"+ cat))
-  })
+
   return postView.add(
     div("postCard").add(
       Post(postData),
-      commentsWrap.add(CommentsList(postData.id), CommentInput(postData.id))
-
+      div("commentsWrap").add(
+        CommentsList(postData.id),
+        CommentInput(postData.id)
+      )
     )
   );
 };
