@@ -16,19 +16,19 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	switch conn.Path[2] {
 	case "register":
 		if req.Method != http.MethodPost {
-			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
+			conn.Error(errors.HttpMethodNotAllowed)
 			return
 		}
 		Register(conn, forumDB)
 	case "login":
 		if req.Method != http.MethodPost {
-			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
+			conn.Error(errors.HttpMethodNotAllowed)
 			return
 		}
 		LogIn(conn, forumDB)
 	case "logout":
 		if req.Method != http.MethodPost {
-			http.Error(resp, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
+			conn.Error(errors.HttpMethodNotAllowed)
 			return
 		}
 		cookie := http.Cookie{
