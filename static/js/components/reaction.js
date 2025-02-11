@@ -1,7 +1,7 @@
 import { Fetch } from "../utils/fetch.js";
 import { svg } from "./native/svg.js";
 import div from "./native/div.js";
-export const reaction = (type, postData, url) => {
+export const reaction = (type, postData) => {
   const reactionElement = div(`reaction ${type}`).add(
     svg(type),
     div("", postData[type + "s"])
@@ -11,11 +11,11 @@ export const reaction = (type, postData, url) => {
   }
   return [
     reactionElement,
-    (adverse) => {
+    (adverse, url) => {
       reactionElement.onclick = () => {
         const isReacted = reactionElement.classList.contains("reacted");
         const isAdverseReacted = adverse.classList.contains("reacted");
-        Fetch(url + type ?? `/api/reactions/posts/${postData.id}/${type}`, {
+        Fetch(url + type, {
           method: isReacted ? "delete" : "post",
         });
         reactionElement.classList.toggle("reacted");
