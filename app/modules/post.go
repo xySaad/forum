@@ -18,8 +18,8 @@ type Post struct {
 	Id           int         `json:"id"`
 	Content      PostContent `json:"content"`
 	Likes        int         `json:"likes"`
-	Dislikes      int         `json:"dislikes"`
-	Reaction     int         `json:"reaction"`
+	Dislikes     int         `json:"dislikes"`
+	Reaction     string      `json:"reaction"`
 	CreationTime time.Time   `json:"creationTime"`
 	Publisher    User        `json:"publisher"`
 }

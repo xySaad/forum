@@ -6,34 +6,30 @@ import (
 	"forum/app/modules/log"
 )
 
-// getReactions fetches reactions for either a post or a comment based on itemID
-func GetReactions(itemID int, item_type int, userId int, forumDB *sql.DB) (likes, dislikes, reaction int) {
-	query := `SELECT user_id ,reaction_type FROM item_reactions WHERE item_internal_id =? AND item_type = ?`
-	rows, err := forumDB.Query(query, itemID, item_type)
-	if err != nil {
-		if err != sql.ErrNoRows {
-			log.Error(err)
-		}
+func GetReactions(itemID int, itemType int, userID int, forumDB *sql.DB) (likes, dislikes int, reaction string) {
+	err := forumDB.QueryRow(`
+        SELECT 
+            SUM(CASE WHEN reaction_id = 1 THEN 1 ELSE 0 END),
+            SUM(CASE WHEN reaction_id = 2 THEN 1 ELSE 0 END)
+        FROM item_reactions
+        WHERE item_id = ? AND item_type = ?`,
+		itemID, itemType).Scan(&likes, &dislikes)
+
+	if err != nil && err != sql.ErrNoRows {
+		log.Error("Error counting reactions:", err)
 		return
 	}
-	for rows.Next() {
-		cReaction := 0
-		var userdID int
-		if err := rows.Scan(userdID, cReaction); err != nil {
-			log.Warn(err)
-			return
-		}
-		if userdID == userId {
-			reaction = cReaction
-		}
-		switch cReaction {
-		case 1:
-			likes++
-		case 2:
-			dislikes++
-		default:
-			log.Warn("unexpected reaction")
+
+	if userID != 0 {
+		err = forumDB.QueryRow(`SELECT r.name FROM item_reactions
+			JOIN reactions r ON reaction_id = r.id
+			WHERE item_id = ? AND item_type = ? AND user_id = ?`,
+			itemID, itemType, userID).Scan(&reaction)
+
+		if err != nil && err != sql.ErrNoRows {
+			log.Error(err)
 		}
 	}
+
 	return
 }
