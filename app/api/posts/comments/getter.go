@@ -21,7 +21,7 @@ func GetPostComments(conn *modules.Connection, forumDB *sql.DB) {
 		query += "AND created_at > (SELECT created_at from comments where id = ?)"
 	}
 
-	query += "ORDER BY created_at LIMIT 10;"
+	query += "ORDER BY created_at DESC LIMIT 10;"
 	rows, err := forumDB.Query(query, params...)
 	if err != nil {
 		if err == sql.ErrNoRows {
