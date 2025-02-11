@@ -19,8 +19,13 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		Req:  req,
 		Path: strings.Split(req.URL.Path, "/")[1:],
 	}
+
 	if conn.Path[len(conn.Path)-1] == "" {
 		conn.Path = conn.Path[:len(conn.Path)-1]
+	}
+	if len(conn.Path) < 2 {
+		conn.Error(errors.HttpNotFound)
+		return
 	}
 	switch conn.Path[1] {
 	case "auth":
