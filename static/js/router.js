@@ -1,11 +1,5 @@
 import div from "./components/native/div.js";
 
-const routesByLevel = [
-  {
-    404: () => div("404", "404 - page not found"),
-  },
-];
-
 const trimSlash = (str) => {
   if (str[0] === "/") {
     if (str[str.length - 1] === "/") {
@@ -15,6 +9,24 @@ const trimSlash = (str) => {
   } else if (str[str.length - 1] === "/") {
     return str.slice(0, str.length - 1);
   }
+};
+
+const routesByLevel = [
+  {
+    404: () => div("404", "404 - page not found"),
+  },
+];
+
+let Params = {};
+
+export const GetParams = () => {
+  const result = {};
+
+  Object.keys(Params).forEach((key) => {
+    result[key] = trimSlash(location.pathname).split("/")[Params[key]];
+  });
+
+  return result;
 };
 
 export const AddRoute = (route, page) => {
@@ -29,16 +41,16 @@ export const AddRoute = (route, page) => {
     const isArg = path[0] == ":";
     const pageToAdd = i === splitedRoute.length - 1 ? page : null;
 
-    let args = routesByLevel[i - 1]
-      ? { ...routesByLevel[i - 1][splitedRoute[i - 1]].args }
+    let params = routesByLevel[i - 1]
+      ? { ...routesByLevel[i - 1][splitedRoute[i - 1]].params }
       : {};
 
     if (isArg) {
-      args[path.slice(1)] = i;
+      params[path.slice(1)] = i;
       path = splitedRoute[i - 1] + "/*";
     }
 
-    routesByLevel[i][path] = { page: pageToAdd, args };
+    routesByLevel[i][path] = { page: pageToAdd, params };
   }
 };
 
@@ -54,27 +66,30 @@ const routeLookup = (route) => {
     const path = splitedRoute[i];
 
     if (i === splitedRoute.length - 1) {
-      if (!routesByLevel[i][path] || !routesByLevel[i][path].page) {
+      if (!routesByLevel[i][path] || !routesByLevel[i][path]) {
         if (routesByLevel[i][splitedRoute[i - 1] + "/*"]) {
           return {
             found: true,
-            page: routesByLevel[i][splitedRoute[i - 1] + "/*"].page,
+            ...routesByLevel[i][splitedRoute[i - 1] + "/*"],
           };
         }
-        return { found: false, page: routesByLevel[0]["404"] };
+        return { found: false, ...routesByLevel[0]["404"] };
       }
-      return { found: true, page: routesByLevel[i][path].page };
+      return { found: true, ...routesByLevel[i][path] };
     }
 
     if (!routesByLevel[i][path]) {
-      return { found: false, page: routesByLevel[0]["404"] };
+      return { found: false, ...routesByLevel[0]["404"] };
     }
   }
 };
 
 export const go = (route, popup, ...args) => {
-  const { found, page } = routeLookup(route);
+  Params = {};
+  console.log(routesByLevel);
 
+  const { found, page, params } = routeLookup(route);
+  Params = params;
   if (!found) {
     popup = false;
   }
