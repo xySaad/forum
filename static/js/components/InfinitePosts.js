@@ -1,9 +1,9 @@
 import { PostCard } from "./Post.js";
 import div from "./native/div.js";
 
-const getPosts = async (PostsArea) => {
+const getPosts = async (PostsArea, url) => {
   try {
-    const resp = await fetch(`/api/posts`);
+    const resp = await fetch(url);
     if (!resp.ok) {
       throw new Error("status not ok:", resp.status);
     }
@@ -17,8 +17,8 @@ const getPosts = async (PostsArea) => {
   }
 };
 
-export const InfinitePosts = () => {
+export const InfinitePosts = (url) => {
   const PostsArea = div("posts");
-  getPosts(PostsArea);
+  getPosts(PostsArea, url);
   return PostsArea;
 };
