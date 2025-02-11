@@ -13,12 +13,19 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	case 2:
 		switch conn.Req.Method {
 		case http.MethodGet:
-			GetPosts(conn, forumDB)
+			GetBulkPosts(conn, forumDB)
 		case http.MethodPost:
 			AddPost(conn, forumDB)
 		default:
-			conn.Error(errors.HttpInternalServerError)
+			conn.Error(errors.HttpMethodNotAllowed)
 		}
+	case 3:
+		if conn.Req.Method != http.MethodGet {
+			conn.Error(errors.HttpMethodNotAllowed)
+			return
+		}
+		GetSinglePost(conn, forumDB)
+
 	case 4:
 		nestedRoutes(conn, forumDB)
 	default:
@@ -27,19 +34,19 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 }
 
 func nestedRoutes(conn *modules.Connection, forumDB *sql.DB) {
-	switch conn.Path[3] {
-	case "comments":
-		switch conn.Req.Method {
-		case http.MethodGet:
-			comments.GetPostComments(conn, forumDB)
-		case http.MethodPost:
-			comments.AddComment(conn, forumDB)
-		case http.MethodPatch:
-			comments.UpdateComment(conn, forumDB)
-		default:
-			conn.Error(errors.HttpMethodNotAllowed)
-		}
-	default:
+	if conn.Path[3] != "comments" {
 		conn.Error(errors.HttpNotFound)
+		return
+	}
+
+	switch conn.Req.Method {
+	case http.MethodGet:
+		comments.GetPostComments(conn, forumDB)
+	case http.MethodPost:
+		comments.AddComment(conn, forumDB)
+	case http.MethodPatch:
+		comments.UpdateComment(conn, forumDB)
+	default:
+		conn.Error(errors.HttpMethodNotAllowed)
 	}
 }
