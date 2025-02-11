@@ -40,6 +40,7 @@ func generateBulkPostsQuery(categories []string, lastId string) (sqlQuery string
 	sqlQuery += "ORDER BY p.created_at DESC LIMIT 10;"
 	return
 }
+
 func GetSinglePost(conn *modules.Connection, forumDB *sql.DB) {
 	conn.GetUserId(forumDB)
 	postId := conn.Path[2]
@@ -83,7 +84,7 @@ func fetchPosts(sqlQuery string, params []any, userId int, forumDB *sql.DB) (pos
 			log.Error(err)
 			return
 		}
-		post.Publisher.GetPublicUser(forumDB)
+
 		post.Likes, post.Dislikes, post.Reaction = handlers.GetReactions(post.Id, 1, userId, forumDB)
 		err = post.Publisher.GetPublicUser(forumDB)
 		if err != nil {
