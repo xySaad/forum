@@ -15,7 +15,7 @@ func GetLikedPosts(conn *modules.Connection, db *sql.DB) {
 
 	lastId := conn.Req.URL.Query().Get("lastId")
 	query := `SELECT p.id,p.user_id,title,content,p.created_at FROM posts p
-	JOIN item_reactions ir ON ir.item_id=p.id WHERE ir.user_id=?`
+	JOIN item_reactions ir ON ir.item_id=p.id WHERE ir.user_id=? AND ir.reaction_id=1 `
 	params := []any{conn.UserId}
 
 	if lastId != "" {
