@@ -34,10 +34,10 @@ func generateBulkPostsQuery(categories []string, lastId string) (sqlQuery string
 		} else {
 			sqlQuery += "WHERE "
 		}
-		sqlQuery += "p.created_at > (SELECT created_at FROM posts WHERE id = ?) "
+		sqlQuery += "p.id > ? "
 	}
 
-	sqlQuery += "ORDER BY p.created_at DESC LIMIT 10;"
+	sqlQuery += "ORDER BY p.id DESC LIMIT 10;"
 	return
 }
 
@@ -50,7 +50,10 @@ func GetSinglePost(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(errors.HttpInternalServerError)
 		return
 	}
-
+	if len(posts) == 0 {
+		conn.Error(errors.BadRequestError("invalid post id"))
+		return
+	}
 	conn.Respond(posts[0])
 }
 

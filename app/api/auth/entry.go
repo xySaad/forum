@@ -12,7 +12,10 @@ import (
 func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	req := conn.Req
 	resp := conn.Resp
-
+	if len(conn.Path) != 3 {
+		conn.Error(errors.HttpNotFound)
+		return
+	}
 	switch conn.Path[2] {
 	case "register":
 		if req.Method != http.MethodPost {

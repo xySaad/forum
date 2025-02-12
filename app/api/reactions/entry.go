@@ -8,6 +8,10 @@ import (
 )
 
 func Entry(conn *modules.Connection, forumDB *sql.DB) {
+	if len(conn.Path) == 2 {
+		conn.Error(errors.HttpNotFound)
+		return
+	}
 	switch conn.Req.Method {
 	case http.MethodPost:
 		AddReaction(conn, forumDB)
