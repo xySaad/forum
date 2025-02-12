@@ -3,10 +3,10 @@ package profile
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"forum/app/modules"
+	"forum/app/modules/log"
 )
 
 func GetUserData(conn *modules.Connection, forumDB *sql.DB) {
@@ -17,14 +17,13 @@ func GetUserData(conn *modules.Connection, forumDB *sql.DB) {
 	type User struct {
 		Username string `json:"username"`
 		Email    string `json:"email"`
-		Token    string `json:"token"`
 	}
 
 	var userD User
-	qurr := `SELECT username, email ,token FROM users WHERE id = ?`
-	err := forumDB.QueryRow(qurr, conn.UserId).Scan(&userD.Username, &userD.Email, &userD.Token)
+	qurr := `SELECT username, email FROM users WHERE id = ?`
+	err := forumDB.QueryRow(qurr, conn.UserId).Scan(&userD.Username, &userD.Email)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		http.Error(conn.Resp, "Database query error", http.StatusInternalServerError)
 		return
 	}
