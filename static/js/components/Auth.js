@@ -18,6 +18,7 @@ const input = (type, confirm) => {
 const createRegisterForm = (authElement, context) => {
   const form = document.createElement("form");
   const username = input("name");
+  username.maxLength= 20
   const password = input("password");
   const email = input("email");
   const confirmPassword = input("password", true);
@@ -36,7 +37,7 @@ const createRegisterForm = (authElement, context) => {
   form.onsubmit = async (e) => {
     e.preventDefault();
     if (confirmPassword.value && password.value !== confirmPassword.value) {
-      document.querySelector(".errors").innerText = "the Passwords aren't identical"
+      document.querySelector(".errorPlace").innerText = "the Passwords aren't identical"
       return
     }
     const resp = await fetch("/api/auth/" + context(), {
@@ -61,7 +62,7 @@ const createRegisterForm = (authElement, context) => {
       }, 3000);
     } else {
       let nn = await resp.json()
-      document.querySelector(".errors").innerText = nn.message
+      document.querySelector(".errorPlace").innerText = nn.message
     }
   };
 
@@ -70,7 +71,7 @@ const createRegisterForm = (authElement, context) => {
     email,
     password,
     confirmPassword,
-    div("errors"),
+    div("errorPlace"),
     div("btns").add(loginButton, cancelButton)
   );
 
