@@ -145,18 +145,6 @@
      letter-spacing: 0.2px;
      color: #FFFFFF;
  }
- .commentTitle {
-    width: 95px;
-    height: 22px;
-
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-    color: #FFFFFF;
-
-}
  .creationTime {
      font-family: 'Inter';
      font-style: normal;

@@ -20,6 +20,21 @@
     z-index: -2;
 
 }
+.notification {
+    background-color: rgb(17, 195, 17);
+    color: black;
+    height: max-content;
+    width: max-content;
+    padding: 24px 32px;
+    box-Shadow : 0 4px 6px rgba(0,0,0,0.1);
+    z-Index : 1000;
+    font-Size : 16px;
+    font-Weight :bold;
+    position: absolute;
+    top: 10%;
+    left: 40%;
+    border-radius: 20px;
+}
 
 .blur-layer {
     position: absolute;
