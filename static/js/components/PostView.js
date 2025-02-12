@@ -21,7 +21,6 @@ const PostView = (postData) => {
         div("postCard").add(
           Post(postData),
           div("commentsWrap").add(
-            div("commentTitle" , "Comments"), 
             CommentsList(postData.id),
             CommentInput(postData.id)
           )
