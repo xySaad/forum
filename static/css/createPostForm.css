@@ -14,20 +14,8 @@
   max-width: 900px;
   margin: auto;
 }
-.create-post:hover {
-  height: 68px;
-  .create-post-button {
-    position: absolute;
-    padding-left: 0px;
-    padding-right: 0px;
-    width: 98%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-input {
 
+input {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(104.85px);
   align-self: stretch;
