@@ -34,8 +34,11 @@ func LogIn(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(errors.HttpInternalServerError)
 		return
 	}
+	query := `UPDATE sessions 
+    SET token = ?, expires_at = datetime('now', '+1 hour')
+    WHERE user_id = (SELECT id FROM users WHERE username = ?)`
 
-	_, err = forumDB.Exec("UPDATE users SET token = ? WHERE username = ? OR email = ?", token.String(), potentialUser.Username, potentialUser.Email)
+	_, err = forumDB.Exec(query, token.String(), potentialUser.Username)
 	if err != nil {
 		log.Error("internal server error: ", err)
 		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
@@ -46,9 +49,11 @@ func LogIn(conn *modules.Connection, forumDB *sql.DB) {
 		Name:     "token",
 		Value:    token.String(),
 		Expires:  time.Now().Add(1 * time.Hour),
-		HttpOnly: true,
 		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
 	}
+
 	http.SetCookie(conn.Resp, &cookie)
 
 	conn.Resp.WriteHeader(http.StatusOK)

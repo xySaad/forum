@@ -62,20 +62,25 @@ func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) er
 	if err != nil {
 		return err
 	}
-	id := snowflake.Default.Generate()
+	userId := snowflake.Default.Generate()
 
-	_, err = db.Exec("INSERT INTO users (id,username,token,password,email) VALUES (?, ? ,? ,? ,?)", id, User.Username, token, hashedPassWord, User.Email)
+	_, err = db.Exec("INSERT INTO users (id,username,password,email) VALUES (? ,? ,? ,?)", userId, User.Username, hashedPassWord, User.Email)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("INSERT INTO sessions (user_id,token,expires_at) VALUES (?, ? ,datetime('now', '+1 hour'))", userId, token.String())
 	if err != nil {
 		return err
 	}
 	cookie := http.Cookie{
-		SameSite: http.SameSiteStrictMode,
 		Name:     "token",
 		Value:    token.String(),
-		Expires:  time.Now().Add(time.Hour),
-		HttpOnly: true, // Makes the cookie inaccessible to JavaScript
+		Expires:  time.Now().Add(1 * time.Hour),
 		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
 	}
+
 	http.SetCookie(resp, &cookie)
 	return nil
 }

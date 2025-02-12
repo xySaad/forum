@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"forum/app/modules/errors"
+	"forum/app/modules/log"
 )
 
 type Connection struct {
@@ -15,13 +16,17 @@ type Connection struct {
 	UserId int
 }
 
+const tokenQuery = `SELECT u.id FROM users u
+	JOIN sessions s ON s.user_id=u.id 
+	WHERE s.token=? AND s.expires_at > datetime('now')`
+
 func (conn *Connection) GetUserId(forumDB *sql.DB) bool {
 	cookie, err := conn.Req.Cookie("token")
 	if err != nil || cookie.Value == "" {
 		return false
 	}
 
-	err = forumDB.QueryRow("SELECT id FROM users WHERE token=?", cookie.Value).Scan(&conn.UserId)
+	err = forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.UserId)
 	if err != nil {
 		return false
 	}
@@ -29,9 +34,20 @@ func (conn *Connection) GetUserId(forumDB *sql.DB) bool {
 }
 
 func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
-	validToken := conn.GetUserId(forumDB)
-	if !validToken {
+	cookie, err := conn.Req.Cookie("token")
+	if err != nil || cookie.Value == "" {
 		conn.Error(errors.HttpUnauthorized)
+		return false
+	}
+
+	err = forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.UserId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			conn.Error(errors.HttpUnauthorized)
+		} else {
+			log.Error(err)
+			conn.Error(errors.HttpInternalServerError)
+		}
 		return false
 	}
 	return true
