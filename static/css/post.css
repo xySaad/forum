@@ -29,12 +29,12 @@
     text-overflow: ellipsis;
 }
 
-.post .text {
+.text {
+    white-space: pre;
     overflow: hidden;
     font-size: clamp(1rem, 1vw, 1.5rem);
     line-height: 1.5rem;
 }
-
 .post .title {
     font-family: "Inter";
     font-weight: 600;
