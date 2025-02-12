@@ -1,9 +1,13 @@
+import { go } from "../router.js";
 import { PostCard } from "./Post.js";
 import div from "./native/div.js";
 
 const getPosts = async (PostsArea, url) => {
   try {
     const resp = await fetch(url);
+    if (resp.status === 401) {
+      go("/login")
+    }
     if (!resp.ok) {
       throw new Error("status not ok:", resp.status);
     }

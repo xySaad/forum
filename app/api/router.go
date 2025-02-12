@@ -9,6 +9,7 @@ import (
 	"forum/app/api/posts"
 	"forum/app/api/profile"
 	"forum/app/api/reactions"
+	"forum/app/api/user"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 )
@@ -34,6 +35,8 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		posts.Entry(conn, forumDB)
 	case "reactions":
 		reactions.Entry(conn, forumDB)
+	case "user":
+		user.Entry(conn, forumDB)
 	case "profile":
 		profile.GetUserData(conn, forumDB)
 	case "categories":

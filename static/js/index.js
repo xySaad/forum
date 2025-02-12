@@ -7,20 +7,19 @@ import { Home } from "./home.js";
 import CreatePost from "./components/createPost.js";
 import Auth from "./components/Auth.js";
 import PostView from "./components/PostView.js";
+import { CreatedPosts, LikedPosts } from "./user-posts.js";
 
 AddRoute("/", Home);
 AddRoute("/create-post", CreatePost);
 AddRoute("/login", () => Auth("login"));
 AddRoute("/register", () => Auth("register"));
 AddRoute("/post/:id", PostView);
+AddRoute("/created-posts", CreatedPosts);
+AddRoute("/liked-posts", LikedPosts);
 
 window.onpopstate = () => {
   go(window.location.pathname);
 };
-
-window.addEventListener("DOMContentLoaded", () => {
-  go(window.location.pathname);
-});
 
 const main = async () => {
   const resp = await fetch("/api/auth/session/");
@@ -28,10 +27,11 @@ const main = async () => {
     changeAuthState(true);
   }
   if (ensureAuth()) {
-    appendUserHeader();
+    await appendUserHeader();
   } else {
     appendGuestHeader();
   }
+  go(window.location.pathname);
 };
 
 main();
