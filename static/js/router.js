@@ -93,7 +93,10 @@ export const go = (route, popup, ...args) => {
   if (!found) {
     popup = false;
   }
-
+  if (history?.state?.prev?.path === route) {
+    back()
+  }
+  
   document.querySelector("popup").innerHTML = "";
   if (popup || history.state?.popup) {
     document.querySelector("popup").append(page(...args));
@@ -101,7 +104,6 @@ export const go = (route, popup, ...args) => {
     document.querySelector("main").innerHTML = "";
     document.querySelector("main").append(page(...args));
   }
-
   if (!history.state) {
     history.replaceState({ prev: null, path: route }, "");
     return;

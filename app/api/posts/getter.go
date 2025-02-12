@@ -45,7 +45,7 @@ func GetSinglePost(conn *modules.Connection, forumDB *sql.DB) {
 	conn.GetUserId(forumDB)
 	postId := conn.Path[2]
 	sqlQuery := "SELECT id,user_id,title,content,created_at FROM posts WHERE id=?"
-	posts, err := fetchPosts(sqlQuery, []any{postId}, conn.UserId, forumDB)
+	posts, err := FetchPosts(sqlQuery, []any{postId}, conn.UserId, forumDB)
 	if err != nil {
 		conn.Error(errors.HttpInternalServerError)
 		return
@@ -63,7 +63,7 @@ func GetBulkPosts(conn *modules.Connection, forumDB *sql.DB) {
 	lastId := queries.Get("lastId")
 	conn.GetUserId(forumDB)
 	sqlQuery, params := generateBulkPostsQuery(categories, lastId)
-	posts, err := fetchPosts(sqlQuery, params, conn.UserId, forumDB)
+	posts, err := FetchPosts(sqlQuery, params, conn.UserId, forumDB)
 	if err != nil {
 		conn.Error(errors.HttpInternalServerError)
 		return
@@ -72,7 +72,7 @@ func GetBulkPosts(conn *modules.Connection, forumDB *sql.DB) {
 	conn.Respond(posts)
 }
 
-func fetchPosts(sqlQuery string, params []any, userId int, forumDB *sql.DB) (posts []modules.Post, err error) {
+func FetchPosts(sqlQuery string, params []any, userId int, forumDB *sql.DB) (posts []modules.Post, err error) {
 	rows, err := forumDB.Query(sqlQuery, params...)
 	if err != nil {
 		log.Error(sqlQuery, params, err)
