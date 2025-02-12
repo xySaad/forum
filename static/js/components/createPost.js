@@ -19,7 +19,7 @@ export const PostCreationBar = () => {
   );
 };
 
-export  const  CreatePost = () => {
+export const CreatePost = () => {
   const postCreateView = document.createElement("div");
   postCreateView.className = "postCreateView";
   postCreateView.onclick = (e) => {
@@ -80,25 +80,29 @@ export  const  CreatePost = () => {
   const submitButton = document.createElement("button");
   submitButton.className = "submitButton";
   submitButton.textContent = "Create a Post";
-  submitButton.onclick = async() => {
-    if(!titleInput.value) {
-      document.querySelector(".errorPlace").textContent = "please provide a valid title (minLength is 1 char)"
-      return
+  submitButton.onclick = async () => {
+    if (!titleInput.value) {
+      document.querySelector(".errorPlace").textContent =
+        "please provide a valid title (minLength is 1 char)";
+      return;
     }
     if (!textInput.value) {
-      document.querySelector(".errorPlace").textContent = "please provide a valid Description (minLength is 1 char)"
-      return
+      document.querySelector(".errorPlace").textContent =
+        "please provide a valid Description (minLength is 1 char)";
+      return;
     }
     let resp = await Fetch("/api/posts", {
       method: "POST",
       body: JSON.stringify({
         title: titleInput.value,
         text: textInput.value,
-        categories: Array.from(document.querySelectorAll(".category-checkbox:checked")).map((checkbox)=>checkbox.value.toLowerCase())
+        categories: Array.from(
+          document.querySelectorAll(".category-checkbox:checked")
+        ).map((checkbox) => checkbox.value.toLowerCase()),
       }),
     });
-    if(resp.ok) {
-      back()
+    if (resp.ok) {
+      back();
     }
   };
 
@@ -117,12 +121,17 @@ export  const  CreatePost = () => {
 
   const postForm = document.createElement("div");
   postForm.className = "postForm";
-  postForm.appendChild(createLabeledInput("Title", titleInput));
-  postForm.appendChild(createLabeledInput("Description", textInput));
-  postForm.appendChild(createLabeledInput("Upload Image", imageInput));
-  postForm.appendChild(categoryDiv);
-  postForm.appendChild(div("errorPlace"));
-  postForm.appendChild(buttonContainer);
+
+  postForm.append(
+    div().add(
+      createLabeledInput("Title", titleInput),
+      createLabeledInput("Description", textInput),
+      createLabeledInput("Upload Image", imageInput),
+      categoryDiv,
+      div("errorPlace")
+    ),
+    buttonContainer
+  );
 
   postCreateView.appendChild(postForm);
   return postCreateView;
