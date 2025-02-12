@@ -98,6 +98,15 @@ export  const  CreatePost = () => {
       }),
     });
     if(resp.ok) {
+      let nn = await resp.text()
+      const notification = document.createElement("div");
+      notification.classList.add("notification");
+      notification.innerText="Post Created Successfully ✓"
+      document.body.appendChild(notification);
+      console.log(notification);
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
       back()
     }
   };
