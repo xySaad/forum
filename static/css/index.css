@@ -22,21 +22,22 @@
 * {
     scrollbar-width: none;
 }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
+
+/* Track */
+::-webkit-scrollbar-track {
     background: #f1f1f1;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
     background: #888;
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
     background: #555;
-  }
+}
+
 h1 {
     margin: 0;
     padding: 0;
@@ -128,4 +129,19 @@ svg {
     border-radius: 0 0 0 24px;
     bottom: 0;
     border-top: none;
+}
+
+
+.page404 {
+    display: flex;
+    margin: auto;
+    font-weight: bold;
+    display: flex;
+    margin: auto;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30%;
+    font-size: xx-large;
+    color: #e75555;
 }

@@ -13,7 +13,7 @@ const trimSlash = (str) => {
 
 const routesByLevel = [
   {
-    404: () => div("404", "404 - page not found"),
+    "404": { page: () => div("page404", "404 - page not found") },
   },
 ];
 
@@ -96,7 +96,7 @@ export const go = (route, popup, ...args) => {
   if (history?.state?.prev?.path === route) {
     back()
   }
-  
+
   document.querySelector("popup").innerHTML = "";
   if (popup || history.state?.popup) {
     document.querySelector("popup").append(page(...args));
