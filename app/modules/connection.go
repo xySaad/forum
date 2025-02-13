@@ -26,11 +26,7 @@ func (conn *Connection) GetUserId(forumDB *sql.DB) bool {
 		return false
 	}
 
-	err = forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.UserId)
-	if err != nil {
-		return false
-	}
-	return true
+	return forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.UserId) != nil
 }
 
 func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
