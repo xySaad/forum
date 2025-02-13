@@ -17,12 +17,12 @@ func ValidUserNameSyntax(name string) bool {
 	if len(name) > 20 || len(name) < 1 {
 		return false
 	}
-
+	//{  || char <= '0' && char >= '9'
 	for _, char := range name {
-		if !(char < 'a' && char > 'z' || char < 'A' && char > 'Z' || char < '0' && char > '9') {
-			if char != '_' {
+		if !(char < 'a' || char >'z' || char < 'A' || char > 'Z' ) {
+		// if char != '_' {
 				return false
-			}
+			// }
 		}
 	}
 	return true
