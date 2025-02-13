@@ -43,12 +43,13 @@ func (User *AuthCredentials) VerifyPassword(db *sql.DB) *errors.HttpError {
 	err := db.QueryRow("SELECT password FROM users WHERE username=? ", User.Username).Scan(&hashedPassWord)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return errors.NewError(404, 404, "account not found", "")
+			return errors.HttpUnauthorized
 		}
+		return errors.HttpInternalServerError
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassWord), []byte(User.Password))
 	if err != nil {
-		return errors.NewError(403, 403, "wrong paasword", "")
+		return errors.HttpUnauthorized
 	}
 	return nil
 }
