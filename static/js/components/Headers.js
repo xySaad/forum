@@ -131,7 +131,7 @@ export function appendGuestHeader() {
                 </div>`;
   Buttons.innerHTML = `<button class="secondary">Register</button>
                 <button class="primary">login</button>`;
-
+  Content.children[0].onclick = () => go("/")
   let header2 = div("toCenter").add(
     div("headerContainer").add(Content, Buttons)
   );
