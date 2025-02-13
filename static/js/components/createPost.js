@@ -117,6 +117,9 @@ export const CreatePost = () => {
       notification.classList.add("notificationError");
       notification.innerText="Unable to create a Post x"
       document.body.appendChild(notification);
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
       back()
     }
   };
