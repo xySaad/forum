@@ -307,3 +307,14 @@ button {
     max-height: 80vh;
   }
 }
+
+.create-post:hover {
+  height: 68px;
+  .create-post-button {
+    position: absolute;
+    width: 98%;
+    top: 50%;
+    left: 50%;  
+    transform: translate(-50%, -50%);
+  }
+}
