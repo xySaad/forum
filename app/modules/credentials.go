@@ -99,10 +99,11 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	}
 	exists := false
 	err := db.QueryRow("SELECT 1 FROM users WHERE username = ?", User.Username).Scan(&exists)
-	if err != sql.ErrNoRows {
-		if err != nil {
-			return errors.HttpInternalServerError
-		}
+	if err != nil && err != sql.ErrNoRows {
+		return errors.HttpInternalServerError
+	}
+
+	if exists {
 		httpErr.Details = "username already taken"
 		return
 	}
