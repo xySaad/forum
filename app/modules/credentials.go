@@ -13,10 +13,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func ValidUserName(name string) bool {
+func ValidUserNameSyntax(name string) bool {
+	if len(name) > 20 || len(name) < 1 {
+		return false
+	}
+
 	for _, char := range name {
-		if !(char < 127 && char > 32) {
-			return false
+		if !(char < 'a' && char > 'z' || char < 'A' && char > 'Z' || char < '0' && char > '9') {
+			if char != '_' {
+				return false
+			}
 		}
 	}
 	return true
@@ -28,7 +34,25 @@ func ValidEmail(email string) bool {
 }
 
 func ValidPassword(password string) bool {
-	return true
+	thereIsCap := false
+	ThereIsNumbers := false
+	ThereIsLower := false
+	if len(password) <= 6 {
+		return false
+	} else {
+		for _, char := range password {
+			if char >= 'a' && char <= 'z' {
+				ThereIsLower = true
+			}
+			if char >= 'A' && char <= 'Z' {
+				thereIsCap = true
+			}
+			if char >= '0' && char <= '9' {
+				ThereIsNumbers = true
+			}
+		}
+	}
+	return thereIsCap && ThereIsLower && ThereIsNumbers
 }
 
 type AuthCredentials struct {
@@ -92,9 +116,9 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 		Code:    errors.CodeInvalidUsername,
 		Message: "invalid username",
 	}
-
-	if !ValidUserName(User.Username) {
-		httpErr.Details = "username contains invalid character"
+	// check username
+	if !ValidUserNameSyntax(User.Username) {
+		httpErr.Details = "username should only contains (a-zA-Z0-9) and length between 1-20"
 		return
 	}
 	exists := false
@@ -127,7 +151,7 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	if !ValidPassword(User.Password) {
 		httpErr.Message = "invalid password"
 		httpErr.Code = errors.CodeIncorrectPassword
-		httpErr.Details = "password contains invalid character"
+		httpErr.Details = "password should contain at least 6 character one upper, one lower and one digit"
 		return
 	}
 	return nil
