@@ -18,7 +18,7 @@ var HttpNotFound = &HttpError{
 var HttpUnauthorized = &HttpError{
 	http.StatusUnauthorized, http.StatusUnauthorized,
 	"unauthorized",
-	"only loged-in members can performe this action",
+	"Invalid credentials",
 }
 
 var HttpMethodNotAllowed = &HttpError{
