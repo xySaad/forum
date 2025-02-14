@@ -4,34 +4,30 @@ import div from "./native/div.js"
 const filterByCat = (e) => {
     const allDiv = document.querySelector(".category.all")
     let categories = document.querySelectorAll(".categories .active")
-    if (e.target === allDiv) {
-        categories.forEach((cat) => {
-            cat.classList.remove("active")
-        })
-        allDiv.classList.add("active")
-    } else {
-        if (e.target.classList.contains("active")) {
-
-            e.target.classList.remove("active")
-        } else {
-            e.target.classList.add("active")
-            allDiv.classList.remove("active")
-        }
-        if (!categories) {
-            categories = document.querySelectorAll(".categories .active")
-            allDiv.classList.add("active")
-        }
+    if (allDiv.classList.contains("active")) {
+        allDiv.classList.remove("active")
     }
 
-
+    e.target.classList.toggle("active")
     const arr = []
     categories = document.querySelectorAll(".categories .active")
+
     categories.forEach((category) => {
         if (category === allDiv) {
             return
         }
+        if (e.target === allDiv) {
+            category.classList.remove("active")
+            return
+        }
+
         arr.push("category=" + category.textContent)
     })
+
+    if (categories.length === 0) {
+        allDiv.classList.add("active")
+    }
+
     const homePage = document.querySelector(".homePage")
     homePage.children[2].remove()
     homePage.append(InfinitePosts("api/posts?" + arr.join("&")))
