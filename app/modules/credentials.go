@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"forum/app/modules/errors"
@@ -51,7 +52,7 @@ type AuthCredentials struct {
 func (User *AuthCredentials) VerifyPassword(db *sql.DB) *errors.HttpError {
 	hashedPassWord := ""
 
-	err := db.QueryRow("SELECT password FROM users WHERE username OR email = ?", User.Username).Scan(&hashedPassWord)
+	err := db.QueryRow("SELECT password FROM users WHERE username OR email = ?", strings.ToLower(User.Username)).Scan(&hashedPassWord)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.HttpUnauthorized
@@ -76,7 +77,7 @@ func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) er
 	}
 	userId := snowflake.Generate()
 
-	_, err = db.Exec("INSERT INTO users (id,username,password,email) VALUES (? ,? ,? ,?)", userId, User.Username, hashedPassWord, User.Email)
+	_, err = db.Exec("INSERT INTO users (id,username,password,email) VALUES (? ,? ,? ,?)", userId, strings.ToLower(User.Username), hashedPassWord, strings.ToLower(User.Email))
 	if err != nil {
 		return err
 	}
@@ -109,7 +110,7 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 		return
 	}
 	exists := false
-	err := db.QueryRow("SELECT 1 FROM users WHERE username = ?", User.Username).Scan(&exists)
+	err := db.QueryRow("SELECT 1 FROM users WHERE username = ?", strings.ToLower(User.Username)).Scan(&exists)
 	if err != nil && err != sql.ErrNoRows {
 		return errors.HttpInternalServerError
 	}
@@ -127,7 +128,7 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 		return
 	}
 
-	err = db.QueryRow("SELECT 1 FROM users WHERE email = ?", User.Email).Scan(&exists)
+	err = db.QueryRow("SELECT 1 FROM users WHERE email = ?", strings.ToLower(User.Email)).Scan(&exists)
 	if err != sql.ErrNoRows {
 		if err != nil {
 			return errors.HttpInternalServerError

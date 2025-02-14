@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"forum/app/modules"
@@ -38,7 +39,7 @@ func LogIn(conn *modules.Connection, forumDB *sql.DB) {
     SET token = ?, expires_at = datetime('now', '+1 hour')
     WHERE user_id = (SELECT id FROM users WHERE username = ?)`
 
-	_, err = forumDB.Exec(query, token.String(), potentialUser.Username)
+	_, err = forumDB.Exec(query, token.String(), strings.ToLower(potentialUser.Username))
 	if err != nil {
 		log.Error("internal server error: ", err)
 		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
