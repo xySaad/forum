@@ -7,6 +7,7 @@ import (
 
 	"forum/app/modules"
 	"forum/app/modules/errors"
+	"forum/app/modules/log"
 )
 
 func Entry(conn *modules.Connection, forumDB *sql.DB) {
@@ -34,16 +35,28 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 			conn.Error(errors.HttpMethodNotAllowed)
 			return
 		}
-		cookie := http.Cookie{
+		cookie, err := conn.Req.Cookie("token")
+		if err != nil || cookie.Value == "" {
+			conn.Error(errors.HttpUnauthorized)
+			return
+		}
+
+		_, err = forumDB.Exec("DELETE FROM sessions WHERE token=?", cookie.Value)
+		if err != nil {
+			log.Error(err)
+			conn.Error(errors.HttpInternalServerError)
+			return
+		}
+
+		newCookie := http.Cookie{
 			Name:     "token",
 			Value:    "",
 			Expires:  time.Now().Add(-time.Hour),
 			HttpOnly: true,
 			Path:     "/",
 		}
-		http.SetCookie(resp, &cookie)
+		http.SetCookie(resp, &newCookie)
 		http.Redirect(resp, req, "/", http.StatusSeeOther)
-
 	case "session":
 		if conn.IsAuthenticated(forumDB) {
 			conn.Resp.Write([]byte{'o', 'k'})
