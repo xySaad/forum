@@ -283,6 +283,7 @@ button {
 .errorPlace {
   color: rgb(237, 83, 83);
   font-size: 14px;
+  width: 300px;
 }
 
 
