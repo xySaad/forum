@@ -51,7 +51,7 @@ type AuthCredentials struct {
 func (User *AuthCredentials) VerifyPassword(db *sql.DB) *errors.HttpError {
 	hashedPassWord := ""
 
-	err := db.QueryRow("SELECT password FROM users WHERE username=? ", User.Username).Scan(&hashedPassWord)
+	err := db.QueryRow("SELECT password FROM users WHERE username OR email = ?", User.Username).Scan(&hashedPassWord)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.HttpUnauthorized
