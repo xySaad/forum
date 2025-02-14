@@ -5,6 +5,11 @@ import { appendUserHeader } from "./Headers.js";
 import { changeAuthState } from "../utils/ensureAuth.js";
 import { back, replacePath } from "../router.js";
 import { NewReference } from "../utils/reference.js";
+import {
+  validateEmail,
+  validatePassword,
+  validateUsername,
+} from "../utils/auth_validation.js";
 
 const input = (type, confirm) => {
   const input = document.createElement("input");
@@ -18,12 +23,9 @@ const input = (type, confirm) => {
 const createRegisterForm = (authElement, context) => {
   const form = document.createElement("form");
   const username = input("name");
-  username.maxLength= 20
   const password = input("password");
   const email = input("email");
   const confirmPassword = input("password", true);
-  password.minLength = "6"
-  confirmPassword.minLength = "6"
   const loginButton = document.createElement("button");
   loginButton.textContent = "Login";
 
@@ -33,13 +35,21 @@ const createRegisterForm = (authElement, context) => {
   cancelButton.onclick = () => {
     authElement.cleanup();
   };
-
+  const errDisplay = div("errorPlace");
   form.onsubmit = async (e) => {
     e.preventDefault();
-    if (confirmPassword.value && password.value !== confirmPassword.value) {
-      document.querySelector(".errorPlace").innerText = "the Passwords aren't identical"
-      return
+
+    const errors = [
+      validateUsername(username.value),
+      validateEmail(email.value, context() === "register"),
+      validatePassword(password.value, context() === "register"),
+    ].filter((value) => value);
+
+    if (errors.length > 0) {
+      errDisplay.textContent = errors[0];
+      return;
     }
+
     const resp = await fetch("/api/auth/" + context(), {
       method: "POST",
       body: JSON.stringify({
@@ -55,14 +65,14 @@ const createRegisterForm = (authElement, context) => {
       cancelButton.onclick = null;
       const notification = document.createElement("div");
       notification.classList.add("notification");
-      notification.innerText="Authenticated Successfully ✓"
+      notification.innerText = "Authenticated Successfully ✓";
       document.body.appendChild(notification);
       setTimeout(() => {
         notification.remove();
       }, 3000);
     } else {
-      let nn = await resp.json()
-      document.querySelector(".errorPlace").innerText = nn.details
+      let nn = await resp.json();
+      errDisplay.innerText = nn.details;
     }
   };
 
@@ -71,7 +81,7 @@ const createRegisterForm = (authElement, context) => {
     email,
     password,
     confirmPassword,
-    div("errorPlace"),
+    errDisplay,
     div("btns").add(loginButton, cancelButton)
   );
 

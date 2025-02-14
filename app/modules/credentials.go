@@ -13,46 +13,33 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func ValidUserNameSyntax(name string) bool {
-	if len(name) > 20 || len(name) < 1 {
-		return false
-	}
+var emailPattern = regexp.MustCompile(`^[a-zA-Z0-9.]+@([a-zA-Z0-9]+\.)+[a-zA-Z0-9]{2,24}$`)
 
+func ValidUsername(name string) (bool, string) {
+	if len(name) < 3 || len(name) > 20 {
+		return false, "username must be between 3 and 20 characters"
+	}
 	for _, char := range name {
-		if !(char < 'a' && char > 'z' || char < 'A' && char > 'Z' || char < '0' && char > '9') {
-			if char != '_' {
-				return false
-			}
+		if !(char >= 'a' && char <= 'z') &&
+			!(char >= 'A' && char <= 'Z') &&
+			!(char >= '0' && char <= '9') &&
+			char != '.' {
+			return false, "username must contain only alphanumeric characters and dot (.)"
 		}
 	}
-	return true
+	return true, ""
 }
 
 func ValidEmail(email string) bool {
-	valid := regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
-	return valid.MatchString(email)
+	return emailPattern.MatchString(email)
 }
 
 func ValidPassword(password string) bool {
-	thereIsCap := false
-	ThereIsNumbers := false
-	ThereIsLower := false
-	if len(password) <= 6 {
+	if len(password) < 12 || len(password) > 256 {
 		return false
-	} else {
-		for _, char := range password {
-			if char >= 'a' && char <= 'z' {
-				ThereIsLower = true
-			}
-			if char >= 'A' && char <= 'Z' {
-				thereIsCap = true
-			}
-			if char >= '0' && char <= '9' {
-				ThereIsNumbers = true
-			}
-		}
 	}
-	return thereIsCap && ThereIsLower && ThereIsNumbers
+
+	return true
 }
 
 type AuthCredentials struct {
@@ -117,8 +104,8 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 		Message: "invalid username",
 	}
 	// check username
-	if !ValidUserNameSyntax(User.Username) {
-		httpErr.Details = "username should only contains (a-zA-Z0-9) and length between 1-20"
+	if valid, msg := ValidUsername(User.Username); !valid {
+		httpErr.Details = msg
 		return
 	}
 	exists := false
@@ -136,7 +123,7 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	httpErr.Message = "invalid email"
 
 	if !ValidEmail(User.Email) {
-		httpErr.Details = "email contains invalid character"
+		httpErr.Details = "invalid email"
 		return
 	}
 
@@ -151,7 +138,7 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	if !ValidPassword(User.Password) {
 		httpErr.Message = "invalid password"
 		httpErr.Code = errors.CodeIncorrectPassword
-		httpErr.Details = "password should contain at least 6 character one upper, one lower and one digit"
+		httpErr.Details = "password must be between 12 and 256 characters"
 		return
 	}
 	return nil
