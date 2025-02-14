@@ -27,7 +27,7 @@ const createRegisterForm = (authElement, context) => {
   const email = input("email");
   const confirmPassword = input("password", true);
   const loginButton = document.createElement("button");
-  loginButton.textContent = "Login";
+  loginButton.textContent = "Submit";
 
   const cancelButton = document.createElement("button");
   cancelButton.className = "secondary";
