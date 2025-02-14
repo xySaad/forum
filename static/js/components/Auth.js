@@ -89,6 +89,7 @@ const createRegisterForm = (authElement, context) => {
     form,
     email,
     confirmPassword,
+    errDisplay,
     reset: () => {
       form.innerHTML = "";
       form.append(
@@ -96,7 +97,7 @@ const createRegisterForm = (authElement, context) => {
         email,
         password,
         confirmPassword,
-        div("errorPlace"),
+        errDisplay,
         div("btns").add(loginButton, cancelButton)
       );
     },
@@ -109,6 +110,7 @@ const Auth = (authType) => {
   const registerForm = createRegisterForm(authElement, context);
 
   const changeContext = (registerForm) => {
+    registerForm.errDisplay.innerHTML = "";
     if (context() == "register") {
       context("login");
       registerForm.email.remove();
