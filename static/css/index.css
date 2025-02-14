@@ -61,8 +61,20 @@ body {
 }
 
 main {
+    position: relative;
+    z-index: 1;
     overflow: scroll;
     height: 100vh;
+}
+
+header {
+    position: relative;
+    z-index: 2;
+}
+
+popup {
+    position: relative;
+    z-index: 3;
 }
 
 a {
