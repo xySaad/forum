@@ -12,7 +12,7 @@ import (
 )
 
 func generateBulkPostsQuery(categories []string, lastId string) (sqlQuery string, params []any) {
-	sqlQuery = "SELECT p.id,user_id,title,content,created_at FROM posts p "
+	sqlQuery = "SELECT DISTINCT p.id,user_id,title,content,created_at FROM posts p "
 	if categories != nil {
 		var placeholders []string
 		for _, category := range categories {
