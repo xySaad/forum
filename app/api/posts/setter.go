@@ -41,7 +41,7 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 }
 
 func CreatePost(content *modules.PostContent, userID int, forumDB *sql.DB) (int64, error) {
-	postID := snowflake.Default.Generate()
+	postID := snowflake.Generate()
 
 	sqlQuery := "INSERT INTO posts (id, title, content, user_id) VALUES (?, ?, ?, ?)"
 	_, err := forumDB.Exec(sqlQuery, postID, content.Title, content.Text, userID)

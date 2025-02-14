@@ -32,7 +32,7 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(errors.BadRequestError("missing content"))
 		return
 	}
-	commentId := snowflake.Default.Generate()
+	commentId := snowflake.Generate()
 	query := `INSERT INTO comments (id, post_id, user_id, content) VALUES (?, ?, ?, ?)`
 	_, err = forumDB.Exec(query, commentId, postId, conn.UserId, comment.Content)
 	if err != nil {
