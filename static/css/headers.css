@@ -99,6 +99,7 @@ h3 {
 }
 
 .header {
+    position: relative;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -237,14 +238,12 @@ h3 {
     }
 
     .close {
+        font-size: medium;
         display: block;
         color: white;
-        position: absolute;
         z-index: 4;
         cursor: pointer;
-        top: 50%;
-        right: 64px;
-        transform: translate(-50%, -50%);
+        order: 3;
     }
 
 }
