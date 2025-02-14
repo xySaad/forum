@@ -81,12 +81,12 @@ export const CreatePost = () => {
   submitButton.className = "submitButton";
   submitButton.textContent = "Create a Post";
   submitButton.onclick = async () => {
-    if (!titleInput.value) {
+    if (titleInput.value.trim().length === 0) {
       document.querySelector(".errorPlace").textContent =
         "please provide a valid title (minLength is 1 char)";
       return;
     }
-    if (!textInput.value) {
+    if (textInput.value.trim().length === 0) {
       document.querySelector(".errorPlace").textContent =
         "please provide a valid Description (minLength is 1 char)";
       return;
@@ -94,28 +94,28 @@ export const CreatePost = () => {
     let resp = await Fetch("/api/posts", {
       method: "POST",
       body: JSON.stringify({
-        title: titleInput.value,
-        text: textInput.value,
+        title: titleInput.value.trim(),
+        text: textInput.value.trim(),
         categories: Array.from(
           document.querySelectorAll(".category-checkbox:checked")
         ).map((checkbox) => checkbox.value.toLowerCase()),
       }),
     });
 
-    if(resp.ok) {
+    if (resp.ok) {
       let nn = await resp.text()
       const notification = document.createElement("div");
       notification.classList.add("notification");
-      notification.innerText="Post Created Successfully ✓"
+      notification.innerText = "Post Created Successfully ✓"
       document.body.appendChild(notification);
       setTimeout(() => {
         notification.remove();
       }, 3000);
       back()
-    }else {
+    } else {
       const notification = document.createElement("div");
       notification.classList.add("notificationError");
-      notification.innerText="Unable to create a Post x"
+      notification.innerText = "Unable to create a Post x"
       document.body.appendChild(notification);
       setTimeout(() => {
         notification.remove();
