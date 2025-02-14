@@ -24,7 +24,11 @@ const AUTH_RULES = {
     },
   },
 };
-const validateUsername = (username) => {
+const validateUsername = (username, context) => {
+  if (context === "login") {
+    return;
+  }
+
   if (
     username.length < AUTH_RULES.USERNAME.MIN_LENGTH ||
     username.length > AUTH_RULES.USERNAME.MAX_LENGTH

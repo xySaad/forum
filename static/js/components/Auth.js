@@ -40,7 +40,7 @@ const createRegisterForm = (authElement, context) => {
     e.preventDefault();
 
     const errors = [
-      validateUsername(username.value),
+      validateUsername(username.value, context()),
       validateEmail(email.value, context() === "register"),
       validatePassword(password.value, context() === "register"),
     ].filter((value) => value);

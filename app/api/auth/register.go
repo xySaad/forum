@@ -3,6 +3,7 @@ package auth
 import (
 	"database/sql"
 	"encoding/json"
+	"strings"
 
 	"forum/app/modules"
 	"forum/app/modules/errors"
@@ -16,7 +17,7 @@ func Register(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(errors.BadRequestError("Request is not valid JSON"))
 		return
 	}
-
+	potentialuser.Username = strings.ToLower(potentialuser.Username)
 	httpErr := potentialuser.ValidInfo(forumDB)
 	if httpErr != nil {
 		conn.Error(httpErr)
