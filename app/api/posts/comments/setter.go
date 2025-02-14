@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"forum/app/modules"
@@ -26,6 +27,7 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 		conn.Error(errors.BadRequestError("invalid format"))
 		return
 	}
+	comment.Content = strings.TrimSpace(comment.Content)
 	if comment.Content == "" {
 		conn.Error(errors.BadRequestError("missing content"))
 		return
