@@ -103,24 +103,24 @@ export const CreatePost = () => {
     });
 
     if (resp.ok) {
-      let nn = await resp.text()
+      let nn = await resp.text();
       const notification = document.createElement("div");
       notification.classList.add("notification");
-      notification.innerText = "Post Created Successfully ✓"
+      notification.innerText = "Post Created Successfully ✓";
       document.body.appendChild(notification);
       setTimeout(() => {
         notification.remove();
       }, 3000);
-      back()
+      back();
     } else {
       const notification = document.createElement("div");
       notification.classList.add("notificationError");
-      notification.innerText = "Unable to create a Post x"
+      notification.innerText = "Unable to create a Post x";
       document.body.appendChild(notification);
       setTimeout(() => {
         notification.remove();
       }, 3000);
-      back()
+      back();
     }
   };
 
@@ -144,7 +144,7 @@ export const CreatePost = () => {
     div().add(
       createLabeledInput("Title", titleInput),
       createLabeledInput("Description", textInput),
-      createLabeledInput("Upload Image", imageInput),
+      // createLabeledInput("Upload Image", imageInput),
       categoryDiv,
       div("errorPlace")
     ),
