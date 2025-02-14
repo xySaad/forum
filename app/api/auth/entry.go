@@ -43,7 +43,7 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 		}
 		http.SetCookie(resp, &cookie)
 		http.Redirect(resp, req, "/", http.StatusSeeOther)
-
+		//remove session
 	case "session":
 		if conn.IsAuthenticated(forumDB) {
 			conn.Resp.Write([]byte{'o', 'k'})

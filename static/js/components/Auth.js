@@ -25,7 +25,7 @@ const createRegisterForm = (authElement, context) => {
   password.minLength = "6"
   confirmPassword.minLength = "6"
   const loginButton = document.createElement("button");
-  loginButton.textContent = "Login";
+  loginButton.textContent = "Submit";
 
   const cancelButton = document.createElement("button");
   cancelButton.className = "secondary";
