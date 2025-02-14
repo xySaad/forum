@@ -48,8 +48,6 @@ h1 {
 }
 
 body {
-    width: 100vw;
-    min-height: 100vh;
     margin: 0;
     font-family: Inter;
     font-size: 0.75rem;
@@ -58,6 +56,13 @@ body {
     background: linear-gradient(129.76deg, #252937 -0.72%, #101218 80.04%);
     background-repeat: no-repeat;
     background-size: cover;
+    overflow: hidden;
+    height: 100%;
+}
+
+main {
+    overflow: scroll;
+    height: 100vh;
 }
 
 a {
