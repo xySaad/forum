@@ -85,19 +85,23 @@ func FetchPosts(sqlQuery string, params []any, userId int, forumDB *sql.DB) (pos
 			&post.Content.Title, &post.Content.Text, &post.CreationTime)
 		if err != nil {
 			log.Error(err)
-			return
+			continue
 		}
 
 		post.Likes, post.Dislikes, post.Reaction = handlers.GetReactions(post.Id, 1, userId, forumDB)
 		err = post.Publisher.GetPublicUser(forumDB)
 		if err != nil {
-			log.Error(err)
-			return
+			if err == sql.ErrNoRows {
+				post.Publisher.Username = "deleted user"
+			} else {
+				log.Error(err)
+				continue
+			}
 		}
 		post.Content.Categories, err = getPostCategories(post.Id, forumDB)
 		if err != nil {
 			log.Error(err)
-			return
+			continue
 		}
 		posts = append(posts, post)
 	}
