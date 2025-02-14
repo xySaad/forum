@@ -63,15 +63,3 @@ func (s *Snowflake) Generate() int64 {
 	id := (now-epoch)<<timestampShift | (s.machineID << machineIDShift) | s.sequence
 	return id
 }
-
-// GetMachineID returns the machine ID.
-func (s *Snowflake) GetMachineID() int64 {
-	return s.machineID
-}
-
-// GetSequence returns the current sequence number.
-func (s *Snowflake) GetSequence() int64 {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	return s.sequence
-}
