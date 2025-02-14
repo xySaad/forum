@@ -8,19 +8,19 @@ import (
 	"time"
 )
 
-var logFile io.Writer
+var logFile = Initlog()
 var logFilename = "./logs/" + time.Now().Format(time.DateOnly) + ".log"
 
-func Initlog() error {
+func Initlog() io.Writer {
 	err := os.MkdirAll("./logs", 0o777)
 	if err != nil {
-		return err
+		panic(err)
 	}
-	logFile, err = os.OpenFile(logFilename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
+	logFile, err := os.OpenFile(logFilename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {
-		return err
+		panic(err)
 	}
-	return nil
+	return logFile
 }
 
 func Info(v ...any) {

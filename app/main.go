@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,15 +16,9 @@ import (
 )
 
 func main() {
-	err := log.Initlog()
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "error creating log file: ", err)
-		return
-	}
 	forumDB, err := sql.Open("sqlite3", "./forum.db")
 	if err != nil {
-		log.Error("error opening database:", err)
-		return
+		log.Fatal("error opening database:", err)
 	}
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
