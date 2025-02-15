@@ -34,7 +34,7 @@ func generateBulkPostsQuery(categories []string, lastId string) (sqlQuery string
 		} else {
 			sqlQuery += "WHERE "
 		}
-		sqlQuery += "p.id > ? "
+		sqlQuery += "p.id < ? "
 	}
 
 	sqlQuery += "ORDER BY p.id DESC LIMIT 10;"

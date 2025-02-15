@@ -18,7 +18,7 @@ func GetPostComments(conn *modules.Connection, forumDB *sql.DB) {
 	query := "SELECT id,post_id,user_id,content,created_at FROM comments WHERE post_id = ? "
 	if lastId != "" {
 		params = append(params, lastId)
-		query += "AND id > ?"
+		query += "AND id < ?"
 	}
 
 	query += "ORDER BY id DESC LIMIT 10;"

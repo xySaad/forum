@@ -24,7 +24,7 @@ export const CommentContainer = (comment) => {
 const fetchComments = async (commentsList, postId) => {
   const resp = await fetch(`/api/posts/${postId}/comments`);
   const json = await resp.json();
-  json.forEach((comment) => {
+  json?.forEach((comment) => {
     commentsList.add(CommentContainer(comment));
   });
 };
