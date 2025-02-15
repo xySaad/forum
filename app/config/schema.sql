@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS post_categories (
   category_id INTEGER NOT NULL,
   FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
   FOREIGN KEY (category_id) REFERENCES categories(id)
+  UNIQUE (post_id, category_id)
 );
 
 CREATE TABLE IF NOT EXISTS comments (
