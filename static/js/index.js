@@ -1,4 +1,3 @@
-"use strict";
 import { appendUserHeader } from "./components/Headers.js";
 import { appendGuestHeader } from "./components/Headers.js";
 import ensureAuth, { changeAuthState } from "./utils/ensureAuth.js";
