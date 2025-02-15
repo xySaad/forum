@@ -42,7 +42,7 @@ const createRegisterForm = (authElement, context) => {
     const errors = [
       validateUsername(username.value, context()),
       validateEmail(email.value, context() === "register"),
-      validatePassword(password.value, context() === "register"),
+      validatePassword(password.value,confirmPassword.value, context() === "register"),
     ].filter((value) => value);
 
     if (errors.length > 0) {
