@@ -86,8 +86,6 @@ const routeLookup = (route) => {
 
 export const go = (route, popup, ...args) => {
   Params = {};
-  console.log(routesByLevel);
-
   const { found, page, params } = routeLookup(route);
   Params = params;
   if (!found) {
