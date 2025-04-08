@@ -9,6 +9,7 @@
   flex-direction: column;
   gap: 39px;
   padding: 10vh 0;
+  margin-bottom: 20vh;
 }
 
 .posts {
