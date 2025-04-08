@@ -58,6 +58,9 @@ func GetSinglePost(conn *modules.Connection, forumDB *sql.DB) {
 }
 
 func GetBulkPosts(conn *modules.Connection, forumDB *sql.DB) {
+	if !conn.IsAuthenticated(forumDB) {
+		return
+	}
 	queries := conn.Req.URL.Query()
 	categories := queries["category"]
 	lastId := queries.Get("lastId")

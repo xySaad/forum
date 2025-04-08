@@ -8,6 +8,6 @@ export const Home = () => {
   return div("homePage").add(
     PostCreationBar(),
     FilterSearch(),
-    InfinitePosts("api/posts")
+    InfinitePosts("/api/posts")
   );
 };
