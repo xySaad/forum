@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -45,7 +46,7 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 	comment = modules.Comment{
-		Id:           int(commentId),
+		Id:           strconv.Itoa(int(commentId)),
 		Content:      comment.Content,
 		PostId:       postId,
 		CreationTime: time.Now().Format(time.DateTime),

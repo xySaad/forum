@@ -6,7 +6,7 @@ import (
 	"forum/app/modules/log"
 )
 
-func GetReactions(itemID int, itemType int, userID int, forumDB *sql.DB) (likes, dislikes int, reaction string) {
+func GetReactions(itemID string, itemType int, userID int, forumDB *sql.DB) (likes, dislikes int, reaction string) {
 	err := forumDB.QueryRow(`
         SELECT 
             SUM(CASE WHEN reaction_id = 1 THEN 1 ELSE 0 END),

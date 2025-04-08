@@ -16,7 +16,7 @@ type PostContent struct {
 	Categories []string `json:"categories"`
 }
 type Post struct {
-	Id           int         `json:"id"`
+	Id           string      `json:"id"`
 	Content      PostContent `json:"content"`
 	Likes        int         `json:"likes"`
 	Dislikes     int         `json:"dislikes"`

@@ -114,7 +114,7 @@ func FetchPosts(sqlQuery string, params []any, userId int, forumDB *sql.DB) (pos
 	return
 }
 
-func getPostCategories(postId int, forumDB *sql.DB) (categories []string, err error) {
+func getPostCategories(postId string, forumDB *sql.DB) (categories []string, err error) {
 	categories = make([]string, 4)
 	sqlQuery := `
         SELECT categories.name 
