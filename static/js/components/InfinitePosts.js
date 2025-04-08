@@ -8,17 +8,19 @@ const getPosts = async (PostsArea, url) => {
   try {
     const resp = await fetch(url);
     if (resp.status === 401) {
-      go("/login")
+      go("/login");
+      return;
     }
     if (!resp.ok) {
       throw new Error("status not ok:", resp.status);
     }
     json = await resp.json();
-
-    for (const post of json) {
-      PostsArea.append(PostCard(post));
+    if (json) {
+      for (const post of json) {
+        PostsArea.append(PostCard(post));
+      }
+      nextUrl = new URL(resp.url);
     }
-    nextUrl = new URL(resp.url)
   } catch (error) {
     console.error("Error fetching comments:", error);
   }
@@ -31,15 +33,15 @@ const getPosts = async (PostsArea, url) => {
 
   const observer = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) {
-      observer.unobserve(entries[0].target)
+      observer.unobserve(entries[0].target);
       if (nextUrl) {
-        nextUrl.searchParams.set("lastId", json[json.length - 1].id)
-        getPosts(PostsArea, nextUrl)      
+        nextUrl.searchParams.set("lastId", json[json.length - 1].id);
+        getPosts(PostsArea, nextUrl);
       }
     }
   }, options);
 
-  observer.observe(PostsArea.children[PostsArea.children.length - 1])
+  observer.observe(PostsArea.children[PostsArea.children.length - 1]);
 };
 
 export const InfinitePosts = (url) => {
