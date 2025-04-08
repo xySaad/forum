@@ -1,128 +1,127 @@
 .postContainer {
-    position: relative;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    border-radius: 24px;
-    max-width: 900px;
-    margin: auto;
+  position: relative;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 24px;
+  max-width: 900px;
+  margin: auto;
 }
 
-
 .post {
-    position: relative;
-    padding: 40px;
-    gap: 8px;
-    border-radius: 24px;
-    z-index: 1;
-    background: #FFFFFF14;
-    overflow: hidden;
-    cursor: default;
-    max-height: 40vh;
+  position: relative;
+  padding: 40px;
+  gap: 8px;
+  border-radius: 24px;
+  z-index: 1;
+  background: #ffffff14;
+  overflow: hidden;
+  cursor: default;
+  max-height: 40vh;
 }
 
 .text,
 .username {
-    width: fit-content;
-    max-width: 100%;
-    text-overflow: ellipsis;
+  width: fit-content;
+  max-width: 100%;
+  text-overflow: ellipsis;
 }
 
 .text {
-    white-space: pre;
-    overflow: hidden;
-    font-size: clamp(1rem, 1vw, 1.5rem);
-    line-height: 1.5rem;
+  max-height: 12.5rem;
+  overflow: hidden;
+  font-size: clamp(1rem, 1vw, 1.5rem);
+  line-height: 1.5rem;
 }
 .post .title {
-    font-family: "Inter";
-    font-weight: 600;
-    line-height: 1.9vmax;
-    min-height: 1.9vmax;
-    padding: 5px 0;
-    font-size: 18px;
-    overflow: hidden;
-    white-space: nowrap;
+  font-family: "Inter";
+  font-weight: 600;
+  line-height: 1.9vmax;
+  min-height: 1.9vmax;
+  padding: 5px 0;
+  font-size: 18px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .leftBar {
-    padding: 0 8px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  padding: 0 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .reactionsContainer {
-    display: flex;
-    width: max-content;
-    background: none;
-    gap: 12px;
+  display: flex;
+  width: max-content;
+  background: none;
+  gap: 12px;
 }
 
 .publisher {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5px;
-    font-weight: 500;
-    flex-wrap: wrap;
-    width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .publisher img {
-    border-radius: 100%;
-    width: 2rem;
+  border-radius: 100%;
+  width: 2rem;
 }
 
 .publisher div {
-    width: fit-content;
+  width: fit-content;
 }
 
 .publisher div.username {
-    font-size: 0.875rem;
-    line-height: 16.94px;
-    overflow: hidden;
-    white-space: nowrap;
+  font-size: 0.875rem;
+  line-height: 16.94px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .publisher div.time {
-    font-size: 0.75rem;
-    color: #FFFFFF52;
-    line-height: 16.94px;
+  font-size: 0.75rem;
+  color: #ffffff52;
+  line-height: 16.94px;
 }
 
 .readmore {
-    font-size: clamp(0.75rem, 1vw, 0.5rem);
-    font-weight: 700;
-    line-height: 14.52px;
-    text-align: left;
-    color: #FD5F49;
-    cursor: pointer;
-    width: fit-content;
-    padding-top: 1rem;
+  font-size: clamp(0.75rem, 1vw, 0.5rem);
+  font-weight: 700;
+  line-height: 14.52px;
+  text-align: left;
+  color: #fd5f49;
+  cursor: pointer;
+  width: fit-content;
+  padding-top: 1rem;
 }
 
 .commentCreator {
-    color: green;
+  color: green;
 }
 
 .categoriesInPost {
-    display: flex;
-    gap: 6px;
+  display: flex;
+  gap: 6px;
 }
 
 .cat {
-    margin: 12px 0px;
-    padding: 4px 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 18px;
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 15px;
-    color: rgba(255, 255, 255, 0.8);
+  margin: 12px 0px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+  color: rgba(255, 255, 255, 0.8);
 }
