@@ -1,9 +1,9 @@
 import { importSvg } from "../../utils/index.js";
 
 export const svg = (name) => {
-  const svg = document.createElement("div");
+  const svg = document.createElement("svg");
   fetch(importSvg(name)).then(async (res) => {
-    svg.innerHTML = await res.text();
+    svg.outerHTML = await res.text();
   });
   return svg;
 };
