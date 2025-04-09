@@ -77,7 +77,7 @@ func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) er
 	}
 	userId := snowflake.Generate()
 
-	_, err = db.Exec("INSERT INTO users (id,username,password,email) VALUES (? ,? ,? ,?)", userId, strings.ToLower(User.Username), hashedPassWord, strings.ToLower(User.Email))
+	_, err = db.Exec("INSERT INTO users (id,firstname,secendname,age,gender,username,password,email) VALUES (? ,? ,? ,? ,? ,? ,? ,?)", userId, strings.ToLower(User.Username), hashedPassWord, strings.ToLower(User.Email))
 	if err != nil {
 		return err
 	}
