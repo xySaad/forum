@@ -2,6 +2,7 @@ package modules
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -44,9 +45,13 @@ func ValidPassword(password string) bool {
 }
 
 type AuthCredentials struct {
-	Username string
-	Email    string
-	Password string
+	Username  string
+	Age       string
+	Gender    string
+	Firstname string
+	Lastname  string
+	Email     string
+	Password  string
 }
 
 func (User *AuthCredentials) VerifyPassword(db *sql.DB) *errors.HttpError {
@@ -77,8 +82,9 @@ func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) er
 	}
 	userId := snowflake.Generate()
 
-	_, err = db.Exec("INSERT INTO users (id,username,password,email) VALUES (? ,? ,? ,?)", userId, strings.ToLower(User.Username), hashedPassWord, strings.ToLower(User.Email))
+	_, err = db.Exec("INSERT INTO users (id,username,age,gender,firstname,lastname,password,email) VALUES (? ,? ,? ,? ,? ,? ,? ,?)", userId, strings.ToLower(User.Username), User.Age, strings.ToLower(User.Gender), strings.ToLower(User.Firstname), strings.ToLower(User.Lastname), hashedPassWord, strings.ToLower(User.Email))
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	_, err = db.Exec("INSERT INTO sessions (user_id,token,expires_at) VALUES (?, ? ,datetime('now', '+1 hour'))", userId, token.String())
