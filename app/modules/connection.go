@@ -20,7 +20,7 @@ const tokenQuery = `SELECT u.id FROM users u
 	JOIN sessions s ON s.user_id=u.id 
 	WHERE s.token=? AND s.expires_at > datetime('now')`
 
-func (conn *Connection) GetUser(forumDB *sql.DB) bool {
+func (conn *Connection) GetUserId(forumDB *sql.DB) bool {
 	cookie, err := conn.Req.Cookie("token")
 	if err != nil || cookie.Value == "" {
 		return false

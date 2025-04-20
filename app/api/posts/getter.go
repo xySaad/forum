@@ -42,7 +42,7 @@ func generateBulkPostsQuery(categories []string, lastId string) (sqlQuery string
 }
 
 func GetSinglePost(conn *modules.Connection, forumDB *sql.DB) {
-	conn.GetUser(forumDB)
+	conn.GetUserId(forumDB)
 	postId := conn.Path[2]
 	sqlQuery := "SELECT id,user_id,title,content,created_at FROM posts WHERE id=?"
 	posts, err := FetchPosts(sqlQuery, []any{postId}, conn.User.Id, forumDB)
@@ -64,7 +64,7 @@ func GetBulkPosts(conn *modules.Connection, forumDB *sql.DB) {
 	queries := conn.Req.URL.Query()
 	categories := queries["category"]
 	lastId := queries.Get("lastId")
-	conn.GetUser(forumDB)
+	conn.GetUserId(forumDB)
 	sqlQuery, params := generateBulkPostsQuery(categories, lastId)
 	posts, err := FetchPosts(sqlQuery, params, conn.User.Id, forumDB)
 	if err != nil {

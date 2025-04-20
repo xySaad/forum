@@ -33,7 +33,7 @@ func GetPostComments(conn *modules.Connection, forumDB *sql.DB) {
 	}
 	defer rows.Close()
 	var comments []modules.Comment
-	conn.GetUser(forumDB)
+	conn.GetUserId(forumDB)
 	for rows.Next() {
 		var comment modules.Comment
 		err = rows.Scan(&comment.Id, &comment.PostId, &comment.Publisher.Id, &comment.Content, &comment.CreationTime)
