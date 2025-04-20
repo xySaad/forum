@@ -36,7 +36,7 @@ func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
 		return false
 	}
 
-	err = forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.User)
+	err = forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.User.Id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			conn.Error(errors.HttpUnauthorized)
