@@ -44,7 +44,7 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 	VALUES (((SELECT id from items where name = ?)), ?, ?, (SELECT id from reactions where name = ?))
 	ON CONFLICT(user_id, item_id, item_type) DO UPDATE SET reaction_id = excluded.reaction_id;`
 
-	_, err = forumDB.Exec(query, itemType[:len(itemType)-1], itemId, conn.UserId, reactionType)
+	_, err = forumDB.Exec(query, itemType[:len(itemType)-1], itemId, conn.User, reactionType)
 	if err != nil {
 		log.Error(err)
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
@@ -77,7 +77,7 @@ func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
 	}
 
 	sqlQuery := "DELETE FROM item_reactions WHERE user_id = ? AND item_id =?"
-	result, err := forumDB.Exec(sqlQuery, conn.UserId, itemId)
+	result, err := forumDB.Exec(sqlQuery, conn.User, itemId)
 	if err != nil {
 		conn.Error(errors.HttpInternalServerError)
 		return

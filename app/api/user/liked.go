@@ -16,7 +16,7 @@ func GetLikedPosts(conn *modules.Connection, db *sql.DB) {
 	lastId := conn.Req.URL.Query().Get("lastId")
 	query := `SELECT p.id,p.user_id,title,content,p.created_at FROM posts p
 	JOIN item_reactions ir ON ir.item_id=p.id WHERE ir.user_id=? AND ir.reaction_id=1 `
-	params := []any{conn.UserId}
+	params := []any{conn.User}
 
 	if lastId != "" {
 		params = append(params, any(lastId))
@@ -24,7 +24,7 @@ func GetLikedPosts(conn *modules.Connection, db *sql.DB) {
 	}
 	query += "ORDER BY p.id DESC LIMIT 10;"
 
-	posts, err := posts.FetchPosts(query, params, conn.UserId, db)
+	posts, err := posts.FetchPosts(query, params, conn.User.Id, db)
 	if err != nil {
 		conn.Error(errors.HttpInternalServerError)
 		return

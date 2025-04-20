@@ -27,7 +27,7 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	postID, err := CreatePost(&postContent, conn.UserId, forumDB)
+	postID, err := CreatePost(&postContent, conn.User.Id, forumDB)
 	if err != nil {
 		if err != sql.ErrNoRows {
 			log.Error(err)

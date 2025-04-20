@@ -33,7 +33,7 @@ func GetPostComments(conn *modules.Connection, forumDB *sql.DB) {
 	}
 	defer rows.Close()
 	var comments []modules.Comment
-	conn.GetUserId(forumDB)
+	conn.GetUser(forumDB)
 	for rows.Next() {
 		var comment modules.Comment
 		err = rows.Scan(&comment.Id, &comment.PostId, &comment.Publisher.Id, &comment.Content, &comment.CreationTime)
@@ -41,7 +41,7 @@ func GetPostComments(conn *modules.Connection, forumDB *sql.DB) {
 			conn.Error(errors.HttpInternalServerError)
 			return
 		}
-		comment.Likes, comment.Dislikes, comment.Reaction = handlers.GetReactions(comment.Id, 2, conn.UserId, forumDB)
+		comment.Likes, comment.Dislikes, comment.Reaction = handlers.GetReactions(comment.Id, 2, conn.User.Id, forumDB)
 		err := comment.Publisher.GetPublicUser(forumDB)
 		if err != nil {
 			conn.Error(errors.HttpInternalServerError)

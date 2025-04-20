@@ -21,7 +21,7 @@ func GetUserData(conn *modules.Connection, forumDB *sql.DB) {
 
 	var userD User
 	qurr := `SELECT username, email FROM users WHERE id = ?`
-	err := forumDB.QueryRow(qurr, conn.UserId).Scan(&userD.Username, &userD.Email)
+	err := forumDB.QueryRow(qurr, conn.User).Scan(&userD.Username, &userD.Email)
 	if err != nil {
 		log.Error(err)
 		http.Error(conn.Resp, "Database query error", http.StatusInternalServerError)

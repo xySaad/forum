@@ -10,23 +10,23 @@ import (
 )
 
 type Connection struct {
-	Resp   http.ResponseWriter
-	Req    *http.Request
-	Path   []string
-	UserId int
+	Resp http.ResponseWriter
+	Req  *http.Request
+	Path []string
+	User User
 }
 
 const tokenQuery = `SELECT u.id FROM users u
 	JOIN sessions s ON s.user_id=u.id 
 	WHERE s.token=? AND s.expires_at > datetime('now')`
 
-func (conn *Connection) GetUserId(forumDB *sql.DB) bool {
+func (conn *Connection) GetUser(forumDB *sql.DB) bool {
 	cookie, err := conn.Req.Cookie("token")
 	if err != nil || cookie.Value == "" {
 		return false
 	}
 
-	return forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.UserId) != nil
+	return forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.User) != nil
 }
 
 func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
@@ -36,7 +36,7 @@ func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {
 		return false
 	}
 
-	err = forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.UserId)
+	err = forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.User)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			conn.Error(errors.HttpUnauthorized)

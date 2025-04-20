@@ -14,7 +14,7 @@ func GetUserCreatedPosts(conn *modules.Connection, db *sql.DB) {
 	}
 	lastId := conn.Req.URL.Query().Get("lastId")
 	query := "SELECT p.id,user_id,title,content,created_at FROM posts p WHERE user_id=? "
-	params := []any{conn.UserId}
+	params := []any{conn.User}
 
 	if lastId != "" {
 		params = append(params, any(lastId))
@@ -22,7 +22,7 @@ func GetUserCreatedPosts(conn *modules.Connection, db *sql.DB) {
 	}
 	query += "ORDER BY p.id DESC LIMIT 10;"
 
-	posts, err := posts.FetchPosts(query, params, conn.UserId, db)
+	posts, err := posts.FetchPosts(query, params, conn.User.Id, db)
 	if err != nil {
 		conn.Error(errors.HttpInternalServerError)
 		return
