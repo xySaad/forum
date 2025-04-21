@@ -1,0 +1,45 @@
+.users {
+    position: relative;
+    display: inline-flex;
+    left: 15px;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 100%;
+    align-items: center;
+}
+.profilepic {
+    width: 15px;
+    height: 15px;
+}
+.userholder {
+    /*align-items: baseline;*/
+    border: none;
+    display: flex;
+    padding: 16px 16px;
+    gap: 6px;
+    min-width: 100px;
+    height: 20px;
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(2px);
+    border-radius: 16px;
+    flex: none;
+    align-self: stretch;
+    flex-grow: 0;
+}
+.userpopup {
+    .users{
+        left: 0px;
+    }
+    gap: 24px;
+    background: #1F222B;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    position: absolute;
+    position: fixed;
+    padding: 24px;
+}

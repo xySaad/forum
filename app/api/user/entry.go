@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"log"
 
 	"forum/app/modules"
 	"forum/app/modules/errors"
@@ -18,4 +19,32 @@ func Entry(conn *modules.Connection, db *sql.DB) {
 	case "created":
 		GetUserCreatedPosts(conn, db)
 	}
+}
+
+func GetAllUsers(conn *modules.Connection, db *sql.DB) {
+	var users []modules.User
+	query := `SELECT id, username, profile_picture FROM users`
+
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Println("Error executing query:", err)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user modules.User
+		err := rows.Scan(&user.Id, &user.Username, &user.ProfilePicture)
+		if err != nil {
+			log.Println("Error scanning row:", err)
+			continue
+		}
+		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Println("Rows error:", err)
+		return
+	}
+	conn.Respond(users)
 }
