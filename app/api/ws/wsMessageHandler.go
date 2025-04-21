@@ -1,0 +1,44 @@
+package ws
+
+import (
+	"forum/app/modules/log"
+	"forum/app/modules/snowflake"
+)
+
+type wsDirectMessage struct {
+	Type     string `json:"type"`
+	Receiver string `json:"receiver"`
+	Text     string `json:"text"`
+}
+
+func handleWsMessage(msg wsDirectMessage, userId snowflake.SnowflakeID) {
+	for _, conn := range activeUsers[userId] {
+		err := conn.WriteJSON(msg)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+}
+
+type wsNotifyMsg struct {
+	Type   string `json:"type"`
+	Id     snowflake.SnowflakeID
+	status string
+}
+
+func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
+	msg := wsNotifyMsg{
+		Type:   "online",
+		Id:     userId,
+		status: status,
+	}
+
+	for _, WsConnections := range activeUsers {
+		for _, conn := range WsConnections {
+			err := conn.WriteJSON(msg)
+			if err != nil {
+				log.Error(err)
+			}
+		}
+	}
+}

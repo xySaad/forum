@@ -10,6 +10,7 @@ import (
 	"forum/app/api/profile"
 	"forum/app/api/reactions"
 	"forum/app/api/user"
+	"forum/app/api/ws"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 )
@@ -43,6 +44,8 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		GetAllCategories(conn, forumDB)
 	case "users":
 		user.GetAllUsers(conn, forumDB)
+	case "ws":
+		ws.Entry(conn, forumDB)
 	default:
 		conn.Error(errors.HttpNotFound)
 	}
