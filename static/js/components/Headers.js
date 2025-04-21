@@ -90,7 +90,7 @@ export async function appendUserHeader() {
     img("../../static/svg/logo.svg", "logo", "logo"),
     div("close", "☰"),
     div("icons").add(icn1, icn2, icn3, chatBubble),
-    div("profileContainer").add(img("avatar", "avatar", "profile")),
+    div("profileContainer").add(img("", "avatar", "profile")),
     div("profileCard").add(
       div("textContainer").add(h2, h4),
       div("line"),

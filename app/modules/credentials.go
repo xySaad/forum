@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -82,7 +83,7 @@ func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) er
 	}
 	userId := snowflake.Generate()
 
-	_, err = db.Exec("INSERT INTO users (id,username,age,gender,firstname,lastname,password,email) VALUES (? ,? ,? ,? ,? ,? ,? ,?)", userId, strings.ToLower(User.Username), User.Age, strings.ToLower(User.Gender), strings.ToLower(User.Firstname), strings.ToLower(User.Lastname), hashedPassWord, strings.ToLower(User.Email))
+	_, err = db.Exec("INSERT INTO users (id,username,age,gender,firstname,lastname,password,email,profile_picture) VALUES (? ,? ,? ,? ,? ,? ,? ,? ,?)", userId, strings.ToLower(User.Username), User.Age, strings.ToLower(User.Gender), strings.ToLower(User.Firstname), strings.ToLower(User.Lastname), hashedPassWord, strings.ToLower(User.Email), generateAvatarURL(User.Username))
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -149,4 +150,9 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 		return
 	}
 	return nil
+}
+
+func generateAvatarURL(username string) string {
+	escaped := url.PathEscape(username)
+	return fmt.Sprintf("https://api.dicebear.com/7.x/bottts/svg?seed=%s", escaped)
 }

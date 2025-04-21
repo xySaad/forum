@@ -7,7 +7,12 @@
     max-width: 100%;
     align-items: center;
 }
+.profilepic {
+    width: 15px;
+    height: 15px;
+}
 .userholder {
+    /*align-items: baseline;*/
     border: none;
     display: flex;
     padding: 16px 16px;

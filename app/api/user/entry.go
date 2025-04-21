@@ -22,28 +22,29 @@ func Entry(conn *modules.Connection, db *sql.DB) {
 }
 
 func GetAllUsers(conn *modules.Connection, db *sql.DB) {
-	// efer db.Close()
-	var users []string
+	var users []modules.User
+	query := `SELECT id, username, profile_picture FROM users`
 
-	rows, err := db.Query("SELECT username FROM users")
+	rows, err := db.Query(query)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error executing query:", err)
+		return
 	}
 	defer rows.Close()
 
-	var names []string
 	for rows.Next() {
-		var name string
-		if err := rows.Scan(&name); err != nil {
-			log.Fatal(err)
+		var user modules.User
+		err := rows.Scan(&user.Id, &user.Username, &user.ProfilePicture)
+		if err != nil {
+			log.Println("Error scanning row:", err)
+			continue
 		}
-		names = append(names, name)
+		users = append(users, user)
 	}
 
 	if err = rows.Err(); err != nil {
-		log.Fatal(err)
+		log.Println("Rows error:", err)
+		return
 	}
-
-	users = append(users, names...)
 	conn.Respond(users)
 }

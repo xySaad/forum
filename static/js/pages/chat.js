@@ -16,7 +16,7 @@ export const infinitusers = (url) => {
   return UserArea;
 }
 export async function getusers(UserArea, url) {
-  let nextUrl
+  //let nextUrl
   let json
   try {
     const resp = await fetch(url);
@@ -30,7 +30,14 @@ export async function getusers(UserArea, url) {
     json = await resp.json();
     if (json) {
       for (const user of json) {
-        UserArea.append(div("userholder").add(user))
+        let img = document.createElement("img");
+        img.src = user.profilePicture;
+        UserArea.append(
+          div("userholder").add(
+            div("profilepic").add(img),
+            user.username
+          )
+        );
       }
       nextUrl = new URL(resp.url);
     }
