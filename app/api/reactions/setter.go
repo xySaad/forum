@@ -44,7 +44,7 @@ func AddReaction(conn *modules.Connection, forumDB *sql.DB) {
 	VALUES (((SELECT id from items where name = ?)), ?, ?, (SELECT id from reactions where name = ?))
 	ON CONFLICT(user_id, item_id, item_type) DO UPDATE SET reaction_id = excluded.reaction_id;`
 
-	_, err = forumDB.Exec(query, itemType[:len(itemType)-1], itemId, conn.User, reactionType)
+	_, err = forumDB.Exec(query, itemType[:len(itemType)-1], itemId, conn.User.Id, reactionType)
 	if err != nil {
 		log.Error(err)
 		if sqliteErr, ok := err.(sqlite3.Error); ok {
@@ -83,6 +83,9 @@ func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 	n, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err)
+	}
 	if n == 0 {
 		conn.Error(errors.BadRequestError("invalid item id"))
 		return
