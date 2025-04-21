@@ -29,8 +29,7 @@ const filterByCat = (e) => {
     }
 
     const homePage = document.querySelector(".homePage")
-    homePage.children[2].remove()
-    homePage.append(InfinitePosts("api/posts?" + arr.join("&")))
+    homePage.children[2].replaceWith(InfinitePosts("api/posts?" + arr.join("&")))
 }
 
 export const FilterSearch = () => {
