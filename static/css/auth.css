@@ -71,6 +71,10 @@
     justify-content: center;
     align-items: center;
 }
+.inputContainer {
+    display: flex;
+    gap: 8px;
+}
 
 .card {
     /* width: fit-content; */
@@ -188,6 +192,7 @@ button.secondary {
 }
 
 .auth form {
+    /*position: relative;*/
     display: flex;
     flex-direction: column;
     gap: 16px;

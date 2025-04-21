@@ -3,11 +3,16 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY NOT NULL,
   username TEXT NOT NULL UNIQUE,
+  age INTEGER,
+  gender TEXT NOT NULL,
+  firstname TEXT NOT NULL,
+  lastname TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   profile_picture TEXT,
   password TEXT NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
 
 CREATE TABLE IF NOT EXISTS sessions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
