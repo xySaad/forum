@@ -42,7 +42,7 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 	})
 }
 
-func CreatePost(content *modules.PostContent, userID int, forumDB *sql.DB) (snowflake.SnowflakeID, error) {
+func CreatePost(content *modules.PostContent, userID snowflake.SnowflakeID, forumDB *sql.DB) (snowflake.SnowflakeID, error) {
 	postID := snowflake.Generate()
 
 	sqlQuery := "INSERT INTO posts (id, title, content, user_id) VALUES (?, ?, ?, ?)"

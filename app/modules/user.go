@@ -1,11 +1,14 @@
 package modules
 
-import "database/sql"
+import (
+	"database/sql"
+	"forum/app/modules/snowflake"
+)
 
 type User struct {
-	Username       string  `json:"username"`
-	Id             int     `json:"id"`
-	ProfilePicture *string `json:"profilePicture"`
+	Username       string                `json:"username"`
+	Id             snowflake.SnowflakeID `json:"id"`
+	ProfilePicture *string               `json:"profilePicture"`
 }
 
 func (u *User) GetPublicUser(db *sql.DB) (err error) {

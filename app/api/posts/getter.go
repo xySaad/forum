@@ -76,7 +76,7 @@ func GetBulkPosts(conn *modules.Connection, forumDB *sql.DB) {
 	conn.Respond(posts)
 }
 
-func FetchPosts(sqlQuery string, params []any, userId int, forumDB *sql.DB) (posts []modules.Post, err error) {
+func FetchPosts(sqlQuery string, params []any, userId snowflake.SnowflakeID, forumDB *sql.DB) (posts []modules.Post, err error) {
 	rows, err := forumDB.Query(sqlQuery, params...)
 	if err != nil {
 		log.Error(sqlQuery, params, err)
@@ -92,7 +92,7 @@ func FetchPosts(sqlQuery string, params []any, userId int, forumDB *sql.DB) (pos
 			continue
 		}
 
-		post.Likes, post.Dislikes, post.Reaction = handlers.GetReactions(post.Id, 1, userId, forumDB)
+		post.Likes, post.Dislikes, post.Reaction = handlers.GetReactions(post.Id, userId, 1, forumDB)
 		err = post.Publisher.GetPublicUser(forumDB)
 		if err != nil {
 			if err == sql.ErrNoRows {
