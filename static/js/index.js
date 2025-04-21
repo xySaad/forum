@@ -8,7 +8,7 @@ import CreatePost from "./components/createPost.js";
 import Auth from "./components/Auth.js";
 import PostView from "./components/PostView.js";
 import { CreatedPosts, LikedPosts } from "./user-posts.js";
-import { Chat } from "./pages/chat.js";
+import { Chat, conversation } from "./pages/chat.js";
 
 AddRoute("/", Home);
 AddRoute("/create-post", CreatePost);
@@ -18,6 +18,7 @@ AddRoute("/post/:id", PostView);
 AddRoute("/created-posts", CreatedPosts);
 AddRoute("/liked-posts", LikedPosts);
 AddRoute("/chat", Chat);
+// AddRoute("/chat/:id", conversation);
 
 window.onpopstate = () => {
   go(window.location.pathname);

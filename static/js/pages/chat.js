@@ -1,5 +1,6 @@
 import { toggleIcon } from "../components/Headers.js";
 import div from "../components/native/div.js";
+import { input } from "../components/native/input.js";
 
 export const Chat = () => {
   const chatBubble = document.querySelector(".chat-bubble");
@@ -29,19 +30,34 @@ export async function getusers(UserArea, url) {
     }
     json = await resp.json();
     if (json) {
+
       for (const user of json) {
         let img = document.createElement("img");
         img.src = user.profilePicture;
-        UserArea.append(
-          div("userholder").add(
-            div("profilepic").add(img),
-            user.username
-          )
-        );
+        let jj = div("userholder")
+        jj.onclick(conversation)
+        jj.add(
+          div("profilepic").add(img),
+          user.username
+        )
+        UserArea.append(jj);
       }
       nextUrl = new URL(resp.url);
     }
   } catch (error) {
     console.error("Error fetching users:", error);
   }
+}
+export function conversation() {
+  return callfunction(infinitusers)
+}
+export function callfunction(func1) {
+  func1()
+  let creatbtn = document.createElement("button").value("send")
+  let inputmsg = input("msj-input", "message", true)
+  const conversation = div("ConversationArea").add(
+    div(msgdiv),
+    div("inputmsg").add(inputmsg, creatbtn),
+  )
+  return conversation
 }
