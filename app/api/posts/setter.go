@@ -37,10 +37,12 @@ func AddPost(conn *modules.Connection, forumDB *sql.DB) {
 		}
 		return
 	}
-	conn.Respond(map[string]int64{"postID": postID})
+	conn.Respond(modules.Post{
+		Id: postID,
+	})
 }
 
-func CreatePost(content *modules.PostContent, userID int, forumDB *sql.DB) (int64, error) {
+func CreatePost(content *modules.PostContent, userID int, forumDB *sql.DB) (snowflake.SnowflakeID, error) {
 	postID := snowflake.Generate()
 
 	sqlQuery := "INSERT INTO posts (id, title, content, user_id) VALUES (?, ?, ?, ?)"

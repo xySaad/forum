@@ -15,6 +15,6 @@ func noerr() *Snowflake {
 	return sf
 }
 
-func Generate() int64 {
+func Generate() SnowflakeID {
 	return defaultGenerator.Generate()
 }

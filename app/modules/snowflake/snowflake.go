@@ -17,6 +17,12 @@ const (
 	machineIDShift = sequenceBits
 )
 
+type SnowflakeID int64
+
+func (id SnowflakeID) MarshalJSON() ([]byte, error) {
+	return []byte(`"` + strconv.FormatInt(int64(id), 10) + `"`), nil
+}
+
 // Snowflake represents a unique ID generator.
 type Snowflake struct {
 	mutex     sync.Mutex
@@ -41,7 +47,7 @@ func NewSnowflake(machineID int64, timeFunc func() int64) (*Snowflake, error) {
 }
 
 // Generate creates a new unique ID.
-func (s *Snowflake) Generate() int64 {
+func (s *Snowflake) Generate() SnowflakeID {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
@@ -61,5 +67,5 @@ func (s *Snowflake) Generate() int64 {
 
 	s.timestamp = now
 	id := (now-epoch)<<timestampShift | (s.machineID << machineIDShift) | s.sequence
-	return id
+	return SnowflakeID(id)
 }

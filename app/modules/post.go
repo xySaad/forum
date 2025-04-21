@@ -7,6 +7,7 @@ import (
 
 	"forum/app/config"
 	"forum/app/modules/errors"
+	"forum/app/modules/snowflake"
 )
 
 type PostContent struct {
@@ -15,14 +16,15 @@ type PostContent struct {
 	Image      string   `json:"image,omitempty"`
 	Categories []string `json:"categories"`
 }
+
 type Post struct {
-	Id           string      `json:"id"`
-	Content      PostContent `json:"content"`
-	Likes        int         `json:"likes"`
-	Dislikes     int         `json:"dislikes"`
-	Reaction     string      `json:"reaction"`
-	CreationTime time.Time   `json:"creationTime"`
-	Publisher    User        `json:"publisher"`
+	Id           snowflake.SnowflakeID `json:"id"`
+	Content      PostContent           `json:"content"`
+	Likes        int                   `json:"likes"`
+	Dislikes     int                   `json:"dislikes"`
+	Reaction     string                `json:"reaction"`
+	CreationTime time.Time             `json:"creationTime"`
+	Publisher    User                  `json:"publisher"`
 }
 
 func (pc *PostContent) ValidatePostContent() (err *errors.HttpError) {

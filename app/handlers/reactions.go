@@ -4,9 +4,10 @@ import (
 	"database/sql"
 
 	"forum/app/modules/log"
+	"forum/app/modules/snowflake"
 )
 
-func GetReactions(itemID string, itemType int, userID int, forumDB *sql.DB) (likes, dislikes int, reaction string) {
+func GetReactions(itemID snowflake.SnowflakeID, itemType, userID int, forumDB *sql.DB) (likes, dislikes int, reaction string) {
 	err := forumDB.QueryRow(`
         SELECT 
             SUM(CASE WHEN reaction_id = 1 THEN 1 ELSE 0 END),
