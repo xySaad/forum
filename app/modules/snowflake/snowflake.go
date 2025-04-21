@@ -2,6 +2,7 @@ package snowflake
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -21,6 +22,21 @@ type SnowflakeID int64
 
 func (id SnowflakeID) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + strconv.FormatInt(int64(id), 10) + `"`), nil
+}
+
+func (id *SnowflakeID) UnmarshalJSON(data []byte) error {
+	str, err := strconv.Unquote(string(data))
+	if err != nil {
+		return fmt.Errorf("invalid snowflake string: %w", err)
+	}
+
+	parsed, err := strconv.ParseInt(str, 10, 64)
+	if err != nil {
+		return fmt.Errorf("invalid snowflake number: %w", err)
+	}
+
+	*id = SnowflakeID(parsed)
+	return nil
 }
 
 // Snowflake represents a unique ID generator.
