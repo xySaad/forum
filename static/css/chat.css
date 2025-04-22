@@ -8,6 +8,25 @@
     height: 100vh;
     align-items: center;
 }
+.ConversationArea  {
+    /* position: absolute;*/
+     display: flex;
+     width: 80%;
+ }
+ .msj-input {
+    
+    height: 30px;
+}
+.inputmsg {
+    position: relative;
+    width: 500px;
+    top: 80vh;
+    left: 50%;
+}
+.boody {
+    display: flex;
+    height: 80vh;
+}
 .profilepic {
     width: 15px;
     height: 15px;
