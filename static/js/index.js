@@ -10,6 +10,7 @@ import PostView from "./components/PostView.js";
 import { CreatedPosts, LikedPosts } from "./user-posts.js";
 import { Chat } from "./pages/chat.js";
 export let userInfo
+
 AddRoute("/", Home);
 AddRoute("/create-post", CreatePost);
 AddRoute("/login", () => Auth("login"));
@@ -18,6 +19,7 @@ AddRoute("/post/:id", PostView);
 AddRoute("/created-posts", CreatedPosts);
 AddRoute("/liked-posts", LikedPosts);
 AddRoute("/chat", Chat);
+// AddRoute("/chat/:id", conversation);
 
 window.onpopstate = () => {
   go(window.location.pathname);

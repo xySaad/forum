@@ -10,6 +10,8 @@ export const Fetch = async (...args) => {
   if (resp.status == 401) {
     changeAuthState(false);
     go("/login", true);
+  } else if (!resp.ok) {
+    throw new Error("status not ok:", resp.status);
   }
   return resp;
 };
