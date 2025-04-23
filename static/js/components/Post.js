@@ -29,7 +29,7 @@ export const Post = (postData) => {
 
 export const PostCard = (postData) => {
   const showPost = () => {
-    go(`/post/${postData.id}`, true, postData);
+    go(`/post/${postData.id}`, postData);
   };
 
   const readMore = div("readmore", "Read more");

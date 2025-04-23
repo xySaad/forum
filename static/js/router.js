@@ -13,7 +13,7 @@ const trimSlash = (str) => {
 
 const routesByLevel = [
   {
-    "404": { page: () => div("page404", "404 - page not found") },
+    404: { page: () => div("page404", "404 - page not found"), popup: false },
   },
 ];
 
@@ -29,7 +29,7 @@ export const GetParams = () => {
   return result;
 };
 
-export const AddRoute = (route, page) => {
+export const AddRoute = (route, page, popup) => {
   const splitedRoute = trimSlash(route).split("/");
 
   for (let i = 0; i < splitedRoute.length; i++) {
@@ -50,7 +50,7 @@ export const AddRoute = (route, page) => {
       path = splitedRoute[i - 1] + "/*";
     }
 
-    routesByLevel[i][path] = { page: pageToAdd, params };
+    routesByLevel[i][path] = { page: pageToAdd, params, popup };
   }
 };
 
@@ -84,31 +84,28 @@ const routeLookup = (route) => {
   }
 };
 
-export const go = (route, popup, ...args) => {
+export const go = (route, ...args) => {
   Params = {};
-  const { found, page, params } = routeLookup(route);
+  const { popup, page, params } = routeLookup(route);
+  console.log(popup, routesByLevel);
+  
   Params = params;
-  if (!found) {
-    popup = false;
-  }
+
   if (history?.state?.prev?.path === route) {
-    back()
+    back();
   }
 
   document.querySelector("popup").innerHTML = "";
-  if (popup || history.state?.popup) {
-    document.querySelector("popup").append(page(...args));
-  } else {
-    document.querySelector("main").innerHTML = "";
-    document.querySelector("main").append(page(...args));
-  }
+  const targetLayer = document.querySelector(popup ? "popup" : "main");
+  targetLayer.innerHTML = "";
+  targetLayer.append(page(...args));
   if (!history.state) {
     history.replaceState({ prev: null, path: route }, "");
     return;
   }
 
   if (history.state.prev?.path != route && history.state.path != route) {
-    history.pushState({ prev: history.state, path: route, popup }, "", route);
+    history.pushState({ prev: history.state, path: route }, "", route);
   }
 };
 

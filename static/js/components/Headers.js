@@ -142,9 +142,9 @@ export function appendGuestHeader() {
   );
   head.append(header2);
   document.querySelector(".primary").addEventListener("click", () => {
-    go("/login", true);
+    go("/login");
   });
   document.querySelector(".secondary").addEventListener("click", () => {
-    go("/register", true);
+    go("/register");
   });
 }

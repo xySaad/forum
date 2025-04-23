@@ -9,7 +9,7 @@ export const Fetch = async (...args) => {
   const resp = await fetch(...args);
   if (resp.status == 401) {
     changeAuthState(false);
-    go("/login", true);
+    go("/login");
   }
   return resp;
 };
