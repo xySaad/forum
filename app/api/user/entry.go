@@ -2,10 +2,10 @@ package user
 
 import (
 	"database/sql"
-	"log"
 
 	"forum/app/modules"
 	"forum/app/modules/errors"
+	"forum/app/modules/log"
 )
 
 func Entry(conn *modules.Connection, db *sql.DB) {
@@ -27,7 +27,7 @@ func GetAllUsers(conn *modules.Connection, db *sql.DB) {
 
 	rows, err := db.Query(query)
 	if err != nil {
-		log.Println("Error executing query:", err)
+		log.Error("Error executing query:", err)
 		return
 	}
 	defer rows.Close()
@@ -36,14 +36,14 @@ func GetAllUsers(conn *modules.Connection, db *sql.DB) {
 		var user modules.User
 		err := rows.Scan(&user.Id, &user.Username, &user.ProfilePicture)
 		if err != nil {
-			log.Println("Error scanning row:", err)
+			log.Error("Error scanning row:", err)
 			continue
 		}
 		users = append(users, user)
 	}
 
 	if err = rows.Err(); err != nil {
-		log.Println("Rows error:", err)
+		log.Error("Rows error:", err)
 		return
 	}
 	conn.Respond(users)
