@@ -26,8 +26,6 @@ window.onpopstate = () => {
 };
 
 const main = async () => {
-  const main = document.querySelector("main");
-  main.insertAdjacentElement("beforebegin", ActiveUsers());
   const resp = await fetch("/api/profile");
   if (resp.ok) {
     changeAuthState(true);
@@ -39,6 +37,9 @@ const main = async () => {
     appendGuestHeader();
   }
   go(window.location.pathname);
+  const main = document.querySelector("main");
+  main.insertAdjacentElement("beforebegin", ActiveUsers());
+
   InitWS();
 };
 

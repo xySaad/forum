@@ -1,3 +1,4 @@
+import { userInfo } from "../index.js";
 import div from "./native/div.js";
 import img from "./native/img.js";
 const USERS_API = "/api/users";
@@ -6,11 +7,13 @@ const getActiveUsers = async (parentNode) => {
   const resp = await fetch(USERS_API);
   const users = await resp.json();
   users.forEach((user) => {
+    if (user.id === userInfo?.id) return
     parentNode.add(
       div("user").add(
         div("publisher").add(
           img(user.profilePicture, "no-profile"),
-          div("username", user.username)
+          div("username", user.username),
+          div(`status ${user.status}`, user.status)
         )
       )
     );
