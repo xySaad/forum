@@ -10,6 +10,7 @@ import {
   validatePassword,
   validateUsername,
 } from "../utils/auth_validation.js";
+import { ActiveUsers } from "./ActiveUsers.js";
 
 const input = (type, confirm, placeholdername) => {
   const input = document.createElement("input");
@@ -81,8 +82,10 @@ const createRegisterForm = (authElement, context) => {
       }),
     });
     if (resp.ok) {
+      const resp = await fetch("/api/profile/")
       changeAuthState(true);
-      appendUserHeader();
+      appendUserHeader(await resp.json());
+      document.querySelector(".users").replaceWith(ActiveUsers())
       authElement.cleanup();
       cancelButton.onclick = null;
       const notification = document.createElement("div");
