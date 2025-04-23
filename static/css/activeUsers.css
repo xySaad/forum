@@ -5,9 +5,18 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-  background-color: hsla(0, 0%, 0%, 0.719);
+  background-color: hsl(238, 22%, 10%);
   border-radius: 20px;
   z-index: 2;
+}
+.users .title {
+  margin: auto;
+  border-bottom: gray 1px solid;
+  padding: 0 10px;
+}
+.users .fallback {
+  white-space: pre;
+  text-align: center;
 }
 
 .user {
@@ -22,6 +31,7 @@
   border-radius: 16px;
 }
 .user .username {
+  margin-right: 10px;
   font-weight: bold;
 }
 .status {

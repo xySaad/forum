@@ -5,9 +5,13 @@ const USERS_API = "/api/users";
 
 const getActiveUsers = async (parentNode) => {
   const resp = await fetch(USERS_API);
+  if (!resp.ok) {
+    parentNode.append(div("fallback", "It's lonely right here!\nno users."));
+    return;
+  }
   const users = await resp.json();
   users.forEach((user) => {
-    if (user.id === userInfo?.id) return
+    if (user.id === userInfo?.id) return;
     parentNode.add(
       div("user").add(
         div("publisher").add(
@@ -23,5 +27,5 @@ const getActiveUsers = async (parentNode) => {
 export const ActiveUsers = () => {
   const usersContainer = div("users");
   getActiveUsers(usersContainer);
-  return usersContainer;
+  return usersContainer.add(div("title", "Users"));
 };
