@@ -10,6 +10,7 @@ import PostView from "./components/PostView.js";
 import { CreatedPosts, LikedPosts } from "./pages/user-posts.js";
 import { Chat } from "./pages/chat.js";
 import { ActiveUsers } from "./components/ActiveUsers.js";
+import { InitWS } from "./websockets.js";
 export let userInfo;
 AddRoute("/", Home);
 AddRoute("/create-post", CreatePost);
@@ -38,6 +39,7 @@ const main = async () => {
     appendGuestHeader();
   }
   go(window.location.pathname);
+  InitWS();
 };
 
 main();
