@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Inter:700|Inter:400');
 @import url("../css/home.css");
 @import url("../css/reaction.css");
-@import url("../css/chat.css");
+@import url("../css/activeUsers.css");
 :root[data-theme="light"] {
     --text: #050316;
     --background: #fbfbfe;

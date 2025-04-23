@@ -9,7 +9,8 @@ import Auth from "./components/Auth.js";
 import PostView from "./components/PostView.js";
 import { CreatedPosts, LikedPosts } from "./user-posts.js";
 import { Chat } from "./pages/chat.js";
-export let userInfo
+import { ActiveUsers } from "./components/ActiveUsers.js";
+export let userInfo;
 AddRoute("/", Home);
 AddRoute("/create-post", CreatePost);
 AddRoute("/login", () => Auth("login"));
@@ -24,10 +25,12 @@ window.onpopstate = () => {
 };
 
 const main = async () => {
+  const main = document.querySelector("main");
+  main.insertAdjacentElement("beforebegin", ActiveUsers());
   const resp = await fetch("/api/profile");
   if (resp.ok) {
     changeAuthState(true);
-    userInfo = await resp.json()
+    userInfo = await resp.json();
   }
   if (ensureAuth()) {
     await appendUserHeader();

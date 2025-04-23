@@ -1,0 +1,23 @@
+.users {
+  position: absolute;
+  margin-left: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background-color: hsla(0, 0%, 0%, 0.719);
+  border-radius: 20px;
+  z-index: 2;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  padding: 16px 16px;
+  gap: 6px;
+  min-width: 100px;
+  height: 20px;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
