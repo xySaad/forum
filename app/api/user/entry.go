@@ -23,6 +23,9 @@ func Entry(conn *modules.Connection, db *sql.DB) {
 }
 
 func GetAllUsers(conn *modules.Connection, db *sql.DB) {
+	if !conn.IsAuthenticated(db) {
+		return
+	}
 	var users []modules.User
 	query := `SELECT id, username, profile_picture FROM users`
 
