@@ -24,7 +24,7 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 	defer wsConn.Close()
-	defer notifyStatusChange(conn.User.Id, "offline")
+	defer deleteActiveUser(conn.User.Id)
 	addActiveUser(conn.User.Id, wsConn)
 
 	for {
