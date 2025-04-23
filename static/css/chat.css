@@ -8,29 +8,49 @@
     height: 100vh;
     align-items: center;
 }
-.ConversationArea  {
-    /* position: absolute;*/
-     display: flex;
-     width: 80%;
- }
- .msj-input {
-    
+
+button {
+    position: relative;
+    border-radius: 30px;
+    width: 20%;
+    top: 100%;
     height: 30px;
 }
+
+.ConversationArea {
+    /* position: absolute;*/
+    display: flex;
+    width: 80%;
+}
+
+.msj-input {
+    margin: 0;
+    position: relative;
+    border-radius: 30px;
+    width: 70%;
+    top: 100%;
+    height: 30px;
+}
+
 .inputmsg {
+    border-width: 12px;
+    border: 1px solid #fd5f49;
     position: relative;
     width: 500px;
-    top: 80vh;
+    /* top: 80vh; */
     left: 50%;
 }
+
 .boody {
     display: flex;
     height: 80vh;
 }
+
 .profilepic {
     width: 15px;
     height: 15px;
 }
+
 .userholder {
     /*align-items: baseline;*/
     border: none;
@@ -47,10 +67,12 @@
     align-self: stretch;
     flex-grow: 0;
 }
+
 .userpopup {
-    .users{
+    .users {
         left: 0px;
     }
+
     gap: 24px;
     background: #1F222B;
     border-radius: 24px;
