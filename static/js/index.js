@@ -7,7 +7,7 @@ import { Home } from "./pages/home.js";
 import CreatePost from "./components/createPost.js";
 import Auth from "./components/Auth.js";
 import PostView from "./components/PostView.js";
-import { CreatedPosts, LikedPosts } from "./user-posts.js";
+import { CreatedPosts, LikedPosts } from "./pages/user-posts.js";
 import { Chat } from "./pages/chat.js";
 import { ActiveUsers } from "./components/ActiveUsers.js";
 export let userInfo;

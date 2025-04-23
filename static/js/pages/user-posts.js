@@ -1,5 +1,5 @@
-import { toggleIcon } from "./components/Headers.js";
-import { InfinitePosts } from "./components/InfinitePosts.js";
+import { toggleIcon } from "../components/Headers.js";
+import { InfinitePosts } from "../components/InfinitePosts.js";
 
 export const CreatedPosts = () => {
   const url = "/api/user/created/";
