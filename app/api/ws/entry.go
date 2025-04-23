@@ -24,7 +24,7 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 	defer wsConn.Close()
-	defer deleteActiveUser(conn.User.Id)
+	defer deleteActiveUser(conn.User.Id, wsConn)
 	addActiveUser(conn.User.Id, wsConn)
 
 	for {
