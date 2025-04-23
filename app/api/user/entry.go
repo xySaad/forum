@@ -35,15 +35,16 @@ func GetAllUsers(conn *modules.Connection, db *sql.DB) {
 
 	for rows.Next() {
 		var user modules.User
-		if ws.IsActive(user.Id) {
-			user.Status = "online"
-		} else {
-			user.Status = "offline"
-		}
+
 		err := rows.Scan(&user.Id, &user.Username, &user.ProfilePicture)
 		if err != nil {
 			log.Error("Error scanning row:", err)
 			continue
+		}
+		if ws.IsActive(user.Id) {
+			user.Status = "online"
+		} else {
+			user.Status = "offline"
 		}
 		users = append(users, user)
 	}
