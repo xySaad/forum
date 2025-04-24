@@ -2,10 +2,11 @@ package user
 
 import (
 	"database/sql"
-	"log"
 
+	"forum/app/api/ws"
 	"forum/app/modules"
 	"forum/app/modules/errors"
+	"forum/app/modules/log"
 )
 
 func Entry(conn *modules.Connection, db *sql.DB) {
@@ -22,28 +23,37 @@ func Entry(conn *modules.Connection, db *sql.DB) {
 }
 
 func GetAllUsers(conn *modules.Connection, db *sql.DB) {
+	if !conn.IsAuthenticated(db) {
+		return
+	}
 	var users []modules.User
 	query := `SELECT id, username, profile_picture FROM users`
 
 	rows, err := db.Query(query)
 	if err != nil {
-		log.Println("Error executing query:", err)
+		log.Error("Error executing query:", err)
 		return
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var user modules.User
+
 		err := rows.Scan(&user.Id, &user.Username, &user.ProfilePicture)
 		if err != nil {
-			log.Println("Error scanning row:", err)
+			log.Error("Error scanning row:", err)
 			continue
+		}
+		if ws.IsActive(user.Id) {
+			user.Status = "online"
+		} else {
+			user.Status = "offline"
 		}
 		users = append(users, user)
 	}
 
 	if err = rows.Err(); err != nil {
-		log.Println("Rows error:", err)
+		log.Error("Rows error:", err)
 		return
 	}
 	conn.Respond(users)

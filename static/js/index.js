@@ -7,15 +7,15 @@ import { Home } from "./pages/home.js";
 import CreatePost from "./components/createPost.js";
 import Auth from "./components/Auth.js";
 import PostView from "./components/PostView.js";
-import { CreatedPosts, LikedPosts } from "./user-posts.js";
+import { CreatedPosts, LikedPosts } from "./pages/user-posts.js";
 import { Chat } from "./pages/chat.js";
-export let userInfo
-
+import { ActiveUsers } from "./components/ActiveUsers.js";
+import { InitWS } from "./websockets.js";
 AddRoute("/", Home);
-AddRoute("/create-post", CreatePost);
-AddRoute("/login", () => Auth("login"));
-AddRoute("/register", () => Auth("register"));
-AddRoute("/post/:id", PostView);
+AddRoute("/create-post", CreatePost, true);
+AddRoute("/login", () => Auth("login"), true);
+AddRoute("/register", () => Auth("register"), true);
+AddRoute("/post/:id", PostView, true);
 AddRoute("/created-posts", CreatedPosts);
 AddRoute("/liked-posts", LikedPosts);
 AddRoute("/chat", Chat);
@@ -29,14 +29,16 @@ const main = async () => {
   const resp = await fetch("/api/profile");
   if (resp.ok) {
     changeAuthState(true);
-    userInfo = await resp.json()
-  }
-  if (ensureAuth()) {
-    await appendUserHeader();
+    const userInfo = await resp.json();
+    await appendUserHeader(userInfo);
   } else {
     appendGuestHeader();
   }
   go(window.location.pathname);
+  const main = document.querySelector("main");
+  main.insertAdjacentElement("beforebegin", ActiveUsers());
+
+  InitWS();
 };
 
 main();

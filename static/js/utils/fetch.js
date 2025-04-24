@@ -9,9 +9,7 @@ export const Fetch = async (...args) => {
   const resp = await fetch(...args);
   if (resp.status == 401) {
     changeAuthState(false);
-    go("/login", true);
-  } else if (!resp.ok) {
-    throw new Error("status not ok:", resp.status);
+    go("/login");
   }
   return resp;
 };

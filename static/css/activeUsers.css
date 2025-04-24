@@ -1,0 +1,46 @@
+.users {
+  position: absolute;
+  margin-left: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background-color: hsl(238, 22%, 10%);
+  border-radius: 20px;
+  z-index: 2;
+}
+.users .title {
+  margin: auto;
+  border-bottom: gray 1px solid;
+  padding: 0 10px;
+}
+.users .fallback {
+  white-space: pre;
+  text-align: center;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  padding: 16px 16px;
+  gap: 6px;
+  min-width: 100px;
+  height: 20px;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
+.user .username {
+  margin-right: 10px;
+  font-weight: bold;
+}
+.status {
+  margin-left: auto;
+}
+
+.status.online {
+  color: #a9cc00;
+}
+.status.offline {
+  color: red;
+}

@@ -16,7 +16,7 @@ export const changeAuthState = (state = null) => {
 
 export const ensureAuth = (force) => {
   if (force && !isAuthenticated) {
-    go("/login", true);
+    go("/login");
   }
   return isAuthenticated;
 };

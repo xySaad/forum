@@ -11,7 +11,7 @@ export const PostCreationBar = () => {
     if (!ensureAuth(true)) {
       return;
     }
-    go("/create-post", true);
+    go("/create-post");
   };
   return createButton.add(
     input("post-input", placeholder),

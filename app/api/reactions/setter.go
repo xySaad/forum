@@ -77,7 +77,7 @@ func RemoveReaction(conn *modules.Connection, forumDB *sql.DB) {
 	}
 
 	sqlQuery := "DELETE FROM item_reactions WHERE user_id = ? AND item_id =?"
-	result, err := forumDB.Exec(sqlQuery, conn.User, itemId)
+	result, err := forumDB.Exec(sqlQuery, conn.User.Id, itemId)
 	if err != nil {
 		conn.Error(errors.HttpInternalServerError)
 		return

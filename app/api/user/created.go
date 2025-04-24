@@ -14,7 +14,7 @@ func GetUserCreatedPosts(conn *modules.Connection, db *sql.DB) {
 	}
 	lastId := conn.Req.URL.Query().Get("lastId")
 	query := "SELECT p.id,user_id,title,content,created_at FROM posts p WHERE user_id=? "
-	params := []any{conn.User}
+	params := []any{conn.User.Id}
 
 	if lastId != "" {
 		params = append(params, any(lastId))

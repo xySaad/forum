@@ -7,6 +7,9 @@ body {
 .profileContainer {
     cursor: pointer;
 }
+.profileContainer img:not([data-alt="true"]) {
+    width: 40px;
+}
 
 @media (max-width: 400px) {
 

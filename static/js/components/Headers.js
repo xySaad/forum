@@ -3,7 +3,6 @@ import img from "./native/img.js";
 import { changeAuthState } from "../utils/ensureAuth.js";
 import { go } from "../router.js";
 import { svg } from "./native/svg.js";
-import { userInfo } from "../index.js";
 
 export async function   toggleIcon(type) {
   let icns = document.querySelectorAll(".icon");
@@ -26,12 +25,12 @@ function ToggleDisplay() {
 async function Logout() {
   const resp = await fetch(`/api/auth/logout`, { method: "POST" });
   if (!resp.ok) {
-    console.log("haven't logged out!");
+    console.error("haven't logged out!");
     return;
   } else {
     changeAuthState(false);
     appendGuestHeader();
-    go("/");
+    location.reload()
   }
 }
 
@@ -48,7 +47,7 @@ async function fetchProfile() {
     console.error("Error fetching user profile:", error);
   }
 }
-export async function appendUserHeader() {
+export async function appendUserHeader(userInfo) {
   let head = document.querySelector("header");
   head.innerHTML = "";
   let icn1 = div("contain");
@@ -88,7 +87,7 @@ export async function appendUserHeader() {
     img("../../static/svg/logo.svg", "logo", "logo"),
     div("close", "☰"),
     div("icons").add(icn1, icn2, icn3, chatBubble),
-    div("profileContainer").add(img(userInfo.profilePicture, "avatar", "profile")),
+    div("profileContainer").add(img(userInfo.profilePicture, "avatar", "profile", userInfo.id)),
     div("profileCard").add(
       div("textContainer").add(h2, h4),
       div("line"),
@@ -143,9 +142,9 @@ export function appendGuestHeader() {
   );
   head.append(header2);
   document.querySelector(".primary").addEventListener("click", () => {
-    go("/login", true);
+    go("/login");
   });
   document.querySelector(".secondary").addEventListener("click", () => {
-    go("/register", true);
+    go("/register");
   });
 }

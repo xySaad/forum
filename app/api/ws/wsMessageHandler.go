@@ -21,16 +21,16 @@ func handleWsMessage(msg wsDirectMessage, userId snowflake.SnowflakeID) {
 }
 
 type wsNotifyMsg struct {
-	Type   string `json:"type"`
-	Id     snowflake.SnowflakeID
-	status string
+	Type   string                `json:"type"`
+	Id     snowflake.SnowflakeID `json:"id"`
+	Status string                `json:"status"`
 }
 
 func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
 	msg := wsNotifyMsg{
-		Type:   "online",
+		Type:   "status",
 		Id:     userId,
-		status: status,
+		Status: status,
 	}
 
 	for _, WsConnections := range activeUsers {
