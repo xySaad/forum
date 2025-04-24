@@ -15,7 +15,7 @@ const getActiveUsers = async (parentNode) => {
   users.forEach((user) => {
     if (user.id === ownUserId) return;
     parentNode.add(
-      div("user").add(
+      div(`user uid-${user.id}`).add(
         div("publisher").add(
           img(user.profilePicture, "no-profile"),
           div("username", user.username),
