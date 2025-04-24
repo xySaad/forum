@@ -9,6 +9,8 @@ const img = (src, alt, className, id) => {
 
   imgElement.onerror = () => {
     imgElement.onerror = null;
+    console.log(imgElement.dataset.alt = true);
+    
     imgElement.src = importSvg(alt) ?? imgElement.remove();
   };
   return imgElement;
