@@ -34,7 +34,7 @@ func AddComment(conn *modules.Connection, forumDB *sql.DB) {
 	}
 	commentId := snowflake.Generate()
 	query := `INSERT INTO comments (id, post_id, user_id, content) VALUES (?, ?, ?, ?)`
-	_, err = forumDB.Exec(query, commentId, postId, conn.User, comment.Content)
+	_, err = forumDB.Exec(query, commentId, postId, conn.User.Id, comment.Content)
 	if err != nil {
 		if sqlErr, ok := err.(sqlite3.Error); ok && sqlErr.ExtendedCode == sqlite3.ErrConstraintForeignKey {
 			conn.Error(errors.BadRequestError("invalid post id"))
