@@ -54,7 +54,7 @@ export async function getusers(UserArea, url) {
 export function conversation() {
   //return callfunction(infinitusers)
   //func1()
-  let creatbtn = document.createElement("button")
+  let creatbtn = div("btn").add("send")
 
   let inputmsg = input("msj-input", "message", true)
   const conversation = div("ConversationArea").add(
