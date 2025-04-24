@@ -41,7 +41,7 @@ func GetPostComments(conn *modules.Connection, forumDB *sql.DB) {
 			conn.Error(errors.HttpInternalServerError)
 			return
 		}
-		comment.Likes, comment.Dislikes, comment.Reaction = handlers.GetReactions(comment.Id, conn.User.Id, 2, forumDB)
+		comment.Likes, comment.Dislikes, comment.Reaction = handlers.GetReactions(comment.Id, comment.Publisher.Id, 2, forumDB)
 		err := comment.Publisher.GetPublicUser(forumDB)
 		if err != nil {
 			conn.Error(errors.HttpInternalServerError)
