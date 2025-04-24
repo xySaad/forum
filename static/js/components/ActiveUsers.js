@@ -4,12 +4,14 @@ const USERS_API = "/api/users";
 
 const getActiveUsers = async (parentNode) => {
   const resp = await fetch(USERS_API);
-  if (!resp.ok) {
+  const users = await resp.json();
+  console.log(users);
+
+  if (!users.length || users.length < 2) {
     parentNode.append(div("fallback", "It's lonely right here!\nno users."));
     return;
   }
-  const users = await resp.json();
-  const ownUserId = document.querySelector(".profile").id
+  const ownUserId = document.querySelector(".profile").id;
   users.forEach((user) => {
     if (user.id === ownUserId) return;
     parentNode.add(
