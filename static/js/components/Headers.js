@@ -34,19 +34,6 @@ async function Logout() {
   }
 }
 
-async function fetchProfile() {
-  try {
-    const response = await fetch("/api/profile", { method: "GET" });
-    if (!response.ok) {
-      throw new Error("Failed to fetch: " + response.statusText);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching user profile:", error);
-  }
-}
 export async function appendUserHeader(userInfo) {
   let head = document.querySelector("header");
   head.innerHTML = "";
