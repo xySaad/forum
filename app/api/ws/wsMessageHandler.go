@@ -4,22 +4,11 @@ import (
 	"forum/app/modules/log"
 	"forum/app/modules/snowflake"
 )
-
-type wsDirectMessage struct {
-	Type     string `json:"type"`
+type mesage struct {
+	Id       string `json:"id"`
 	Receiver string `json:"receiver"`
-	Text     string `json:"text"`
+	Msg      string `json:"msg"`
 }
-
-func handleWsMessage(msg wsDirectMessage, userId snowflake.SnowflakeID) {
-	for _, conn := range activeUsers[userId] {
-		err := conn.WriteJSON(msg)
-		if err != nil {
-			log.Error(err)
-		}
-	}
-}
-
 type wsNotifyMsg struct {
 	Type   string                `json:"type"`
 	Id     snowflake.SnowflakeID `json:"id"`

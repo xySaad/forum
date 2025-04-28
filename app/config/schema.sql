@@ -14,9 +14,8 @@ CREATE TABLE IF NOT EXISTS users (
 );
 CREATE TABLE IF NOT EXISTS message (
   id INTEGER REFERENCES users(id),
-  sender TEXT REFERENCES users(username),
   receiver TEXT REFERENCES users(username),
-  redbel INTEGER CHECK (redbel IN (0, 1))
+  msg TEXT NOT NULL
 );
 
 

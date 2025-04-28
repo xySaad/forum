@@ -2,6 +2,8 @@ package ws
 
 import (
 	"database/sql"
+	"fmt"
+
 	"forum/app/modules"
 	"forum/app/modules/log"
 
@@ -11,6 +13,22 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+}
+
+
+func Message(message mesage, forumDB *sql.DB) {
+	//var message Msg
+	//err := json.NewDecoder(conn.Req.Body).Decode(&message)
+	//
+	fmt.Println("Received message:", message)
+
+	_, err := forumDB.Exec("INSERT INTO message (id, receiver, msg) VALUES (?, ?, ?)", message.Id, message.Receiver, message.Msg)
+	if err != nil {
+		fmt.Println("Error inserting into database:", err)
+		return
+	}
+
+	// fmt.Println("Message inserted successfully.")
 }
 
 func Entry(conn *modules.Connection, forumDB *sql.DB) {
@@ -25,13 +43,13 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	}
 	defer wsConn.Close()
 	defer deleteActiveUser(conn.User.Id, wsConn)
-	addActiveUser(conn.User.Id, wsConn)
+		addActiveUser(conn.User.Id, wsConn)
 
 	for {
-		var msg wsDirectMessage
+		var msg mesage
 		err := wsConn.ReadJSON(&msg)
 		if err == nil {
-			handleWsMessage(msg, conn.User.Id)
+			Message(msg , forumDB)
 			continue
 		}
 

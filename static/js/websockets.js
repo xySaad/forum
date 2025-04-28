@@ -2,8 +2,8 @@ import div from "./components/native/div.js";
 
 const WS_API = "/api/ws";
 
+export const ws = new WebSocket(WS_API);
 export const InitWS = () => {
-  const ws = new WebSocket(WS_API);
   ws.onerror = (e) => console.log("ws error", e);
   ws.onopen = (e) => console.log("ws open");
   ws.onclose = (e) => console.log("ws close");

@@ -44,3 +44,8 @@
 .status.offline {
   color: red;
 }
+.ConversationArea{
+  position: relative;
+  left: 50%;
+  top: 50vh;
+}
