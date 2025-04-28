@@ -17,7 +17,14 @@ const getActiveUsers = async (parentNode) => {
     if (user.id === ownUserId) return;
     let userholder = div(`user uid-${user.id}`)
     userholder.onclick = () => {
-      message(user.username)
+      ws.send(
+        JSON.stringify({
+          type : "message fetch",
+          id: ownUserId,
+          receiver: user.id,
+        })
+      ),
+      message(user.id)
     };
 
 
@@ -48,21 +55,12 @@ export function message(user) {
     console.log(user);
     ws.send(
       JSON.stringify({
+        type : "send message",
         id: ownUserId,
         receiver: user,
         msg: inputmsg.value
       })
     );
-    
-    // ws.wr( MESSAGE_API , {
-    //   method: "POST",
-    //   body: JSON.stringify({
-    //     id : ownUserId,
-    //     receiver : user ,
-    //     msg : inputmsg.value
-    //   }),
-    // });  
-    //let re = resp.json
 
 
   }

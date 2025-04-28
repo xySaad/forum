@@ -15,6 +15,11 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+type Mssage struct {
+	Id       int
+	Receiver string
+	Msg      string
+}
 
 func Message(message mesage, forumDB *sql.DB) {
 	//var message Msg
@@ -43,13 +48,14 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	}
 	defer wsConn.Close()
 	defer deleteActiveUser(conn.User.Id, wsConn)
-		addActiveUser(conn.User.Id, wsConn)
+	addActiveUser(conn.User.Id, wsConn)
 
 	for {
 		var msg mesage
 		err := wsConn.ReadJSON(&msg)
 		if err == nil {
-			Message(msg , forumDB)
+			Message(msg, forumDB)
+			sendMessages(msg)
 			continue
 		}
 
@@ -59,4 +65,29 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 			return
 		}
 	}
+}
+
+func FetchMessages(msg mesage, forumDB *sql.DB) []Mssage {
+	query := `SELECT id, receiver, msg FROM message WHERE id = ? AND receiver = ? OR id = ? AND receiver = ?`
+	rows, err := forumDB.Query(query, msg.Id, msg.Receiver, msg.Id, msg.Receiver)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer rows.Close()
+
+	var messages []Mssage
+	for rows.Next() {
+		var msg Mssage
+		if err := rows.Scan(&msg.Id, &msg.Receiver, &msg.Msg); err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(msg)
+		messages = append(messages, msg)
+	}
+
+	if err := rows.Err(); err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(messages)
+	return messages
 }
