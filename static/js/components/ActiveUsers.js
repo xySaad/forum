@@ -2,7 +2,7 @@ import { ws } from "../websockets.js";
 import div from "./native/div.js";
 import img from "./native/img.js";
 const USERS_API = "/api/users";
-const MESSAGE_API = "/api/msg"
+const MESSAGE_API = "/api/msgfetch"
 
 const getActiveUsers = async (parentNode) => {
   const resp = await fetch(USERS_API);
@@ -16,14 +16,15 @@ const getActiveUsers = async (parentNode) => {
   users.forEach((user) => {
     if (user.id === ownUserId) return;
     let userholder = div(`user uid-${user.id}`)
-    userholder.onclick = () => {
-      ws.send(
-        JSON.stringify({
-          type : "message fetch",
+    userholder.onclick = async () => {
+      const resp = await fetch(MESSAGE_API, {
+        method: 'POST',
+        body: JSON.stringify({
           id: ownUserId,
           receiver: user.id,
-        })
-      ),
+        }),
+      });
+      //const users = await resp.json();
       message(user.id)
     };
 
@@ -55,7 +56,7 @@ export function message(user) {
     console.log(user);
     ws.send(
       JSON.stringify({
-        type : "send message",
+        type: "send message",
         id: ownUserId,
         receiver: user,
         msg: inputmsg.value

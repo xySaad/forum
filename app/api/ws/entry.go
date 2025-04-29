@@ -2,10 +2,13 @@ package ws
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"forum/app/modules"
+	"forum/app/modules/errors"
 	"forum/app/modules/log"
+	"forum/app/modules/snowflake"
 
 	"github.com/gorilla/websocket"
 )
@@ -67,11 +70,26 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	}
 }
 
-func FetchMessages(msg mesage, forumDB *sql.DB) []Mssage {
-	query := `SELECT id, receiver, msg FROM message WHERE id = ? AND receiver = ? OR id = ? AND receiver = ?`
-	rows, err := forumDB.Query(query, msg.Id, msg.Receiver, msg.Id, msg.Receiver)
+type config struct {
+	Resever snowflake.SnowflakeID `json:"receiver"`
+}
+
+func FetchMessages(conn *modules.Connection, forumDB *sql.DB) {
+	// hh := conn.Req.Body
+	if !conn.IsAuthenticated(forumDB) {
+		conn.Error(errors.HttpUnauthorized)
+		return
+	}
+	var confige config
+	err := json.NewDecoder(conn.Req.Body).Decode(&confige)
 	if err != nil {
-		fmt.Println(err)
+		log.Debug(err)
+	}
+
+	query := `SELECT id, receiver, msg FROM message WHERE id = ? AND receiver = ? OR id = ? AND receiver = ?`
+	rows, err := forumDB.Query(query, conn.User.Id, confige.Resever, confige.Resever, conn.User.Id)
+	if err != nil {
+		log.Debug(err)
 	}
 	defer rows.Close()
 
@@ -79,15 +97,15 @@ func FetchMessages(msg mesage, forumDB *sql.DB) []Mssage {
 	for rows.Next() {
 		var msg Mssage
 		if err := rows.Scan(&msg.Id, &msg.Receiver, &msg.Msg); err != nil {
-			fmt.Println(err)
+			log.Debug(err)
 		}
 		fmt.Println(msg)
 		messages = append(messages, msg)
 	}
 
 	if err := rows.Err(); err != nil {
-		fmt.Println(err)
+		log.Debug(err)
 	}
 	fmt.Println(messages)
-	return messages
+	conn.Respond(messages)
 }

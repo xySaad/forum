@@ -8,10 +8,10 @@ import (
 )
 
 type mesage struct {
-	Type     string `json:"type"`
-	Id       string `json:"id"`
-	Receiver string `json:"receiver"`
-	Msg      string `json:"msg"`
+	Type     string                `json:"type"`
+	Id       snowflake.SnowflakeID `json:"id"`
+	Receiver snowflake.SnowflakeID `json:"receiver"`
+	Msg      string                `json:"msg"`
 }
 type wsNotifyMsg struct {
 	Type   string                `json:"type"`
@@ -20,14 +20,13 @@ type wsNotifyMsg struct {
 }
 
 func sendMessages(msg mesage) {
-	 user := activeUsers[msg.Receiver]
-		for _, conn := range user {
-			err := conn.WriteJSON(msg)
-			if err != nil {
-				log.Error(err)
-			}
+	user := activeUsers[msg.Receiver]
+	for _, conn := range user {
+		err := conn.WriteJSON(msg)
+		if err != nil {
+			log.Error(err)
 		}
-
+	}
 }
 
 func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
@@ -36,7 +35,7 @@ func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
 		Id:     userId,
 		Status: status,
 	}
-	
+
 	for _, WsConnections := range activeUsers {
 		fmt.Print(WsConnections)
 		for _, conn := range WsConnections {

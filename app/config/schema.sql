@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS message (
-  id INTEGER REFERENCES users(id),
-  receiver INTEGER REFERENCES users(id),
+  id REFERENCES users(id),
+  receiver REFERENCES users(id),
   msg TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS sessions (
