@@ -9,6 +9,7 @@ const trimSlash = (str) => {
   } else if (str[str.length - 1] === "/") {
     return str.slice(0, str.length - 1);
   }
+  return str;
 };
 
 const routesByLevel = [
@@ -85,19 +86,13 @@ const routeLookup = (route) => {
 };
 
 export const go = (route, ...args) => {
-  Params = {};
   const { popup, page, params } = routeLookup(route);
-  
+  if (!page) return go("404");
   Params = params;
 
   if (history?.state?.prev?.path === route) {
     back();
   }
-
-  document.querySelector("popup").innerHTML = "";
-  const targetLayer = document.querySelector(popup ? "popup" : "main");
-  targetLayer.innerHTML = "";
-  targetLayer.append(page(...args));
   if (!history.state) {
     history.replaceState({ prev: null, path: route }, "");
     return;
@@ -106,6 +101,11 @@ export const go = (route, ...args) => {
   if (history.state.prev?.path != route && history.state.path != route) {
     history.pushState({ prev: history.state, path: route }, "", route);
   }
+
+  document.querySelector("popup").innerHTML = "";
+  const targetLayer = document.querySelector(popup ? "popup" : "main");
+  targetLayer.innerHTML = "";
+  targetLayer.append(page(...args));
 };
 
 export const back = () => {
