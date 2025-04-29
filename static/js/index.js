@@ -11,6 +11,7 @@ import { CreatedPosts, LikedPosts } from "./pages/user-posts.js";
 import { Chat } from "./pages/chat.js";
 import { ActiveUsers } from "./components/ActiveUsers.js";
 import { InitWS } from "./websockets.js";
+import users from "./context/users.js";
 AddRoute("/", Home);
 AddRoute("/create-post", CreatePost, true);
 AddRoute("/login", () => Auth("login"), true);
@@ -29,8 +30,8 @@ const main = async () => {
   const resp = await fetch("/api/profile");
   if (resp.ok) {
     changeAuthState(true);
-    const userInfo = await resp.json();
-    await appendUserHeader(userInfo);
+    users.myself = await resp.json();
+    await appendUserHeader();
   } else {
     appendGuestHeader();
   }

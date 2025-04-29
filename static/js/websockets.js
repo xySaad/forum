@@ -1,4 +1,4 @@
-import div from "./components/native/div.js";
+import users from "./context/users.js";
 
 const WS_API = "/api/ws";
 
@@ -9,9 +9,14 @@ export const InitWS = () => {
   ws.onclose = (e) => console.log("ws close");
   ws.onmessage = (e) => {
     const msg = JSON.parse(e.data);
-    if (msg.type === "status") {
+    if (msg.type === "status" && msg.id !== users.myself.id) {
       const userStatus = document.querySelector(`.user.uid-${msg.id} .status`);
-      userStatus?.replaceWith(div(`status ${msg.status}`, msg.status));
+      if (!userStatus) {
+        console.log("should append new user", msg);
+        return;
+      }
+      userStatus.className = `status ${msg.status}`;
+      userStatus.textContent = msg.status;
     }
   };
 };

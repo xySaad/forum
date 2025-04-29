@@ -11,27 +11,30 @@ import {
   validateUsername,
 } from "../utils/auth_validation.js";
 import { ActiveUsers } from "./ActiveUsers.js";
+import { InitWS } from "../websockets.js";
+import users from "../context/users.js";
 
 const input = (type, confirm, placeholdername) => {
   const input = document.createElement("input");
   if (type == "select") {
     const select = document.createElement("select");
     select.name = "gender";
-    select.className = "input"
+    select.className = "input";
     const fruits = ["male", "female", "other", "prefer not to say"];
-    fruits.forEach(fruit => {
+    fruits.forEach((fruit) => {
       const option = document.createElement("option");
-      option.style.color ="blue"
+      option.style.color = "blue";
       option.value = fruit.toLowerCase();
       option.text = fruit;
       select.appendChild(option);
     });
-    return select
+    return select;
   }
   input.required = true;
   input.type = type == "name" ? "text" : type;
   input.className = "input";
-  input.placeholder = (confirm ? "Confirm" : "Enter") + " your " + placeholdername;
+  input.placeholder =
+    (confirm ? "Confirm" : "Enter") + " your " + placeholdername;
   return input;
 };
 
@@ -39,7 +42,7 @@ const createRegisterForm = (authElement, context) => {
   const form = document.createElement("form");
   const username = input("name", false, "nickname");
   const age = input("number", false, "age");
-  const gender = input("select", false, 'gender');
+  const gender = input("select", false, "gender");
   const firstname = input("name", false, "firstname");
   const lastname = input("name", false, "lastname");
   const password = input("password", false, "password");
@@ -61,7 +64,11 @@ const createRegisterForm = (authElement, context) => {
     const errors = [
       validateUsername(username.value, context()),
       validateEmail(email.value, context() === "register"),
-      validatePassword(password.value, confirmPassword.value, context() === "register"),
+      validatePassword(
+        password.value,
+        confirmPassword.value,
+        context() === "register"
+      ),
     ].filter((value) => value);
 
     if (errors.length > 0) {
@@ -82,10 +89,13 @@ const createRegisterForm = (authElement, context) => {
       }),
     });
     if (resp.ok) {
-      const resp = await fetch("/api/profile/")
+      const resp = await fetch("/api/profile/");
+      const json = await resp.json();
+      users.myself = json;
+      InitWS();
       changeAuthState(true);
-      appendUserHeader(await resp.json());
-      document.querySelector(".users").replaceWith(ActiveUsers())
+      appendUserHeader();
+      document.querySelector(".users").replaceWith(ActiveUsers());
       authElement.cleanup();
       cancelButton.onclick = null;
       const notification = document.createElement("div");
@@ -102,10 +112,10 @@ const createRegisterForm = (authElement, context) => {
   };
 
   form.append(
-    div('inputContainer').add(username, age),
-    div('inputContainer').add(gender, firstname),
-    div('inputContainer').add(lastname, email),
-    div('inputContainer').add(password, confirmPassword),
+    div("inputContainer").add(username, age),
+    div("inputContainer").add(gender, firstname),
+    div("inputContainer").add(lastname, email),
+    div("inputContainer").add(password, confirmPassword),
     errDisplay,
     div("btns").add(loginButton, cancelButton)
   );
@@ -122,10 +132,10 @@ const createRegisterForm = (authElement, context) => {
     reset: () => {
       form.innerHTML = "";
       form.append(
-        div('inputContainer').add(username, age),
-        div('inputContainer').add(gender, firstname),
-        div('inputContainer').add(lastname, email),
-        div('inputContainer').add(password, confirmPassword),
+        div("inputContainer").add(username, age),
+        div("inputContainer").add(gender, firstname),
+        div("inputContainer").add(lastname, email),
+        div("inputContainer").add(password, confirmPassword),
         errDisplay,
         div("btns").add(loginButton, cancelButton)
       );
@@ -143,9 +153,9 @@ const Auth = (authType) => {
     if (context() == "register") {
       context("login");
       registerForm.age.remove();
-      registerForm.firstname.remove()
-      registerForm.lastname.remove()
-      registerForm.gender.remove()
+      registerForm.firstname.remove();
+      registerForm.lastname.remove();
+      registerForm.gender.remove();
       registerForm.email.remove();
       registerForm.confirmPassword.remove();
       registerForm.registerSpan.classList.remove("clicked");

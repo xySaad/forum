@@ -3,6 +3,7 @@ import img from "./native/img.js";
 import { changeAuthState } from "../utils/ensureAuth.js";
 import { go } from "../router.js";
 import { svg } from "./native/svg.js";
+import users from "../context/users.js";
 
 export async function   toggleIcon(type) {
   let icns = document.querySelectorAll(".icon");
@@ -34,7 +35,7 @@ async function Logout() {
   }
 }
 
-export async function appendUserHeader(userInfo) {
+export async function appendUserHeader() {
   let head = document.querySelector("header");
   head.innerHTML = "";
   let icn1 = div("contain");
@@ -42,9 +43,9 @@ export async function appendUserHeader(userInfo) {
   let icn3 = div("contain");
   let logout = div("logoutBtn");
   let h2 = document.createElement("h2");
-  h2.innerText = userInfo.username;
+  h2.innerText = users.myself.username;
   let h4 = document.createElement("h4");
-  h4.innerText = userInfo.email;
+  h4.innerText = users.myself.email;
   logout.innerHTML =
     `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path fill-rule="evenodd" clip-rule="evenodd" d="M22.4206 11.5898L19.4926 8.67383C19.1986 8.38183 18.7246 8.38183 18.4326 8.67583C18.1406 8.96983 18.1416 9.44383 18.4346 9.73583L20.0746 11.3698H17.1396C17.1496 11.8698 17.1496 12.3698 17.1396 12.8698H20.0766L18.4346 14.5058C18.1416 14.7978 18.1406 15.2728 18.4326 15.5668C18.5786 15.7138 18.7716 15.7868 18.9636 15.7868C19.1546 15.7868 19.3466 15.7138 19.4926 15.5688L22.4206 12.6518C22.5626 12.5118 22.6416 12.3198 22.6416 12.1208C22.6416 11.9218 22.5626 11.7308 22.4206 11.5898Z" fill="#FD5F49"/>
@@ -74,7 +75,7 @@ export async function appendUserHeader(userInfo) {
     img("../../static/svg/logo.svg", "logo", "logo"),
     div("close", "☰"),
     div("icons").add(icn1, icn2, icn3, chatBubble),
-    div("profileContainer").add(img(userInfo.profilePicture, "avatar", "profile", userInfo.id)),
+    div("profileContainer").add(img(users.myself.profilePicture, "avatar", "profile", users.myself.id)),
     div("profileCard").add(
       div("textContainer").add(h2, h4),
       div("line"),
