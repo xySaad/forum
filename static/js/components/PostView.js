@@ -1,6 +1,6 @@
 import div from "./native/div.js";
-import { CommentInput } from "./CommentInput.js";
-import { CommentsList } from "./CommentsList.js";
+import { Input } from "./Input.js";
+import { CommentContainer, CommentsList } from "./CommentsList.js";
 import { Post } from "./Post.js";
 import { back, GetParams } from "../router.js";
 
@@ -22,7 +22,7 @@ const PostView = (postData) => {
           Post(postData),
           div("commentsWrap").add(
             CommentsList(postData.id),
-            CommentInput(postData.id)
+            Input(`/api/posts/${postData.id}/comments/`, CommentContainer)
           )
         )
       );
@@ -36,7 +36,7 @@ const PostView = (postData) => {
       Post(postData),
       div("commentsWrap").add(
         CommentsList(postData.id),
-        CommentInput(postData.id)
+        Input(`/api/posts/${postData.id}/comments/`, CommentContainer)
       )
     )
   );
