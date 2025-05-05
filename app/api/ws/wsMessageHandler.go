@@ -2,6 +2,8 @@ package ws
 
 import (
 	"database/sql"
+	"time"
+
 	"forum/app/modules"
 	"forum/app/modules/log"
 	"forum/app/modules/snowflake"
@@ -25,8 +27,9 @@ type wsConnection struct {
 
 func (conn *wsConnection) sendMessageTo(db *sql.DB, msg message) error {
 	msg.Id = snowflake.Generate()
-	const query = "INSERT INTO message (id, receiver, sender, content) VALUES (?, ?, ?, ?)"
-	_, err := db.Exec(query, msg.Id, msg.Chat, conn.User.Id, msg.Value)
+	msg.CreationTime = time.Now().Format(time.DateTime)
+	const query = "INSERT INTO message (id, receiver, sender, content, created_at) VALUES (?, ?, ?, ?, ?)"
+	_, err := db.Exec(query, msg.Id, msg.Chat, conn.User.Id, msg.Value, msg.CreationTime)
 	if err != nil {
 		log.Error("Error inserting DM into database:", err)
 		return err
@@ -42,6 +45,7 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg message) error {
 
 	return nil
 }
+
 func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
 	msg := message{
 		Type:  "status",

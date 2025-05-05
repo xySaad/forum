@@ -2,20 +2,21 @@ import div from "./components/native/div.js";
 import { query } from "./components/native/index.js";
 import { UserCard } from "./components/UserCard.js";
 import users from "./context/users.js";
+import { Message } from "./pages/chat.js";
+import { GetParams } from "./router.js";
 import { Deferred } from "./utils/Deferred.js";
 
 const WS_API = "/api/ws";
 export let ws;
-
 const handleMessage = (e) => {
   const msg = JSON.parse(e.data);
   if (msg.type === "error") {
     query("popup").append(div("error", msg.value));
     return;
   }
-  if (msg.type === "status" && msg.id !== users.myself.id) {
+  if (msg.type === "status") {               /*msg.id !== users.myself.id*/
     const userStatus = query(`.user.uid-${msg.id} .status`);
-    if (!userStatus) {
+    if (!userStatus && msg.id !== users.myself.id) {
       query(".users").add(UserCard(msg));
       console.log("should append new user", msg);
       return;
@@ -23,8 +24,12 @@ const handleMessage = (e) => {
     userStatus.className = `status ${msg.value}`;
     userStatus.textContent = msg.value;
   }
-};
+  if (msg.type === "DM" && (msg.chat == GetParams().id || msg.chat === users.myself.id)) {
+    let messages = document.getElementsByClassName("messages")[0];
+    messages.prepend(Message(msg)) 
 
+  }
+};
 export const InitWS = async () => {
   const deferred = new Deferred();
   const tempWs = new WebSocket(WS_API);

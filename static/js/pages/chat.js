@@ -13,7 +13,11 @@ const MESSAGE_TYPE_DM = "DM";
 const CONVERSATION_API = "http://localhost:8080/api/chat/";
 let observer;
 
-const Message = (msg) => {
+export const Message = (msg) => {
+  console.log(msg);
+  
+  console.log("jat");
+  
   const publisher = users.get(msg.sender);
   const time = new Date(msg.creationTime);
   const minutes = time.getMinutes().toString().padStart(2, "0");
