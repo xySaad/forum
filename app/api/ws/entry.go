@@ -6,6 +6,7 @@ import (
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
+	"forum/app/modules/snowflake"
 
 	"github.com/gorilla/websocket"
 )
@@ -33,7 +34,9 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	addActiveUser(conn.User.Id, wsConn)
 
 	for {
-		var msg message
+		msg := message{
+			Sender: conn.User.Id,
+		}
 		err := wsConn.ReadJSON(&msg)
 		if err != nil {
 			log.Error(err)
@@ -55,7 +58,7 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 				log.Error(err)
 			}
 		default:
-			//Bad Request
+			// Bad Request
 		}
 	}
 }
@@ -87,4 +90,8 @@ func FetchMessages(conn *modules.Connection, forumDB *sql.DB) {
 	}
 
 	conn.Respond(messages)
+}
+
+type msg struct {
+	Id snowflake.SnowflakeID `json:"id"`
 }

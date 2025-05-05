@@ -12,7 +12,11 @@ import { ws } from "../websockets.js";
 const CONVERSATION_API = "/api/chat/";
 const MESSAGETYPE_DM = "DM";
 
-const Message = (msg) => {
+export const Message = (msg) => {
+  console.log(msg);
+  
+  console.log("jat");
+  
   const publisher = users.get(msg.sender);
   const creationTime = new Date(msg.creationTime);
   const formatedDate = `${creationTime}`;
@@ -42,7 +46,10 @@ export const Chat = async () => {
       messages.add(div("fallback", "it's empty here!"));
     }
     json?.forEach((msg) => {
+      console.log(msg);
+      
       messages.append(Message(msg));
+
     });
   } catch (error) {
     console.error(error);
