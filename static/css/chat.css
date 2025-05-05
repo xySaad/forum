@@ -24,7 +24,7 @@
 .messages {
   display: flex;
   flex-direction: column-reverse;
-  padding: 0 30px;
+  padding: 5px 30px;
   overflow: scroll;
 }
 .message {
@@ -33,4 +33,9 @@
   padding: 10px 30px;
   width: fit-content;
   border-radius: 20px;
+  width: 40%;
+}
+.message .text {
+  height: fit-content;
+  margin-left: 2rem;
 }

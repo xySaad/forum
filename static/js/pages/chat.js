@@ -15,8 +15,11 @@ let observer;
 
 const Message = (msg) => {
   const publisher = users.get(msg.sender);
-  const creationTime = new Date(msg.creationTime);
-  const formatedDate = `${creationTime}`;
+  const time = new Date(msg.creationTime);
+  const minutes = time.getMinutes().toString().padStart(2, "0");
+  const hours = time.getHours().toString().padStart(2, "0")
+  
+  const formatedDate = `${hours}:${minutes}`;
   return div("message").add(
     div("publisher").add(
       img(publisher.profilePicture, "no-profile"),
