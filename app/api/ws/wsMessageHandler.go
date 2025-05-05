@@ -2,7 +2,6 @@ package ws
 
 import (
 	"database/sql"
-	"fmt"
 	"forum/app/modules"
 	"forum/app/modules/log"
 	"forum/app/modules/snowflake"
@@ -32,7 +31,6 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg message) error {
 		log.Error("Error inserting DM into database:", err)
 		return err
 	}
-	fmt.Println(msg.Chat)
 	userConns := activeUsers[msg.Chat]
 
 	for _, conn := range append(userConns, activeUsers[conn.User.Id]...) {

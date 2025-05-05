@@ -20,7 +20,7 @@ func GetLikedPosts(conn *modules.Connection, db *sql.DB) {
 
 	if lastId != "" {
 		params = append(params, any(lastId))
-		query += "AND p.id > ? "
+		query += "AND p.id < ? "
 	}
 	query += "ORDER BY p.id DESC LIMIT 10;"
 

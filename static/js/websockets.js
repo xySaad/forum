@@ -1,5 +1,6 @@
 import div from "./components/native/div.js";
 import { query } from "./components/native/index.js";
+import { UserCard } from "./components/UserCard.js";
 import users from "./context/users.js";
 import { Deferred } from "./utils/Deferred.js";
 
@@ -15,6 +16,7 @@ const handleMessage = (e) => {
   if (msg.type === "status" && msg.id !== users.myself.id) {
     const userStatus = query(`.user.uid-${msg.id} .status`);
     if (!userStatus) {
+      query(".users").add(UserCard(msg));
       console.log("should append new user", msg);
       return;
     }
@@ -29,7 +31,7 @@ export const InitWS = async () => {
 
   tempWs.onopen = () => {
     ws = tempWs;
-    deferred.resolve()
+    deferred.resolve();
   };
   tempWs.onerror = deferred.resolve;
   tempWs.onclose = () => {

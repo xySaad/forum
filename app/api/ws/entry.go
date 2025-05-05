@@ -64,12 +64,23 @@ func FetchMessages(conn *modules.Connection, forumDB *sql.DB) {
 	if !conn.IsAuthenticated(forumDB) {
 		return
 	}
+	if len(conn.Path) < 3 {
+		conn.Error(errors.HttpNotFound)
+		return
+	}
 	chatId := conn.Path[2]
-	query := `SELECT id, sender, receiver, content, created_at FROM message WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)`
-	rows, err := forumDB.Query(query, conn.User.Id, chatId, chatId, conn.User.Id)
+	lastId := conn.Req.URL.Query().Get("lastId")
+	query := `SELECT id, sender, receiver, content, created_at FROM message WHERE ((sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)) `
+	args := []any{conn.User.Id, chatId, chatId, conn.User.Id}
+	if lastId != "" {
+		query += "AND id < ? "
+		args = append(args, lastId)
+	}
+	query += "ORDER BY id DESC LIMIT 10"
+	rows, err := forumDB.Query(query, args...)
 	if err != nil {
 		conn.Error(errors.HttpInternalServerError)
-		log.Error(err)
+		log.Debug(err)
 		return
 	}
 	defer rows.Close()

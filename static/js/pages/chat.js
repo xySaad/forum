@@ -9,8 +9,9 @@ import users from "../context/users.js";
 import { GetParams } from "../router.js";
 import { Fetch } from "../utils/fetch.js";
 import { ws } from "../websockets.js";
-const CONVERSATION_API = "/api/chat/";
-const MESSAGETYPE_DM = "DM";
+const MESSAGE_TYPE_DM = "DM";
+const CONVERSATION_API = "http://localhost:8080/api/chat/";
+let observer;
 
 const Message = (msg) => {
   const publisher = users.get(msg.sender);
@@ -25,33 +26,63 @@ const Message = (msg) => {
     div("text", msg.value)
   );
 };
-export const Chat = async () => {
+
+const fetchNext = async (parentNode, url) => {
+  try {
+    const resp = await Fetch(url);
+    const json = await resp.json();
+    if (!json) {
+      if (parentNode.children.length < 0) {
+        parentNode.add(div("fallback", "it's empty here!"));
+      }
+      return;
+    }
+    json.forEach((msg) => {
+      parentNode.append(Message(msg));
+    });
+    const topMessage = parentNode.lastChild;
+    topMessage.id = json[json.length - 1].id;
+    observer.observe(topMessage);
+  } catch (error) {
+    console.error(error);
+    parentNode.append(div("fallback", "error loading messages"));
+  }
+};
+
+const observerArgs = (parentNode, url) => {
+  const callBack = (e) => {
+    if (e[0].isIntersecting) {
+      observer.unobserve(e[0].target);
+      const topMessage = parentNode.lastChild;
+      console.log(topMessage.id, topMessage.textContent);
+
+      url.searchParams.set("lastId", topMessage.id);
+      fetchNext(parentNode, url);
+    }
+  };
+  const options = {
+    root: parentNode,
+    rootMargin: "0px",
+    threshold: 0.1,
+  };
+  return [callBack, options];
+};
+
+export const Chat = () => {
+  const { id } = GetParams();
+  const url = new URL(CONVERSATION_API + id);
   const chatBubble = query(".chat-bubble");
   toggleIcon(".chat-bubble");
   chatBubble?.on("load", (svg) => svg.classList.add("active"));
 
-  const { id } = GetParams();  
   const user = users.get(id);
   const messages = div("messages");
+  observer = new IntersectionObserver(...observerArgs(messages, url));
+  fetchNext(messages, url);
 
-  try {
-    const resp = await Fetch(CONVERSATION_API + id);
-
-    const json = await resp.json();
-    if (!json || json.length < 1) {
-      messages.add(div("fallback", "it's empty here!"));
-    }
-    json?.forEach((msg) => {
-      messages.append(Message(msg));
-    });
-  } catch (error) {
-    console.error(error);
-    messages.add(div("fallback", "error loading messages"));
-  }
-
-  const sendMessage = ({value}) => {
+  const sendMessage = ({ value }) => {
     const msg = {
-      type: MESSAGETYPE_DM,
+      type: MESSAGE_TYPE_DM,
       chat: id,
       value,
     };
