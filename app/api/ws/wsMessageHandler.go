@@ -33,12 +33,9 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg message) error {
 		return err
 	}
 	fmt.Println(msg.Chat)
-	userConns, exist := activeUsers[msg.Chat]
-	if !exist {
-		return nil
-	}
+	userConns := activeUsers[msg.Chat]
 
-	for _, conn := range userConns {
+	for _, conn := range append(userConns, activeUsers[conn.User.Id]...) {
 		err := conn.WriteJSON(msg)
 		if err != nil {
 			log.Error(err)
