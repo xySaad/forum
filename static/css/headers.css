@@ -109,7 +109,8 @@ h3 {
     padding: 24px 16%;
     position: relative;
     align-items: center;
-
+    height: var(--header-height);
+    box-sizing: border-box;
 }
 
 .menu-toggle {

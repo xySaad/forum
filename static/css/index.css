@@ -48,6 +48,7 @@ h1 {
 }
 
 body {
+    --header-height: 94px;
     margin: 0;
     font-family: Inter;
     font-size: 0.75rem;
@@ -57,14 +58,16 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     overflow: hidden;
-    height: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 main {
     position: relative;
     z-index: 1;
     overflow: scroll;
-    height: 100vh;
+    height: 100%;
 }
 
 header {
@@ -158,7 +161,7 @@ svg {
     width: 100%;
     align-items: center;
     justify-content: center;
-    margin-top: 30%;
+    margin-top: 30vh;
     font-size: xx-large;
     color: #e75555;
 }

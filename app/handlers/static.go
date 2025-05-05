@@ -14,10 +14,10 @@ func Static(resp http.ResponseWriter, req *http.Request) {
 	fileInfo, err := os.Stat(req.URL.Path[1:])
 	if err != nil {
 		if os.IsNotExist(err) {
-			http.Redirect(resp, req, "/404", http.StatusPermanentRedirect)
-		} else {
-			http.Error(resp, "500 - internal server error", 500)
+			http.Error(resp, "404 - page not found", http.StatusNotFound)
+			return
 		}
+		http.Error(resp, "500 - internal server error", 500)
 		return
 	}
 	if fileInfo.IsDir() {

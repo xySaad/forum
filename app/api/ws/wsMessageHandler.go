@@ -1,36 +1,57 @@
 package ws
 
 import (
+	"database/sql"
+	"fmt"
+	"forum/app/modules"
 	"forum/app/modules/log"
 	"forum/app/modules/snowflake"
+
+	"github.com/gorilla/websocket"
 )
 
-type wsDirectMessage struct {
-	Type     string `json:"type"`
-	Receiver string `json:"receiver"`
-	Text     string `json:"text"`
+type message struct {
+	Type         string                `json:"type"`
+	Id           snowflake.SnowflakeID `json:"id"`
+	Sender       snowflake.SnowflakeID `json:"sender,omitempty"`
+	Chat         snowflake.SnowflakeID `json:"chat,omitempty"`
+	Value        string                `json:"value"`
+	CreationTime string                `json:"creationTime,omitempty"`
 }
 
-func handleWsMessage(msg wsDirectMessage, userId snowflake.SnowflakeID) {
-	for _, conn := range activeUsers[userId] {
+type wsConnection struct {
+	*websocket.Conn
+	*modules.Connection
+}
+
+func (conn *wsConnection) sendMessageTo(db *sql.DB, msg message) error {
+	msg.Id = snowflake.Generate()
+	const query = "INSERT INTO message (id, receiver, sender, content) VALUES (?, ?, ?, ?)"
+	_, err := db.Exec(query, msg.Id, msg.Chat, conn.User.Id, msg.Value)
+	if err != nil {
+		log.Error("Error inserting DM into database:", err)
+		return err
+	}
+	fmt.Println(msg.Chat)
+	userConns, exist := activeUsers[msg.Chat]
+	if !exist {
+		return nil
+	}
+
+	for _, conn := range userConns {
 		err := conn.WriteJSON(msg)
 		if err != nil {
 			log.Error(err)
 		}
 	}
-}
 
-type wsNotifyMsg struct {
-	Type   string                `json:"type"`
-	Id     snowflake.SnowflakeID `json:"id"`
-	Status string                `json:"status"`
+	return nil
 }
-
 func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
-	msg := wsNotifyMsg{
-		Type:   "status",
-		Id:     userId,
-		Status: status,
+	msg := message{
+		Type:  "status",
+		Id:    userId,
+		Value: status,
 	}
 
 	for _, WsConnections := range activeUsers {

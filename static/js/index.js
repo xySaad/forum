@@ -1,7 +1,7 @@
 "use strict";
 import { appendUserHeader } from "./components/Headers.js";
 import { appendGuestHeader } from "./components/Headers.js";
-import ensureAuth, { changeAuthState } from "./utils/ensureAuth.js";
+import { changeAuthState } from "./utils/ensureAuth.js";
 import { AddRoute, go } from "./router.js";
 import { Home } from "./pages/home.js";
 import CreatePost from "./components/createPost.js";
@@ -19,8 +19,7 @@ AddRoute("/register", () => Auth("register"), true);
 AddRoute("/post/:id", PostView, true);
 AddRoute("/created-posts", CreatedPosts);
 AddRoute("/liked-posts", LikedPosts);
-AddRoute("/chat", Chat);
-// AddRoute("/chat/:id", conversation);
+AddRoute("/chat/:id", Chat);
 
 window.onpopstate = () => {
   go(window.location.pathname);
@@ -32,14 +31,13 @@ const main = async () => {
     changeAuthState(true);
     users.myself = await resp.json();
     await appendUserHeader();
+    const main = document.querySelector("main");
+    main.insertAdjacentElement("beforebegin", await ActiveUsers());
   } else {
     appendGuestHeader();
   }
+  await InitWS();
   go(window.location.pathname);
-  const main = document.querySelector("main");
-  main.insertAdjacentElement("beforebegin", ActiveUsers());
-
-  InitWS();
 };
 
 main();

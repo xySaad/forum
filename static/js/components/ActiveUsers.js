@@ -1,39 +1,29 @@
 import users from "../context/users.js";
+import { Fetch } from "../utils/fetch.js";
 import div from "./native/div.js";
-import img from "./native/img.js";
+import { UserCard } from "./UserCard.js";
 const USERS_API = "/api/users";
 
-const getActiveUsers = async (parentNode) => {  
+export const ActiveUsers = async () => {
+  const usersContainer = div("users").add(div("title", "Users"));
   if (users.size === 0) {
-    const resp = await fetch(USERS_API);
+    const resp = await Fetch(USERS_API);
     if (resp.ok) {
       const json = await resp.json();
-      json.forEach(users.add);
+      json.forEach((user) => users.add(user));
     }
   }
 
   if (users.size < 2) {
-    parentNode.append(div("fallback", "It's lonely right here!\nno users."));
-    return;
+    usersContainer.append(
+      div("fallback", "It's lonely right here!\nno users.")
+    );
+    return usersContainer;
   }
 
-  const ownUserId = document.querySelector(".profile").id;
-  users.list.forEach((user) => {    
-    if (user.id === ownUserId) return;
-    parentNode.add(
-      div(`user uid-${user.id}`).add(
-        div("publisher").add(
-          img(user.profilePicture, "no-profile"),
-          div("username", user.username),
-          div(`status ${user.status}`, user.status)
-        )
-      )
-    );
+  users.list.forEach((user) => {
+    if (user.id === users.myself.id) return;
+    usersContainer.add(UserCard(user));
   });
-};
-
-export const ActiveUsers = () => {
-  const usersContainer = div("users").add(div("title", "Users"));
-  getActiveUsers(usersContainer);
   return usersContainer;
 };

@@ -3,6 +3,7 @@
 @import url("./auth.css");
 @import url("./createPostForm.css");
 @import url("./categories.css");
+@import url("./chat.css");
 
 .homePage {
   display: flex;

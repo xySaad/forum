@@ -63,29 +63,29 @@
   padding-right: 10px;
 }
 
-.commentsWrap .inputwrap {
+.inputwrap {
   box-sizing: border-box;
   width: 100%;
 }
 
-.commentsWrap .inputwrap input {
+.inputwrap input {
   line-height: 17.16px;
   outline: none;
-  border: none;
+  border: none !important;
   width: 100%;
   background: none;
   height: 100%;
   backdrop-filter: none;
 }
 
-.commentsWrap .inputwrap button {
+.inputwrap button {
   background: #fd5f49;
   border: none;
   padding: 1.8px 3.6px 1.8px 3.6px;
   border-radius: 7.2px;
 }
 
-.commentsWrap .inputwrap {
+.inputwrap {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

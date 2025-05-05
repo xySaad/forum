@@ -3,7 +3,7 @@ import ensureAuth, { changeAuthState } from "./ensureAuth.js";
 
 export const Fetch = async (...args) => {
   if (!ensureAuth(true)) {
-    return;
+    return { ok: false };
   }
 
   const resp = await fetch(...args);

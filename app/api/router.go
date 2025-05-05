@@ -46,6 +46,8 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 		user.GetAllUsers(conn, forumDB)
 	case "ws":
 		ws.Entry(conn, forumDB)
+	case "chat":
+		ws.FetchMessages(conn, forumDB)
 	default:
 		conn.Error(errors.HttpNotFound)
 	}

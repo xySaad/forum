@@ -92,10 +92,11 @@ const createRegisterForm = (authElement, context) => {
       const resp = await fetch("/api/profile/");
       const json = await resp.json();
       users.myself = json;
-      InitWS();
+      await InitWS();
       changeAuthState(true);
       appendUserHeader();
-      document.querySelector(".users").replaceWith(ActiveUsers());
+      const main = document.querySelector("main");
+      main.insertAdjacentElement("beforebegin", await ActiveUsers());
       authElement.cleanup();
       cancelButton.onclick = null;
       const notification = document.createElement("div");
@@ -143,9 +144,9 @@ const createRegisterForm = (authElement, context) => {
   };
 };
 
-const Auth = (authType) => {
+const Auth = (authType) => {  
   let authElement = div("auth");
-  const context = NewReference("register");
+  const context = NewReference(authType);
   const registerForm = createRegisterForm(authElement, context);
 
   const changeContext = (registerForm) => {
@@ -209,7 +210,7 @@ const Auth = (authType) => {
   if (authType && authType != context()) {
     changeContext(registerForm);
   }
-
+changeContext(registerForm)
   return authElement.add(
     div("full-screen-background"),
     div("blur-layer"),

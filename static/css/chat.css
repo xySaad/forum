@@ -1,0 +1,34 @@
+.chat {
+  margin-left: 300px;
+  margin-right: 15px;
+  height: 100%;
+  border-radius: 10px 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  --input-height: 50px;
+}
+
+.chat .inputwrap {
+  margin-top: auto;
+  margin-bottom: 40px;
+}
+.chat .fallback {
+  position: absolute;
+  color: gray;
+  top: 50%;
+  left: 50%;
+  transform: translate(50%, -50%);
+}
+
+.messages {
+  padding: 0 30px;
+  overflow: scroll;
+}
+.message {
+  margin-top: 10px;
+  background: hsla(0, 0%, 0%, 0.295);
+  padding: 10px 30px;
+  width: fit-content;
+  border-radius: 20px;
+}

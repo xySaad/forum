@@ -1,4 +1,5 @@
 import div from "./components/native/div.js";
+import { query } from "./components/native/index.js";
 
 const trimSlash = (str) => {
   if (str[0] === "/") {
@@ -22,8 +23,7 @@ let Params = {};
 
 export const GetParams = () => {
   const result = {};
-
-  Object.keys(Params).forEach((key) => {
+  Object.keys(Params || {}).forEach((key) => {
     result[key] = trimSlash(location.pathname).split("/")[Params[key]];
   });
 
@@ -86,26 +86,23 @@ const routeLookup = (route) => {
 };
 
 export const go = (route, ...args) => {
-  const { popup, page, params } = routeLookup(route);
-  if (!page) return go("404");
+  let { popup, page, params } = routeLookup(route);
+  if (!page) ({ page } = routeLookup("404"));
   Params = params;
 
   if (history?.state?.prev?.path === route) {
     back();
-  }
-  if (!history.state) {
-    history.replaceState({ prev: null, path: route }, "");
     return;
-  }
-
-  if (history.state.prev?.path != route && history.state.path != route) {
+  } else if (!history.state) {
+    history.replaceState({ prev: null, path: route }, "");
+  } else if (history.state.prev?.path != route && history.state.path != route) {
     history.pushState({ prev: history.state, path: route }, "", route);
   }
 
   document.querySelector("popup").innerHTML = "";
-  const targetLayer = document.querySelector(popup ? "popup" : "main");
+  const targetLayer = query(popup ? "popup" : "main");
   targetLayer.innerHTML = "";
-  targetLayer.append(page(...args));
+  targetLayer.add(page(...args));
 };
 
 export const back = () => {

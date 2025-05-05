@@ -27,7 +27,7 @@ export const svg = (name) => {
   }
 };
 
-const fetchAndParseSvg = async (url) => {
+const fetchAndParseSvg = async (url) => {  
   const resp = await fetch(url);
   const text = await resp.text();
   const svgDoc = parser.parseFromString(text, "image/svg+xml");
