@@ -2,7 +2,7 @@ import img from "./native/img.js";
 import { importSvg } from "../utils/index.js";
 import div from "./native/div.js";
 import { appendUserHeader } from "./Headers.js";
-import { changeAuthState } from "../utils/ensureAuth.js";
+import ensureAuth, { changeAuthState } from "../utils/ensureAuth.js";
 import { back, replacePath } from "../router.js";
 import { NewReference } from "../utils/reference.js";
 import {
@@ -55,12 +55,6 @@ const createRegisterForm = (authElement, context) => {
   const loginButton = document.createElement("button");
   loginButton.textContent = "Submit";
 
-  const cancelButton = document.createElement("button");
-  cancelButton.className = "secondary";
-  cancelButton.textContent = "Cancel";
-  cancelButton.onclick = () => {
-    authElement.cleanup();
-  };
   const errDisplay = div("errorPlace");
   form.onsubmit = async (e) => {
     e.preventDefault();
@@ -68,16 +62,15 @@ const createRegisterForm = (authElement, context) => {
     const errors = [
       validateUsername(username.value, context()),
       validateEmail(email.value, context() === "register"),
-      validateFirstname(firstname.value),
-      validateLastname(lastname.value),
-      validateGender(gender.value),
-      validateAge(age.value),
+      validateFirstname(firstname.value, context()),
+      validateLastname(lastname.value, context()),
+      validateGender(gender.value, context()),
+      validateAge(age.value, context()),
       validatePassword(
         password.value,
         confirmPassword.value,
         context() === "register"
       ),
-
     ].filter((value) => value);
 
     if (errors.length > 0) {
@@ -107,7 +100,6 @@ const createRegisterForm = (authElement, context) => {
       const main = document.querySelector("main");
       main.insertAdjacentElement("beforebegin", await ActiveUsers());
       authElement.cleanup();
-      cancelButton.onclick = null;
       const notification = document.createElement("div");
       notification.classList.add("notification");
       notification.innerText = "Authenticated Successfully ✓";
@@ -127,7 +119,7 @@ const createRegisterForm = (authElement, context) => {
     div("inputContainer").add(lastname, email),
     div("inputContainer").add(password, confirmPassword),
     errDisplay,
-    div("btns").add(loginButton, cancelButton)
+    div("btns").add(loginButton)
   );
 
   return {
@@ -147,13 +139,17 @@ const createRegisterForm = (authElement, context) => {
         div("inputContainer").add(lastname, email),
         div("inputContainer").add(password, confirmPassword),
         errDisplay,
-        div("btns").add(loginButton, cancelButton)
+        div("btns").add(loginButton)
       );
     },
   };
 };
 
 const Auth = (authType) => {
+  if (ensureAuth()) {
+    back();
+    return null;
+  }
   let authElement = div("auth");
   const context = NewReference(authType);
   const registerForm = createRegisterForm(authElement, context);
@@ -209,21 +205,14 @@ const Auth = (authType) => {
     authElement = null;
   };
 
-  const authentication = div("authentication");
-  authentication.onclick = (e) => {
-    if (e.target == authentication) {
-      authElement.cleanup();
-    }
-  };
-
   if (authType && authType != context()) {
     changeContext(registerForm);
   }
-  changeContext(registerForm)
+  changeContext(registerForm);
   return authElement.add(
     div("full-screen-background"),
     div("blur-layer"),
-    authentication.add(
+    div("authentication").add(
       div("card").add(
         div("tocenter").add(img(importSvg("logo"))),
         div("toggle").add(registerForm.loginSpan, registerForm.registerSpan),

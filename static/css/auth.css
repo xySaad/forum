@@ -74,6 +74,7 @@
 .inputContainer {
     display: flex;
     gap: 8px;
+    flex-wrap: wrap;
 }
 
 .card {
@@ -151,10 +152,9 @@ span {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(2px);
     border-radius: 16px;
-    flex: none;
     align-self: stretch;
-    flex-grow: 0;
-
+    flex: 1;
+    margin: auto;
 }
 
 .input:focus {
