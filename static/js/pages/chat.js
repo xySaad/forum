@@ -17,9 +17,14 @@ export const Message = (msg) => {
   const time = new Date(msg.creationTime);
   const minutes = time.getMinutes().toString().padStart(2, "0");
   const hours = time.getHours().toString().padStart(2, "0")
-  
   const formatedDate = `${hours}:${minutes}`;
-  return div("message").add(
+  const isFromMe = publisher.id === users.myself.id
+  const message = div("message")
+  message.style.marginLeft = isFromMe ? "auto" : "unset"
+  const radius = isFromMe ? "end" : "start"
+  message.style[`border-start-${radius}-radius`] = 0
+
+  return message.add(
     div("publisher").add(
       img(publisher.profilePicture, "no-profile"),
       div("username", publisher.username),
@@ -56,8 +61,6 @@ const observerArgs = (parentNode, url) => {
     if (e[0].isIntersecting) {
       observer.unobserve(e[0].target);
       const topMessage = parentNode.lastChild;
-      console.log(topMessage.id, topMessage.textContent);
-
       url.searchParams.set("lastId", topMessage.id);
       fetchNext(parentNode, url);
     }
