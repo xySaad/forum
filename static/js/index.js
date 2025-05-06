@@ -20,6 +20,7 @@ AddRoute("/post/:id", PostView, true);
 AddRoute("/created-posts", CreatedPosts);
 AddRoute("/liked-posts", LikedPosts);
 AddRoute("/chat/:id", Chat);
+AddRoute("/chat/", Chat);
 
 window.onpopstate = () => {
   go(window.location.pathname);

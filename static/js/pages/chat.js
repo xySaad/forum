@@ -1,4 +1,3 @@
-import { CommentContainer } from "../components/CommentsList.js";
 import { toggleIcon } from "../components/Headers.js";
 import { Input } from "../components/Input.js";
 import div from "../components/native/div.js";
@@ -73,6 +72,9 @@ const observerArgs = (parentNode, url) => {
 
 export const Chat = () => {
   const { id } = GetParams();
+  if (!id) {
+    return div("chat").add(div("fallback", "no user is selected"))
+  }  
   const url = new URL(CONVERSATION_API + id);
   const chatBubble = query(".chat-bubble");
   toggleIcon(".chat-bubble");

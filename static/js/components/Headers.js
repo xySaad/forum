@@ -5,7 +5,7 @@ import { go } from "../router.js";
 import { svg } from "./native/svg.js";
 import users from "../context/users.js";
 
-export async function   toggleIcon(type) {
+export async function toggleIcon(type) {
   let icns = document.querySelectorAll(".icon");
   icns.forEach((icn) => icn.classList.remove("active"));
   let clicked = document.querySelector(type);
@@ -31,7 +31,7 @@ async function Logout() {
   } else {
     changeAuthState(false);
     appendGuestHeader();
-    location.reload()
+    location.reload();
   }
 }
 
@@ -58,7 +58,7 @@ export async function appendUserHeader() {
 
   chatBubble.onclick = () => {
     toggleIcon(".chat-bubble");
-    go(`/chat/${users.list[1].id}`);
+    go(`/chat/${users.list[1]?.id ?? ""}`);
   };
 
   icn1.onclick = () => {
