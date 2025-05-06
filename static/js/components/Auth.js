@@ -6,7 +6,11 @@ import { changeAuthState } from "../utils/ensureAuth.js";
 import { back, replacePath } from "../router.js";
 import { NewReference } from "../utils/reference.js";
 import {
+  validateAge,
   validateEmail,
+  validateFirstname,
+  validateGender,
+  validateLastname,
   validatePassword,
   validateUsername,
 } from "../utils/auth_validation.js";
@@ -64,11 +68,16 @@ const createRegisterForm = (authElement, context) => {
     const errors = [
       validateUsername(username.value, context()),
       validateEmail(email.value, context() === "register"),
+      validateFirstname(firstname.value),
+      validateLastname(lastname.value),
+      validateGender(gender.value),
+      validateAge(age.value),
       validatePassword(
         password.value,
         confirmPassword.value,
         context() === "register"
       ),
+
     ].filter((value) => value);
 
     if (errors.length > 0) {
@@ -144,7 +153,7 @@ const createRegisterForm = (authElement, context) => {
   };
 };
 
-const Auth = (authType) => {  
+const Auth = (authType) => {
   let authElement = div("auth");
   const context = NewReference(authType);
   const registerForm = createRegisterForm(authElement, context);
@@ -210,7 +219,7 @@ const Auth = (authType) => {
   if (authType && authType != context()) {
     changeContext(registerForm);
   }
-changeContext(registerForm)
+  changeContext(registerForm)
   return authElement.add(
     div("full-screen-background"),
     div("blur-layer"),

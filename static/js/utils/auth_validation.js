@@ -8,6 +8,39 @@ const AUTH_RULES = {
       INVALID: "Username must contain only alphanumeric characters and dot (.)",
     },
   },
+  FIRSTNAME: {
+    MIN_LENGTH: 3,
+    MAX_LENGTH: 20,
+    ALLOWED_CHARS: /^[a-zA-Z]+$/,
+    ERRORS: {
+      LENGTH: "FIRSTNAME must be between 3 and 20 characters",
+      INVALID: "FIRSTNAME must contain only alphanumeric characters",
+    },
+  },
+  LASTNAME: {
+    MIN_LENGTH: 3,
+    MAX_LENGTH: 20,
+    ALLOWED_CHARS: /^[a-zA-Z]+$/,
+    ERRORS: {
+      LENGTH: "LASTNAME must be between 3 and 20 characters",
+      INVALID: "LASTNAME must contain only alphanumeric characters",
+    },
+  },
+  GENDER: {
+    ALLOWED_GENDERS: ["male", "female", "other", "prefer not to say"],
+    ERRORS: {
+      INVALID: "this gender not allowed",
+    },
+  },
+  AGE: {
+    MIN_LENGTH: 18,
+    MAX_LENGTH: 99,
+    ALLOWED_CHARS: /^[0-9]+$/,
+    ERRORS: {
+      LENGTH: "AGE must be between 18 and 99",
+      INVALID: "AGE must contain only NUMBERS",
+    },
+  },
   PASSWORD: {
     MIN_LENGTH: 12,
     MAX_LENGTH: 256,
@@ -24,6 +57,7 @@ const AUTH_RULES = {
     },
   },
 };
+
 const validateUsername = (username, context) => {
   if (context === "login") {
     return;
@@ -65,4 +99,60 @@ const validatePassword = (password, confirmPassword, isRegistration) => {
   return null;
 };
 
-export { validateUsername, validateEmail, validatePassword };
+
+const validateFirstname = (firstname) => {
+  if (
+    firstname.length < AUTH_RULES.FIRSTNAME.MIN_LENGTH ||
+    firstname.length > AUTH_RULES.FIRSTNAME.MAX_LENGTH
+  ) {
+    return AUTH_RULES.FIRSTNAME.ERRORS.LENGTH;
+  }
+  if (!AUTH_RULES.FIRSTNAME.ALLOWED_CHARS.test(firstname)) {
+    return AUTH_RULES.FIRSTNAME.ERRORS.INVALID;
+  }
+  return null;
+};
+
+const validateLastname = (lastname) => {
+  if (
+    lastname.length < AUTH_RULES.LASTNAME.MIN_LENGTH ||
+    lastname.length > AUTH_RULES.LASTNAME.MAX_LENGTH
+  ) {
+    return AUTH_RULES.LASTNAME.ERRORS.LENGTH;
+  }
+  if (!AUTH_RULES.LASTNAME.ALLOWED_CHARS.test(lastname)) {
+    return AUTH_RULES.LASTNAME.ERRORS.INVALID;
+  }
+  return null;
+};
+
+const validateGender = (gender) => {
+  if (!AUTH_RULES.GENDER.ALLOWED_GENDERS.includes(gender)) {
+    return AUTH_RULES.GENDER.ERRORS.INVALID;
+  }
+  return null;
+};
+
+const validateAge = (age) => {
+  const numericAge = Number(age);
+  if (!AUTH_RULES.AGE.ALLOWED_CHARS.test(age)) {
+    return AUTH_RULES.AGE.ERRORS.INVALID;
+  }
+  if (
+    numericAge < AUTH_RULES.AGE.MIN_LENGTH ||
+    numericAge > AUTH_RULES.AGE.MAX_LENGTH
+  ) {
+    return AUTH_RULES.AGE.ERRORS.LENGTH;
+  }
+  return null;
+};
+
+export {
+  validateUsername,
+  validateEmail,
+  validatePassword,
+  validateFirstname,
+  validateLastname,
+  validateGender,
+  validateAge,
+};
