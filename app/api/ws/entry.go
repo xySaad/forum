@@ -2,11 +2,11 @@ package ws
 
 import (
 	"database/sql"
+	"net"
 
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
-	"forum/app/modules/snowflake"
 
 	"github.com/gorilla/websocket"
 )
@@ -32,23 +32,20 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	defer wsConn.Close()
 	defer deleteActiveUser(conn.User.Id, wsConn)
 	addActiveUser(conn.User.Id, wsConn)
-
+outer:
 	for {
-		msg := message{
-			Sender: conn.User.Id,
-		}
+		msg := message{Sender: conn.User.Id}
 		err := wsConn.ReadJSON(&msg)
 		if err != nil {
-			log.Error(err)
-			if _, ok := err.(*websocket.CloseError); ok {
-				break
-			} else {
+			switch err.(type) {
+			case *net.OpError, *websocket.CloseError:
+				break outer
+			default:
 				continue
 			}
 		}
 
-		switch msg.Type {
-		case WsMessageType_DM:
+		if msg.Type == WsMessageType_DM {
 			err = wsConn.sendMessageTo(forumDB, msg)
 			if err != nil {
 				wsConn.WriteJSON(map[string]string{
@@ -57,8 +54,6 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 				})
 				log.Error(err)
 			}
-		default:
-			// Bad Request
 		}
 	}
 }
@@ -101,8 +96,4 @@ func FetchMessages(conn *modules.Connection, forumDB *sql.DB) {
 	}
 
 	conn.Respond(messages)
-}
-
-type msg struct {
-	Id snowflake.SnowflakeID `json:"id"`
 }

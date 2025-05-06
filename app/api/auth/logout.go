@@ -2,6 +2,7 @@ package auth
 
 import (
 	"database/sql"
+	"forum/app/api/ws"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
@@ -19,7 +20,7 @@ func Logout(conn *modules.Connection, db *sql.DB) {
 		conn.Error(errors.HttpUnauthorized)
 		return
 	}
-
+	conn.GetUserId(db)
 	_, err = db.Exec("UPDATE sessions SET expires_at=0 WHERE token=?", cookie.Value)
 	if err != nil {
 		log.Error(err)
@@ -36,4 +37,5 @@ func Logout(conn *modules.Connection, db *sql.DB) {
 	}
 	http.SetCookie(conn.Resp, &newCookie)
 	http.Redirect(conn.Resp, conn.Req, "/", http.StatusSeeOther)
+	ws.ExpireAll(conn.User.Id)
 }

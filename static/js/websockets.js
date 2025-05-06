@@ -14,20 +14,30 @@ const handleMessage = (e) => {
     query("popup").append(div("error", msg.value));
     return;
   }
-  if (msg.type === "status") {               /*msg.id !== users.myself.id*/
-    const userStatus = query(`.user.uid-${msg.id} .status`);
-    if (!userStatus && msg.id !== users.myself.id) {
-      query(".users").add(UserCard(msg));
-      console.log("should append new user", msg);
-      return;
-    }
-    userStatus.className = `status ${msg.value}`;
-    userStatus.textContent = msg.value;
-  }
-  if (msg.type === "DM" && (msg.chat == GetParams().id || msg.chat === users.myself.id)) {
-    let messages = document.getElementsByClassName("messages")[0];
-    messages.prepend(Message(msg)) 
+  switch (msg.type) {
+    case "status":
+      console.log(`.user.uid-${msg.id} .status`);
 
+      const userStatus = query(`.user.uid-${msg.id} .status`);
+      if (userStatus) {
+        userStatus.className = `status ${msg.value}`;
+        userStatus.textContent = msg.value;
+      } else if (msg.id !== users.myself.id) {
+        query(".users").add(UserCard(msg));
+      }
+
+      break;
+    case "DM":
+      if (msg.chat == GetParams().id || msg.chat === users.myself.id) {
+        let messages = document.getElementsByClassName("messages")[0];
+        messages.prepend(Message(msg));
+      }
+      break;
+    case "logout":
+      location.reload();
+      break;
+    default:
+      break;
   }
 };
 export const InitWS = async () => {

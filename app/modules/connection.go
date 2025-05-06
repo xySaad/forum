@@ -20,13 +20,19 @@ const tokenQuery = `SELECT u.id FROM users u
 	JOIN sessions s ON s.user_id=u.id 
 	WHERE s.token=? AND s.expires_at > datetime('now')`
 
-func (conn *Connection) GetUserId(forumDB *sql.DB) bool {
+func (conn *Connection) GetUserId(forumDB *sql.DB) *http.Cookie {
 	cookie, err := conn.Req.Cookie("token")
 	if err != nil || cookie.Value == "" {
-		return false
+		log.Error("invalid cookie provided by client")
+		return nil
+	}
+	err = forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.User.Id)
+	if err != nil {
+		log.Error(err)
+		return nil
 	}
 
-	return forumDB.QueryRow(tokenQuery, cookie.Value).Scan(&conn.User.Id) != nil
+	return cookie
 }
 
 func (conn *Connection) IsAuthenticated(forumDB *sql.DB) bool {

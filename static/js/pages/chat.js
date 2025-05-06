@@ -10,14 +10,10 @@ import { GetParams } from "../router.js";
 import { Fetch } from "../utils/fetch.js";
 import { ws } from "../websockets.js";
 const MESSAGE_TYPE_DM = "DM";
-const CONVERSATION_API = "http://localhost:8080/api/chat/";
+const CONVERSATION_API = `${location.origin}/api/chat/`;
 let observer;
 
 export const Message = (msg) => {
-  console.log(msg);
-  
-  console.log("jat");
-  
   const publisher = users.get(msg.sender);
   const time = new Date(msg.creationTime);
   const minutes = time.getMinutes().toString().padStart(2, "0");
