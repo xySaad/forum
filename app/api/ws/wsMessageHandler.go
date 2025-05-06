@@ -35,8 +35,11 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg message) error {
 		return err
 	}
 	userConns := activeUsers[msg.Chat]
+	if msg.Chat != conn.User.Id {
+		userConns = append(userConns, activeUsers[conn.User.Id]...)
+	}
 
-	for _, conn := range append(userConns, activeUsers[conn.User.Id]...) {
+	for _, conn := range userConns {
 		err := conn.WriteJSON(msg)
 		if err != nil {
 			log.Error(err)
