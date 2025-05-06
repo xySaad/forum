@@ -34,7 +34,7 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	addActiveUser(conn.User.Id, wsConn)
 outer:
 	for {
-		msg := message{Sender: conn.User.Id}
+		msg := modules.Message{Sender: conn.User.Id}
 		err := wsConn.ReadJSON(&msg)
 		if err != nil {
 			switch err.(type) {
@@ -68,7 +68,7 @@ func FetchMessages(conn *modules.Connection, forumDB *sql.DB) {
 	}
 	chatId := conn.Path[2]
 	lastId := conn.Req.URL.Query().Get("lastId")
-	query := `SELECT id, sender, receiver, content, created_at FROM message WHERE ((sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)) `
+	query := modules.QUERY_GET_MESSAGE
 	args := []any{conn.User.Id, chatId, chatId, conn.User.Id}
 	if lastId != "" {
 		query += "AND id < ? "
@@ -83,9 +83,9 @@ func FetchMessages(conn *modules.Connection, forumDB *sql.DB) {
 	}
 	defer rows.Close()
 
-	var messages []message
+	var messages []modules.Message
 	for rows.Next() {
-		msg := message{
+		msg := modules.Message{
 			Type: WsMessageType_DM,
 		}
 		if err := rows.Scan(&msg.Id, &msg.Sender, &msg.Chat, &msg.Value, &msg.CreationTime); err != nil {

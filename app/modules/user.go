@@ -10,6 +10,7 @@ type User struct {
 	Id             snowflake.SnowflakeID `json:"id"`
 	ProfilePicture *string               `json:"profilePicture"`
 	Status         string                `json:"status"`
+	LastMessage    *Message              `json:"lastMessage,omitempty"`
 }
 
 func (u *User) GetPublicUser(db *sql.DB) (err error) {

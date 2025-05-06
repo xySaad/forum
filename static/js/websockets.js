@@ -16,22 +16,22 @@ const handleMessage = (e) => {
   }
   switch (msg.type) {
     case "status":
-      console.log(`.user.uid-${msg.id} .status`);
-
       const userStatus = query(`.user.uid-${msg.id} .status`);
       if (userStatus) {
         userStatus.className = `status ${msg.value}`;
         userStatus.textContent = msg.value;
       } else if (msg.id !== users.myself.id) {
+        users.add(msg);
         query(".users").add(UserCard(msg));
       }
 
       break;
-    case "DM":
-      if (msg.chat == GetParams().id || msg.chat === users.myself.id) {
-        let messages = document.getElementsByClassName("messages")[0];
-        messages.prepend(Message(msg));
+    case "DM":      
+      if (msg.sender === GetParams().id || msg.chat === users.myself.id) {
+        query(".messages").prepend(Message(msg));
       }
+      const userElem = query(`.user.uid-${msg.chat}`) || query(`.user.uid-${msg.sender}`);
+      query(".users .title").insertAdjacentElement("afterend", userElem);
       break;
     case "logout":
       location.reload();

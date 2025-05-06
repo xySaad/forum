@@ -11,21 +11,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type message struct {
-	Type         string                `json:"type"`
-	Id           snowflake.SnowflakeID `json:"id"`
-	Sender       snowflake.SnowflakeID `json:"sender,omitempty"`
-	Chat         snowflake.SnowflakeID `json:"chat,omitempty"`
-	Value        string                `json:"value"`
-	CreationTime string                `json:"creationTime,omitempty"`
-}
-
 type wsConnection struct {
 	*websocket.Conn
 	*modules.Connection
 }
 
-func (conn *wsConnection) sendMessageTo(db *sql.DB, msg message) error {
+func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
 	msg.Id = snowflake.Generate()
 	msg.CreationTime = time.Now().Format(time.DateTime)
 	const query = "INSERT INTO message (id, receiver, sender, content, created_at) VALUES (?, ?, ?, ?, ?)"
@@ -50,7 +41,7 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg message) error {
 }
 
 func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
-	msg := message{
+	msg := modules.Message{
 		Type:  "status",
 		Id:    userId,
 		Value: status,

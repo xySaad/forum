@@ -38,7 +38,6 @@ func GetAllUsers(conn *modules.Connection, db *sql.DB) {
 
 	for rows.Next() {
 		var user modules.User
-
 		err := rows.Scan(&user.Id, &user.Username, &user.ProfilePicture)
 		if err != nil {
 			log.Error("Error scanning row:", err)
@@ -49,6 +48,18 @@ func GetAllUsers(conn *modules.Connection, db *sql.DB) {
 		} else {
 			user.Status = "offline"
 		}
+
+		var lastMessage modules.Message
+		msgQuery := modules.QUERY_GET_MESSAGE + "ORDER BY id DESC"
+		row := db.QueryRow(msgQuery, conn.User.Id, user.Id, user.Id, conn.User.Id)
+		err = row.Scan(&lastMessage.Id, &lastMessage.Sender, &lastMessage.Chat, &lastMessage.Value, &lastMessage.CreationTime)
+		user.LastMessage = &lastMessage
+		if err == sql.ErrNoRows {
+			user.LastMessage = nil
+		} else if err != nil {
+			log.Error(err)
+		}
+
 		users = append(users, user)
 	}
 

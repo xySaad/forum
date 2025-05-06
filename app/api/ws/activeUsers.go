@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"forum/app/modules"
 	"forum/app/modules/snowflake"
 	"slices"
 	"sync"
@@ -33,7 +34,7 @@ func ExpireAll(userId snowflake.SnowflakeID) {
 	mux.Lock()
 	defer mux.Unlock()
 	for _, conn := range activeUsers[userId] {
-		conn.WriteJSON(message{Type: "logout"})
+		conn.WriteJSON(modules.Message{Type: "logout"})
 		conn.Close()
 	}
 	delete(activeUsers, userId)
