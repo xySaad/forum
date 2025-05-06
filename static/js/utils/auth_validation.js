@@ -100,7 +100,10 @@ const validatePassword = (password, confirmPassword, isRegistration) => {
 };
 
 
-const validateFirstname = (firstname) => {
+const validateFirstname = (firstname, context) => {
+ if (context === "login") {
+  return;
+}
   if (
     firstname.length < AUTH_RULES.FIRSTNAME.MIN_LENGTH ||
     firstname.length > AUTH_RULES.FIRSTNAME.MAX_LENGTH
@@ -113,7 +116,10 @@ const validateFirstname = (firstname) => {
   return null;
 };
 
-const validateLastname = (lastname) => {
+const validateLastname = (lastname, context) => {
+  if (context === "login") {
+    return;
+  }
   if (
     lastname.length < AUTH_RULES.LASTNAME.MIN_LENGTH ||
     lastname.length > AUTH_RULES.LASTNAME.MAX_LENGTH
@@ -126,14 +132,20 @@ const validateLastname = (lastname) => {
   return null;
 };
 
-const validateGender = (gender) => {
+const validateGender = (gender, context) => {
+  if (context === "login") {
+    return;
+  }
   if (!AUTH_RULES.GENDER.ALLOWED_GENDERS.includes(gender)) {
     return AUTH_RULES.GENDER.ERRORS.INVALID;
   }
   return null;
 };
 
-const validateAge = (age) => {
+const validateAge = (age, context) => {
+  if (context === "login") {
+    return;
+  }
   const numericAge = Number(age);
   if (!AUTH_RULES.AGE.ALLOWED_CHARS.test(age)) {
     return AUTH_RULES.AGE.ERRORS.INVALID;

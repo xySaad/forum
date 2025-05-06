@@ -68,10 +68,10 @@ const createRegisterForm = (authElement, context) => {
     const errors = [
       validateUsername(username.value, context()),
       validateEmail(email.value, context() === "register"),
-      validateFirstname(firstname.value),
-      validateLastname(lastname.value),
-      validateGender(gender.value),
-      validateAge(age.value),
+      validateFirstname(firstname.value, context()),
+      validateLastname(lastname.value, context()),
+      validateGender(gender.value, context()),
+      validateAge(age.value, context()),
       validatePassword(
         password.value,
         confirmPassword.value,

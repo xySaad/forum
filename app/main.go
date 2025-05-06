@@ -56,8 +56,7 @@ func main() {
 	log.Info("shuting down the server", <-sigChan)
 	err = server.Close()
 	if err != nil {
-		log.Error("error shuthing dowm the server:", err)
-	} else {
+		
 		log.Info("server shutdown successfully")
 	}
 }

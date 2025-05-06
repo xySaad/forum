@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"unicode"
 
 	"forum/app/modules/errors"
 	"forum/app/modules/snowflake"
@@ -18,6 +19,47 @@ import (
 
 var emailPattern = regexp.MustCompile(`^[a-zA-Z0-9.]+@([a-zA-Z0-9]+\.)+[a-zA-Z0-9]{2,24}$`)
 
+func ValidFirstname(name string) (bool, string) {
+	if len(name) < 3 || len(name) > 20 {
+		return false, "fstname must be between 3 and 20 characters"
+	}
+	for _, char := range name {
+		if !(char >= 'a' && char <= 'z') &&
+			!(char >= 'A' && char <= 'Z') &&
+			!(char >= '0' && char <= '9') {
+			return false, "firstname must contain only alphanumeric characters "
+		}
+	}
+	return true, ""
+}
+func ValidAge(name string) (bool, string) {
+	for _, r := range name {
+		if !unicode.IsDigit(r) {
+			return false, "age not allowed"
+		}
+	}
+	return true, ""
+}
+func ValidLastname(name string) (bool, string) {
+	if len(name) < 3 || len(name) > 20 {
+		return false, "lastname must be between 3 and 20 characters"
+	}
+	for _, char := range name {
+		if !(char >= 'a' && char <= 'z') &&
+			!(char >= 'A' && char <= 'Z') &&
+			!(char >= '0' && char <= '9') {
+			return false, "lastname must contain only alphanumeric characters"
+		}
+	}
+	return true, ""
+}
+func ValidGender(name string) (bool, string) {
+	if name != "male" && name != "female" && name != "other" && name != "prefer not to say" {
+		return false, "gender not allowed"
+
+	}
+	return true, ""
+}
 func ValidUsername(name string) (bool, string) {
 	if len(name) < 3 || len(name) > 20 {
 		return false, "username must be between 3 and 20 characters"
@@ -113,6 +155,18 @@ func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {
 	}
 	// check username
 	if valid, msg := ValidUsername(User.Username); !valid {
+		httpErr.Details = msg
+		return
+	}
+	if valid, msg := ValidFirstname(User.Firstname); !valid {
+		httpErr.Details = msg
+		return
+	}
+	if valid, msg := ValidLastname(User.Lastname); !valid {
+		httpErr.Details = msg
+		return
+	}
+	if valid, msg := ValidAge(User.Age); !valid {
 		httpErr.Details = msg
 		return
 	}
