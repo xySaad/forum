@@ -26,11 +26,13 @@ const handleMessage = (e) => {
       }
 
       break;
-    case "DM":      
-      if (msg.sender === GetParams().id || msg.chat === users.myself.id) {
+    case "DM":
+      const { id } = GetParams();
+      if (msg.sender === id || msg.chat === id) {
         query(".messages").prepend(Message(msg));
       }
-      const userElem = query(`.user.uid-${msg.chat}`) || query(`.user.uid-${msg.sender}`);
+      const userElem =
+        query(`.user.uid-${msg.chat}`) || query(`.user.uid-${msg.sender}`);
       query(".users .title").insertAdjacentElement("afterend", userElem);
       break;
     case "logout":
