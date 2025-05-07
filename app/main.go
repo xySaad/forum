@@ -48,7 +48,7 @@ func main() {
 		log.Info("server started: http://localhost:8080")
 		err = server.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			log.Error("error starting server:", err)
+			log.Info("error starting server:", err)
 			sigChan <- syscall.SIGTERM
 		}
 	}()
