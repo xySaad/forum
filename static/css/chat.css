@@ -41,10 +41,13 @@
   line-break: anywhere;
   min-height: fit-content;
 }
-.full.time {
-  position: absolute;
-  opacity: 0;
+
+.message .time {
+  display: flex;
+  position: relative;
+  gap: 10px;
+  flex-wrap: wrap;
 }
-.time:hover .full.time {
-  opacity: 1;
+.time .full {
+ white-space: nowrap;
 }
