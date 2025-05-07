@@ -37,6 +37,7 @@ outer:
 		msg := modules.Message{Sender: conn.User.Id}
 		err := wsConn.ReadJSON(&msg)
 		if err != nil {
+			log.Debug(err)
 			switch err.(type) {
 			case *net.OpError, *websocket.CloseError:
 				break outer

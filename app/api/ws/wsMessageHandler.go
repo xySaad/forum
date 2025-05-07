@@ -42,7 +42,11 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
 	return nil
 }
 
-func Notify(msg modules.Message) {
+func Notify[T modules.Message | modules.MessageNewUser](msg T, shouldLock bool) {
+	if shouldLock {
+		mux.Lock()
+		defer mux.Unlock()
+	}
 	for _, WsConnections := range activeUsers {
 		for _, conn := range WsConnections {
 			err := conn.WriteJSON(msg)
@@ -60,5 +64,5 @@ func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
 		Value: status,
 	}
 
-	Notify(msg)
+	Notify(msg, false)
 }

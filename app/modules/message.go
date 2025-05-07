@@ -11,4 +11,9 @@ type Message struct {
 	CreationTime string                `json:"creationTime,omitempty"`
 }
 
+type MessageNewUser struct {
+	Type  string `json:"type"`
+	Value *User  `json:"value"`
+}
+
 const QUERY_GET_MESSAGE = "SELECT id, sender, receiver, content, created_at FROM message WHERE ((sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)) "

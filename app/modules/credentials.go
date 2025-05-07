@@ -11,6 +11,7 @@ import (
 	"unicode"
 
 	"forum/app/modules/errors"
+	"forum/app/modules/log"
 	"forum/app/modules/snowflake"
 
 	"github.com/gofrs/uuid"
@@ -114,25 +115,32 @@ func (User *AuthCredentials) VerifyPassword(db *sql.DB) *errors.HttpError {
 	return nil
 }
 
-func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) error {
-	hashedPassWord, err := bcrypt.GenerateFromPassword([]byte(User.Password), 12)
+func (AC *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) (*User, error) {
+	hashedPassWord, err := bcrypt.GenerateFromPassword([]byte(AC.Password), 12)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	token, err := uuid.NewV4()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	userId := snowflake.Generate()
 
-	_, err = db.Exec("INSERT INTO users (id,username,age,gender,firstname,lastname,password,email,profile_picture) VALUES (? ,? ,? ,? ,? ,? ,? ,? ,?)", userId, strings.ToLower(User.Username), User.Age, strings.ToLower(User.Gender), strings.ToLower(User.Firstname), strings.ToLower(User.Lastname), hashedPassWord, strings.ToLower(User.Email), generateAvatarURL(User.Username))
-	if err != nil {
-		fmt.Println(err)
-		return err
+	pfp := generateAvatarURL(AC.Username)
+	user := &User{
+		Id:             snowflake.Generate(),
+		Username:       strings.ToLower(AC.Username),
+		ProfilePicture: &pfp,
 	}
-	_, err = db.Exec("INSERT INTO sessions (user_id,token,expires_at) VALUES (?, ? ,datetime('now', '+1 hour'))", userId, token.String())
+
+	query := "INSERT INTO users (id,username,age,gender,firstname,lastname,password,email,profile_picture) VALUES (? ,? ,? ,? ,? ,? ,? ,? ,?)"
+	_, err = db.Exec(query, user.Id, user.Username, AC.Age, strings.ToLower(AC.Gender), strings.ToLower(AC.Firstname), strings.ToLower(AC.Lastname), hashedPassWord, strings.ToLower(AC.Email), user.ProfilePicture)
 	if err != nil {
-		return err
+		log.Error(err)
+		return nil, err
+	}
+	_, err = db.Exec("INSERT INTO sessions (user_id,token,expires_at) VALUES (?, ? ,datetime('now', '+1 hour'))", user.Id, token.String())
+	if err != nil {
+		return nil, err
 	}
 	cookie := http.Cookie{
 		Name:     "token",
@@ -144,7 +152,7 @@ func (User *AuthCredentials) CreateUser(db *sql.DB, resp http.ResponseWriter) er
 	}
 
 	http.SetCookie(resp, &cookie)
-	return nil
+	return user, nil
 }
 
 func (User *AuthCredentials) ValidInfo(db *sql.DB) (httpErr *errors.HttpError) {

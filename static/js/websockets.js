@@ -17,32 +17,33 @@ const handleMessage = (e) => {
   switch (msg.type) {
     case "status":
       const userStatus = query(`.user.uid-${msg.id} .status`);
-      if (userStatus) {
-        userStatus.className = `status ${msg.value}`;
-        userStatus.textContent = msg.value;
-      } else if (msg.id !== users.myself.id) {
-        users.add(msg);
-        query(".users").add(UserCard(msg));
-      }
-
+      if (!userStatus) return;
+      userStatus.className = `status ${msg.value}`;
+      userStatus.textContent = msg.value;
       break;
+
     case "DM":
       const { id } = GetParams();
       if (msg.sender !== users.myself.id && msg.sender !== id) {
-        query('.notification.message')?.remove()
-        const notification = div("notification message").add(Message(msg))
+        query(".notification.message")?.remove();
+        const notification = div("notification message").add(Message(msg));
         query("popup").append(notification);
         setTimeout(() => {
-          notification.remove()
+          notification.remove();
         }, 2000);
       }
-
       if (msg.sender === id || msg.chat === id) {
         query(".messages").prepend(Message(msg));
       }
+      users.get(id).lastMessage = msg; // useless
       const userElem =
-        query(`.users .user.uid-${msg.chat}`) || query(`.users .user.uid-${msg.sender}`);
+        query(`.users .user.uid-${msg.chat}`) ||
+        query(`.users .user.uid-${msg.sender}`);
       query(".users .title").insertAdjacentElement("afterend", userElem);
+      break;
+    case "user":
+      users.add(msg.value);
+      query(".users").add(UserCard(msg.value));
       break;
     case "logout":
       location.reload();
@@ -51,6 +52,7 @@ const handleMessage = (e) => {
       break;
   }
 };
+
 export const InitWS = async () => {
   const deferred = new Deferred();
   const tempWs = new WebSocket(WS_API);

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"forum/app/api/ws"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
@@ -26,7 +27,7 @@ func Register(conn *modules.Connection, forumDB *sql.DB) {
 		return
 	}
 
-	err = potentialuser.CreateUser(forumDB, conn.Resp)
+	user, err := potentialuser.CreateUser(forumDB, conn.Resp)
 	if err != nil {
 		log.Error(err)
 		conn.Error(errors.HttpInternalServerError)
@@ -34,4 +35,10 @@ func Register(conn *modules.Connection, forumDB *sql.DB) {
 	}
 
 	conn.Resp.Write([]byte("Registration successful"))
+
+	msg := modules.MessageNewUser{
+		Type:  "user",
+		Value: user,
+	}
+	ws.Notify(msg, true)
 }
