@@ -28,11 +28,20 @@ const handleMessage = (e) => {
       break;
     case "DM":
       const { id } = GetParams();
+      if (msg.sender !== users.myself.id && msg.sender !== id) {
+        query('.notification.message')?.remove()
+        const notification = div("notification message").add(Message(msg))
+        query("popup").append(notification);
+        setTimeout(() => {
+          notification.remove()
+        }, 2000);
+      }
+
       if (msg.sender === id || msg.chat === id) {
         query(".messages").prepend(Message(msg));
       }
       const userElem =
-        query(`.user.uid-${msg.chat}`) || query(`.user.uid-${msg.sender}`);
+        query(`.users .user.uid-${msg.chat}`) || query(`.users .user.uid-${msg.sender}`);
       query(".users .title").insertAdjacentElement("afterend", userElem);
       break;
     case "logout":

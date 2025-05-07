@@ -35,7 +35,9 @@
   border-radius: 20px;
   width: 60%;
 }
-.message .text {
+.chat .message .text {
   height: fit-content;
   margin-left: 2rem;
+  line-break: anywhere;
+  min-height: fit-content;
 }
