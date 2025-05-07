@@ -41,3 +41,10 @@
   line-break: anywhere;
   min-height: fit-content;
 }
+.full.time {
+  position: absolute;
+  opacity: 0;
+}
+.time:hover .full.time {
+  opacity: 1;
+}

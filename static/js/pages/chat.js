@@ -28,7 +28,7 @@ export const Message = (msg) => {
     div("publisher").add(
       img(publisher.profilePicture, "no-profile"),
       div("username", publisher.username),
-      div("time", ` • ${formatedDate}`)
+      div("time", ` • ${formatedDate}`).add(div("full time", time.toDateString()))
     ),
     div("text", msg.value)
   );
