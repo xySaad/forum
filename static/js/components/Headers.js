@@ -1,7 +1,7 @@
 import div from "./native/div.js";
 import img from "./native/img.js";
 import { changeAuthState } from "../utils/ensureAuth.js";
-import { go } from "../router.js";
+import { GetParams, go } from "../router.js";
 import { svg } from "./native/svg.js";
 import users from "../context/users.js";
 
@@ -58,7 +58,13 @@ export async function appendUserHeader() {
 
   chatBubble.onclick = () => {
     toggleIcon(".chat-bubble");
-    go(`/chat/${users.list[1]?.id ?? ""}`);
+
+    if (users.list[1]?.id === users.myself.id) {
+      go(`/chat/${users.list[0]?.id ?? ""}`);
+    }else {
+      go(`/chat/${users.list[1]?.id ?? ""}`);
+    }
+    
   };
 
   icn1.onclick = () => {
