@@ -8,9 +8,17 @@ const users = {
   get list() {
     if (!usersList) usersList = [...usersMap.values()];
 
-    return usersList.sort(
-      (a, b) => BigInt(a.lastMessage?.id || 0) < BigInt(b.lastMessage?.id || 0)
-    );
+    return usersList.sort((a, b) => {
+      const ida = a.lastMessage?.id;
+      const idb = b.lastMessage?.id;
+      const idOrder = BigInt(ida || 0) < BigInt(idb || 0);
+      if (ida || idb) return idOrder;
+
+      const nameA = a.username;
+      const nameB = b.username;
+      const nameOrder = nameA.localeCompare(nameB);
+      return nameOrder;
+    });
   },
   get size() {
     return usersMap.size;
