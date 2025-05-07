@@ -16,13 +16,13 @@ export const Message = (msg) => {
   const publisher = users.get(msg.sender);
   const time = new Date(msg.creationTime);
   const minutes = time.getMinutes().toString().padStart(2, "0");
-  const hours = time.getHours().toString().padStart(2, "0")
+  const hours = time.getHours().toString().padStart(2, "0");
   const formatedDate = `${hours}:${minutes}`;
-  const isFromMe = publisher.id === users.myself.id
-  const message = div("message")
-  message.style.marginLeft = isFromMe ? "auto" : "unset"
-  const radius = isFromMe ? "end" : "start"
-  message.style[`border-start-${radius}-radius`] = 0
+  const isFromMe = publisher.id === users.myself.id;
+  const message = div("message");
+  message.style.marginLeft = isFromMe ? "auto" : "unset";
+  const radius = isFromMe ? "end" : "start";
+  message.style[`border-start-${radius}-radius`] = 0;
 
   return message.add(
     div("publisher").add(
@@ -76,8 +76,8 @@ const observerArgs = (parentNode, url) => {
 export const Chat = () => {
   const { id } = GetParams();
   if (!id) {
-    return div("chat").add(div("fallback", "no user is selected"))
-  }  
+    return div("chat").add(div("fallback", "no user is selected"));
+  }
   const url = new URL(CONVERSATION_API + id);
   const chatBubble = query(".chat-bubble");
   toggleIcon(".chat-bubble");
@@ -97,5 +97,5 @@ export const Chat = () => {
     ws.send(JSON.stringify(msg));
   };
 
-  return div("chat").add(UserCard(user), messages, Input(sendMessage));
+  return div("chat").add(UserCard(user, false), messages, Input(sendMessage));
 };
