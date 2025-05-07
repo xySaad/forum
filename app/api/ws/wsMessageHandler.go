@@ -17,6 +17,8 @@ type wsConnection struct {
 }
 
 func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
+	mux.Lock()
+	defer mux.Unlock()
 	msg.Id = snowflake.Generate()
 	msg.CreationTime = time.Now().Format(time.DateTime)
 	const query = "INSERT INTO message (id, receiver, sender, content, created_at) VALUES (?, ?, ?, ?, ?)"
@@ -40,13 +42,7 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
 	return nil
 }
 
-func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
-	msg := modules.Message{
-		Type:  "status",
-		Id:    userId,
-		Value: status,
-	}
-
+func Notify(msg modules.Message) {
 	for _, WsConnections := range activeUsers {
 		for _, conn := range WsConnections {
 			err := conn.WriteJSON(msg)
@@ -55,4 +51,14 @@ func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
 			}
 		}
 	}
+}
+
+func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
+	msg := modules.Message{
+		Type:  "status",
+		Id:    userId,
+		Value: status,
+	}
+
+	Notify(msg)
 }
