@@ -57,7 +57,7 @@ outer:
 				log.Error(err)
 			}
 		}else if  msg.Type == WsMessageType_tying {
-			msg1 = modules.Message;
+			var msg1 modules.Typing;
 			err := wsConn.ReadJSON(&msg1)
 			if err != nil {
 				log.Debug(err)
