@@ -56,6 +56,19 @@ outer:
 				})
 				log.Error(err)
 			}
+		}else if  msg.Type == WsMessageType_tying {
+			msg1 = modules.Message;
+			err := wsConn.ReadJSON(&msg1)
+			if err != nil {
+				log.Debug(err)
+				switch err.(type) {
+				case *net.OpError, *websocket.CloseError:
+					break outer
+				default:
+					continue
+				}
+			}
+			TypeingS(msg)
 		}
 	}
 }

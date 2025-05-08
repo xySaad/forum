@@ -41,6 +41,15 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
 
 	return nil
 }
+func TypeingS(msg modules.Message) {
+	userConns := activeUsers[msg.Chat]
+	for _, conn := range userConns {
+		err := conn.WriteJSON(msg)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+}
 
 func Notify[T modules.Message | modules.MessageNewUser](msg T, shouldLock bool) {
 	if shouldLock {
