@@ -41,7 +41,7 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
 
 	return nil
 }
-func TypeingS(msg modules.Message) {
+func TypeingS(msg modules.Typing) {
 	userConns := activeUsers[msg.Chat]
 	for _, conn := range userConns {
 		err := conn.WriteJSON(msg)

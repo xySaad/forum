@@ -68,7 +68,7 @@ outer:
 					continue
 				}
 			}
-			TypeingS(msg)
+			TypeingS(msg1)
 		}
 	}
 }
