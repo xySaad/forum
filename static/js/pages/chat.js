@@ -96,6 +96,6 @@ export const Chat = () => {
     };
     ws.send(JSON.stringify(msg));
   };
-
-  return div("chat").add(UserCard(user, false), messages, Input(sendMessage));
+  return div("chat").add(UserCard(user, false), messages, Input(sendMessage))
+  
 };

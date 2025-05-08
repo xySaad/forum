@@ -12,6 +12,7 @@ import (
 )
 
 const WsMessageType_DM = "DM"
+const WsMessageType_tying = "typing_status"
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
