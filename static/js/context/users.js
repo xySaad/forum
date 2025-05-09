@@ -12,7 +12,7 @@ const users = {
       const ida = a.lastMessage?.id;
       const idb = b.lastMessage?.id;
       const idOrder = BigInt(ida || 0) < BigInt(idb || 0);
-      if (ida || idb) return idOrder;
+      if (ida || idb) return idOrder ? 1 : -1;
 
       const nameA = a.username;
       const nameB = b.username;
