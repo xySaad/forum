@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"forum/app/api/ws"
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
@@ -37,15 +38,16 @@ func LogIn(conn *modules.Connection, forumDB *sql.DB) {
 	}
 	query := `UPDATE sessions 
     SET token = ?, expires_at = datetime('now', '+1 hour')
-    WHERE user_id = (SELECT id FROM users WHERE username= ? OR email = ?)`
+    WHERE user_id = (SELECT id FROM users WHERE username= ? OR email = ?)
+	RETURNING user_id`
 
-	_, err = forumDB.Exec(query, token.String(), potentialUser.Username, potentialUser.Username)
+	err = forumDB.QueryRow(query, token.String(), potentialUser.Username, potentialUser.Username).Scan(&conn.User.Id)
 	if err != nil {
 		log.Error("internal server error: ", err)
 		conn.NewError(http.StatusInternalServerError, 500, "internal server error", "")
 		return
 	}
-
+	ws.ExpireAll(conn.User.Id)
 	cookie := http.Cookie{
 		Name:     "token",
 		Value:    token.String(),
@@ -59,5 +61,4 @@ func LogIn(conn *modules.Connection, forumDB *sql.DB) {
 
 	conn.Resp.WriteHeader(http.StatusOK)
 	conn.Resp.Write([]byte(`{"message": "Login successful"}`))
-	return
 }
