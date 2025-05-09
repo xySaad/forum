@@ -11,8 +11,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const WsMessageType_DM = "DM"
-const WsMessageType_tying = "typing_status"
+const (
+	WsMessageType_DM     = "DM"
+	WsMessageType_STATUS = "STATUS"
+)
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -47,7 +49,8 @@ outer:
 			}
 		}
 
-		if msg.Type == WsMessageType_DM {
+		switch msg.Type {
+		case WsMessageType_DM:
 			err = wsConn.sendMessageTo(forumDB, msg)
 			if err != nil {
 				wsConn.WriteJSON(map[string]string{
@@ -56,19 +59,9 @@ outer:
 				})
 				log.Error(err)
 			}
-		}else if  msg.Type == WsMessageType_tying {
-			var msg1 modules.Typing;
-			err := wsConn.ReadJSON(&msg1)
-			if err != nil {
-				log.Debug(err)
-				switch err.(type) {
-				case *net.OpError, *websocket.CloseError:
-					break outer
-				default:
-					continue
-				}
-			}
-			TypeingS(msg1)
+		case WsMessageType_STATUS:
+			msg.Id = msg.Sender
+			TypeingS(msg)
 		}
 	}
 }

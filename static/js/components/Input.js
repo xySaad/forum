@@ -3,9 +3,14 @@ import div from "./native/div.js";
 import img from "./native/img.js";
 import { input } from "./native/input.js";
 import { ws } from "../websockets.js";
+import users from "../context/users.js";
+import { GetParams } from "../router.js";
+import { Chat } from "../pages/chat.js";
 
 
 export const Input = (sendFunction) => {
+  const { id } = GetParams()
+
   const submit = async (input) => {
     const value = input.value.trim();
     if (value.length === 0) return;
@@ -16,23 +21,25 @@ export const Input = (sendFunction) => {
   const inputElm = input("commInput", "Write something...");
   let typingTimeout;
   let isTyping = false;
-  
-  inputElm.onkeydown = (e) => {
+
+  inputElm.onkeydown = async (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      submit(e.target);
-      return; 
+      sendTypingStatus(false, id);
+      clearTimeout(typingTimeout);
+      await submit(e.target);
+      return
     }
-  
+
     if (!isTyping) {
       isTyping = true;
-      sendTypingStatus(true);
+      sendTypingStatus(true, id);
     }
-  
+
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       isTyping = false;
-      sendTypingStatus(false); 
+      sendTypingStatus(false, id);
     }, 2000);
   };
 
@@ -45,12 +52,12 @@ export const Input = (sendFunction) => {
   return div("inputwrap").add(inputElm, button);
 };
 
-function sendTypingStatus(isTyping) {
-  const message = isTyping ? "typing" : "not typing";
+function sendTypingStatus(isTyping, id) {
+  const value = isTyping ? "typing" : "afk";
   ws.send(JSON.stringify({
-    type: "typing_status",
-    status: message,
-    user: users.myself.id
+    type: "STATUS",
+    chat: id,
+    value,
   }));
 }
 

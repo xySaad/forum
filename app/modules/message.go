@@ -10,11 +10,6 @@ type Message struct {
 	Value        string                `json:"value"`
 	CreationTime string                `json:"creationTime,omitempty"`
 }
-type Typing struct {
-	Type   string                `json:"type"`
-	Chat   snowflake.SnowflakeID `json:"chat,omitempty"`
-	Status string `json:"status"`
-}
 
 type MessageNewUser struct {
 	Type  string `json:"type"`
