@@ -22,10 +22,14 @@ const handleMessage = (e) => {
       userStatus.textContent = msg.value;
       break;
     case "STATUS" :
-      let div = query(".publisher")
-      query(".tp").remove()
-      let typ = div("tp").add(msg.value)
-      div.append(typ)
+      let div = query(".publisher");
+      let oldTp = div.querySelector(".tp");
+      if (oldTp) oldTp.remove();
+      let msg = { value: "Your message here" }; 
+      let typ = document.createElement("div");
+      typ.className = "tp";
+      typ.textContent = msg.value;
+      div.appendChild(typ);
     case "DM":
       const { id } = GetParams();
       if (msg.sender !== users.myself.id && msg.sender !== id) {
