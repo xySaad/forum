@@ -53,7 +53,7 @@ export const Input = (sendFunction) => {
 };
 
 function sendTypingStatus(isTyping, id) {
-  const value = isTyping ? "typing" : "afk";
+  const value = isTyping ? "typing" : "not typing";
   ws.send(JSON.stringify({
     type: "STATUS",
     chat: id,

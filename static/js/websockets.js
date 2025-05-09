@@ -21,7 +21,11 @@ const handleMessage = (e) => {
       userStatus.className = `status ${msg.value}`;
       userStatus.textContent = msg.value;
       break;
-
+    case "STATUS" :
+      let div = query(".publisher")
+      query(".tp").remove()
+      let typ = div("tp").add(msg.value)
+      div.append(typ)
     case "DM":
       const { id } = GetParams();
       if (msg.sender !== users.myself.id && msg.sender !== id) {
