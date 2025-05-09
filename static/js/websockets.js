@@ -21,15 +21,24 @@ const handleMessage = (e) => {
       userStatus.className = `status ${msg.value}`;
       userStatus.textContent = msg.value;
       break;
-    case "STATUS" :
-      let div = query(".publisher");
-      let oldTp = div.querySelector(".tp");
-      if (oldTp) oldTp.remove();
-      let msg = { value: "Your message here" }; 
-      let typ = document.createElement("div");
-      typ.className = "tp";
-      typ.textContent = msg.value;
-      div.appendChild(typ);
+    case "STATUS":
+      if (msg.sender === GetParams().id) {
+        let message = query(".messages");
+        let oldt = message.querySelector(".type");
+
+        if (oldt) {
+          console.log("hh");
+          oldt.remove();
+        }
+
+        let chat = document.createElement("div");
+        chat.classList.add("type");
+        chat.textContent = "...";
+        if (msg.value === "typing") {
+          message.prepend(chat);
+        }
+      }
+      break
     case "DM":
       const { id } = GetParams();
       if (msg.sender !== users.myself.id && msg.sender !== id) {

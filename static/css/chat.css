@@ -13,6 +13,7 @@
   margin-top: auto;
   margin-bottom: 40px;
 }
+
 .chat .fallback {
   position: absolute;
   color: gray;
@@ -27,6 +28,7 @@
   padding: 5px 30px;
   overflow: scroll;
 }
+
 .message {
   margin-top: 10px;
   background: hsla(0, 0%, 0%, 0.295);
@@ -35,6 +37,7 @@
   border-radius: 20px;
   width: 60%;
 }
+
 .chat .message .text {
   height: fit-content;
   margin-left: 2rem;
@@ -48,6 +51,25 @@
   gap: 10px;
   flex-wrap: wrap;
 }
+
 .time .full {
- white-space: nowrap;
+  white-space: nowrap;
+}
+
+.type {
+  font-family: 'Courier New', monospace;
+  font-size: 24px;
+  display: inline-block;
+  white-space: nowrap;
+  animation: typing 1.5s infinite steps(3, end);
+}
+
+
+@keyframes typing {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
 }

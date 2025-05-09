@@ -72,7 +72,6 @@ const observerArgs = (parentNode, url) => {
   };
   return [callBack, options];
 };
-
 export const Chat = () => {
   const { id } = GetParams();
   if (!id) {
