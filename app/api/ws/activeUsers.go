@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"fmt"
 	"forum/app/modules"
 	"forum/app/modules/snowflake"
 	"slices"
@@ -10,24 +11,31 @@ import (
 var activeUsers = map[snowflake.SnowflakeID][]*wsConnection{}
 var mux sync.Mutex
 
-func addActiveUser(userId snowflake.SnowflakeID, conn *wsConnection) {
+func addActiveUser(conn *wsConnection) {
 	mux.Lock()
 	defer mux.Unlock()
-	activeUsers[userId] = append(activeUsers[userId], conn)
-	notifyStatusChange(userId, "online")
+	activeUsers[conn.User.Id] = append(activeUsers[conn.User.Id], conn)
+	notifyStatusChange(conn.User.Id, "online")
 }
-func deleteActiveUser(userId snowflake.SnowflakeID, conn *wsConnection) {
+func deleteActiveUser(conn *wsConnection) {
+	fmt.Println("deleting connection for user:", conn.User.Id, "which chatting with:", conn.chattingWith)
+	notifyTypingStatus(modules.Message{
+		Type:  WsMessageType_STATUS,
+		Id:    conn.User.Id,
+		Chat:  conn.chattingWith,
+		Value: "afk",
+	})
 	mux.Lock()
 	defer mux.Unlock()
-	userConns, exist := activeUsers[userId]
+	userConns, exist := activeUsers[conn.User.Id]
 	if !exist {
 		return
 	}
 	connIdx := slices.Index(userConns, conn)
-	activeUsers[userId] = slices.Delete(userConns, connIdx, connIdx+1)
-	if len(activeUsers[userId]) == 0 {
-		delete(activeUsers, userId)
-		notifyStatusChange(userId, "offline")
+	activeUsers[conn.User.Id] = slices.Delete(userConns, connIdx, connIdx+1)
+	if len(activeUsers[conn.User.Id]) == 0 {
+		delete(activeUsers, conn.User.Id)
+		notifyStatusChange(conn.User.Id, "offline")
 	}
 }
 func ExpireAll(userId snowflake.SnowflakeID) {

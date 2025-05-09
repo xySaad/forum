@@ -14,6 +14,7 @@ import (
 type wsConnection struct {
 	*websocket.Conn
 	*modules.Connection
+	chattingWith snowflake.SnowflakeID
 }
 
 func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
@@ -53,6 +54,18 @@ func Notify[T modules.Message | modules.MessageNewUser](msg T, shouldLock bool) 
 			if err != nil {
 				log.Error(err)
 			}
+		}
+	}
+}
+
+func notifyTypingStatus(msg modules.Message) {
+	mux.Lock()
+	defer mux.Unlock()
+	userConns := activeUsers[msg.Chat]
+	for _, conn := range userConns {
+		err := conn.WriteJSON(msg)
+		if err != nil {
+			log.Error(err)
 		}
 	}
 }

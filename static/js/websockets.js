@@ -16,12 +16,20 @@ const handleMessage = (e) => {
   }
   switch (msg.type) {
     case "status":
-      const userStatus = query(`.user.uid-${msg.id} .status`);
+      if (msg.value === "afk") {
+        msg.value = users.get(msg.id).status;
+      } else if (msg.value !== "typing") {
+        users.get(msg.id).status = msg.value;
+      }
+      const userStatus = document.querySelectorAll(
+        `.user.uid-${msg.id} .status`
+      );
       if (!userStatus) return;
-      userStatus.className = `status ${msg.value}`;
-      userStatus.textContent = msg.value;
+      userStatus.forEach((user) => {
+        user.className = `status ${msg.value}`;
+        user.textContent = msg.value;
+      });
       break;
-
     case "DM":
       const { id } = GetParams();
       if (msg.sender !== users.myself.id && msg.sender !== id) {

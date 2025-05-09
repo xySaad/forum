@@ -2,6 +2,7 @@ package ws
 
 import (
 	"database/sql"
+	"fmt"
 	"net"
 
 	"forum/app/modules"
@@ -11,7 +12,10 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const WsMessageType_DM = "DM"
+const (
+	WsMessageType_DM     = "DM"
+	WsMessageType_STATUS = "status"
+)
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
@@ -28,16 +32,15 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 		log.Error(err)
 		return
 	}
-	wsConn := &wsConnection{gorillaWsConn, conn}
+	wsConn := &wsConnection{gorillaWsConn, conn, 0}
 	defer wsConn.Close()
-	defer deleteActiveUser(conn.User.Id, wsConn)
-	addActiveUser(conn.User.Id, wsConn)
+	defer deleteActiveUser(wsConn)
+	addActiveUser(wsConn)
 outer:
 	for {
-		msg := modules.Message{Sender: conn.User.Id}
+		var msg modules.Message
 		err := wsConn.ReadJSON(&msg)
 		if err != nil {
-			log.Debug(err)
 			switch err.(type) {
 			case *net.OpError, *websocket.CloseError:
 				break outer
@@ -45,8 +48,9 @@ outer:
 				continue
 			}
 		}
-
-		if msg.Type == WsMessageType_DM {
+		msg.Sender = conn.User.Id
+		switch msg.Type {
+		case WsMessageType_DM:
 			err = wsConn.sendMessageTo(forumDB, msg)
 			if err != nil {
 				wsConn.WriteJSON(map[string]string{
@@ -55,6 +59,11 @@ outer:
 				})
 				log.Error(err)
 			}
+		case WsMessageType_STATUS:
+			msg.Id = msg.Sender
+			wsConn.chattingWith = msg.Chat
+			fmt.Println("typing status from:", wsConn.chattingWith)
+			notifyTypingStatus(msg)
 		}
 	}
 }
