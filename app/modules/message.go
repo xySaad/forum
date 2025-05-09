@@ -1,6 +1,9 @@
 package modules
 
-import "forum/app/modules/snowflake"
+import (
+	"forum/app/modules/snowflake"
+	"time"
+)
 
 type Message struct {
 	Type         string                `json:"type"`
@@ -8,7 +11,7 @@ type Message struct {
 	Sender       snowflake.SnowflakeID `json:"sender,omitempty"`
 	Chat         snowflake.SnowflakeID `json:"chat,omitempty"`
 	Value        string                `json:"value"`
-	CreationTime string                `json:"creationTime,omitempty"`
+	CreationTime time.Time             `json:"creationTime,omitempty"`
 }
 
 type MessageNewUser struct {

@@ -20,7 +20,7 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
 	mux.Lock()
 	defer mux.Unlock()
 	msg.Id = snowflake.Generate()
-	msg.CreationTime = time.Now().Format(time.DateTime)
+	msg.CreationTime = time.Now()
 	const query = "INSERT INTO message (id, receiver, sender, content, created_at) VALUES (?, ?, ?, ?, ?)"
 	_, err := db.Exec(query, msg.Id, msg.Chat, conn.User.Id, msg.Value, msg.CreationTime)
 	if err != nil {
