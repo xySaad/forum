@@ -22,9 +22,9 @@ const handleMessage = (e) => {
       } else if (msg.value === "typing") {
         query(".messages").prepend(
           div("indicator typing message").add(
-            div("dot", "."),
-            div("dot", "."),
-            div("dot", ".")
+            div("dot"),
+            div("dot"),
+            div("dot")
           )
         );
       } else {
