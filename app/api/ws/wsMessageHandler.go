@@ -58,11 +58,21 @@ func Notify[T modules.Message | modules.MessageNewUser](msg T, shouldLock bool) 
 	}
 }
 
-func notifyTypingStatus(msg modules.Message) {
+func (ownConn *wsConnection) notifyTypingStatus(to snowflake.SnowflakeID, value string) {
+	msg := modules.Message{
+		Type:  WsMessageType_STATUS,
+		Id:    ownConn.User.Id,
+		Chat:  to,
+		Value: value,
+	}
+
 	mux.Lock()
 	defer mux.Unlock()
 	userConns := activeUsers[msg.Chat]
 	for _, conn := range userConns {
+		if conn == ownConn {
+			continue
+		}
 		err := conn.WriteJSON(msg)
 		if err != nil {
 			log.Error(err)

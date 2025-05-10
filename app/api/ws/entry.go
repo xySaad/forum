@@ -2,7 +2,6 @@ package ws
 
 import (
 	"database/sql"
-	"fmt"
 	"net"
 
 	"forum/app/modules"
@@ -62,8 +61,7 @@ outer:
 		case WsMessageType_STATUS:
 			msg.Id = msg.Sender
 			wsConn.chattingWith = msg.Chat
-			fmt.Println("typing status from:", wsConn.chattingWith)
-			notifyTypingStatus(msg)
+			wsConn.notifyTypingStatus(msg.Chat, msg.Value)
 		}
 	}
 }

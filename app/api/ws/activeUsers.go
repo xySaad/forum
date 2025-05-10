@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"fmt"
 	"forum/app/modules"
 	"forum/app/modules/snowflake"
 	"slices"
@@ -18,13 +17,7 @@ func addActiveUser(conn *wsConnection) {
 	notifyStatusChange(conn.User.Id, "online")
 }
 func deleteActiveUser(conn *wsConnection) {
-	fmt.Println("deleting connection for user:", conn.User.Id, "which chatting with:", conn.chattingWith)
-	notifyTypingStatus(modules.Message{
-		Type:  WsMessageType_STATUS,
-		Id:    conn.User.Id,
-		Chat:  conn.chattingWith,
-		Value: "afk",
-	})
+	conn.notifyTypingStatus(conn.chattingWith, "afk")
 	mux.Lock()
 	defer mux.Unlock()
 	userConns, exist := activeUsers[conn.User.Id]
