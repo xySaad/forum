@@ -47,16 +47,28 @@
 }
 .status {
   margin-left: auto;
-}
-
-.status.online {
   color: #a9cc00;
 }
+
 .status.offline {
   color: red;
 }
-.ConversationArea{
+
+.status.typing::after {
+  content: "...";
+}
+
+.ConversationArea {
   position: relative;
   left: 50%;
   top: 50vh;
+}
+.indicator.typing {
+  width: fit-content;
+  display: flex;
+}
+.indicator.typing .dot {
+  display: block;
+  position: relative;
+  animation: 0.5s linear 1s infinite alternate slide-in;
 }

@@ -18,7 +18,17 @@ const handleMessage = (e) => {
     case "status":
       if (msg.value === "afk") {
         msg.value = users.get(msg.id).status;
-      } else if (msg.value !== "typing") {
+        query(".indicator.typing")?.remove();
+      } else if (msg.value === "typing") {
+        query(".messages").prepend(
+          div("indicator typing message").add(
+            div("dot", "."),
+            div("dot", "."),
+            div("dot", ".")
+          )
+        );
+      } else {
+        // msg.value === "online" || "offline"
         users.get(msg.id).status = msg.value;
       }
       const userStatus = document.querySelectorAll(
