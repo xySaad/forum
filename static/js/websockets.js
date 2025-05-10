@@ -1,5 +1,6 @@
 import div from "./components/native/div.js";
 import { query } from "./components/native/index.js";
+import { Typing } from "./components/Typing.js";
 import { UserCard } from "./components/UserCard.js";
 import users from "./context/users.js";
 import { Message } from "./pages/chat.js";
@@ -14,22 +15,24 @@ const handleMessage = (e) => {
     query("popup").append(div("error", msg.value));
     return;
   }
+
+  const { id } = GetParams();
+  const openChat = users.get(msg.id);
+  const messages = query(".messages");
   switch (msg.type) {
     case "status":
       if (msg.value === "afk") {
-        msg.value = users.get(msg.id).status;
+        openChat.isTyping = false;
+        msg.value = openChat.status;
         query(".indicator.typing")?.remove();
       } else if (msg.value === "typing") {
-        query(".messages").prepend(
-          div("indicator typing message").add(
-            div("dot"),
-            div("dot"),
-            div("dot")
-          )
-        );
+        openChat.isTyping = true;
+        console.log(msg.id, id);
+
+        if (msg.id === id) messages.add(Typing());
       } else {
         // msg.value === "online" || "offline"
-        users.get(msg.id).status = msg.value;
+        openChat.status = msg.value;
       }
       const userStatus = document.querySelectorAll(
         `.user.uid-${msg.id} .status`
@@ -41,7 +44,6 @@ const handleMessage = (e) => {
       });
       break;
     case "DM":
-      const { id } = GetParams();
       if (msg.sender !== users.myself.id && msg.sender !== id) {
         query(".notification.message")?.remove();
         const notification = div("notification message").add(Message(msg));
@@ -51,7 +53,7 @@ const handleMessage = (e) => {
         }, 2000);
       }
       if (msg.sender === id || msg.chat === id) {
-        query(".messages").prepend(Message(msg));
+        messages.prepend(Message(msg));
       }
       users.get(id).lastMessage = msg; // useless
       const userElem =

@@ -3,6 +3,7 @@ import { Input } from "../components/Input.js";
 import div from "../components/native/div.js";
 import img from "../components/native/img.js";
 import { query } from "../components/native/index.js";
+import { Typing } from "../components/Typing.js";
 import { UserCard } from "../components/UserCard.js";
 import users from "../context/users.js";
 import { GetParams } from "../router.js";
@@ -28,7 +29,9 @@ export const Message = (msg) => {
     div("publisher").add(
       img(publisher.profilePicture, "no-profile"),
       div("username", publisher.username),
-      div("time", ` • ${formatedDate}`).add(div("full time", time.toDateString()))
+      div("time", ` • ${formatedDate}`).add(
+        div("full time", time.toDateString())
+      )
     ),
     div("text", msg.value)
   );
@@ -85,6 +88,7 @@ export const Chat = () => {
 
   const user = users.get(id);
   const messages = div("messages");
+  if (user.isTyping) messages.add(Typing());
   observer = new IntersectionObserver(...observerArgs(messages, url));
   fetchNext(messages, url);
 
