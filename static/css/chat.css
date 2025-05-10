@@ -59,6 +59,7 @@
   display: flex;
   width: fit-content;
   gap: 8px;
+  order: -1;
 }
 
 
