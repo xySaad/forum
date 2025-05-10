@@ -51,3 +51,42 @@
 .time .full {
  white-space: nowrap;
 }
+
+.indicator.typing {
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  width: fit-content;
+  gap: 8px;
+}
+
+
+.indicator.typing .dot {
+  width: 8px;
+  height: 8px;
+  background: #888;
+  border-radius: 50%;
+  animation: blink 1.4s infinite linear;
+  opacity: 0.3;
+}
+
+.indicator.typing .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.indicator.typing .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+}
