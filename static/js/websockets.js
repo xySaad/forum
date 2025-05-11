@@ -6,45 +6,62 @@ import users from "./context/users.js";
 import { Message } from "./pages/chat.js";
 import { GetParams } from "./router.js";
 import { Deferred } from "./utils/Deferred.js";
-
 const WS_API = "/api/ws";
+export const MESSAGE = {
+  TYPE: {
+    DM: "DM",
+    STATUS: "STATUS",
+    Action: "ACTION",
+    NEW_USER: "NEW_USER",
+  },
+  STATUS: {
+    ONLINE: "online",
+    OFFLINE: "offline",
+  },
+  ACTION: {
+    LOGOUT: "LOGOUT",
+  },
+};
+
 export let ws;
 const handleMessage = (e) => {
-  const msg = JSON.parse(e.data);
-  if (msg.type === "error") {
-    query("popup").append(div("error", msg.value));
-    return;
-  }
-
-  const { id } = GetParams();
-  const openChat = users.get(msg.id);
+  const json = JSON.parse(e.data);
+  const { type, data: msg } = json;
+  const { id: chatId } = GetParams();
+  const IncomingChat = users.get(msg.id);
   const messages = query(".messages");
-  switch (msg.type) {
-    case "status":
-      if (msg.value === "afk") {
-        openChat.isTyping = false;
-        msg.value = openChat.status;
-        query(".indicator.typing")?.remove();
-      } else if (msg.value === "typing") {
-        openChat.isTyping = true;
-        console.log(msg.id, id);
-
-        if (msg.id === id) messages.add(Typing());
-      } else {
-        // msg.value === "online" || "offline"
-        openChat.status = msg.value;
+  switch (type) {
+    case MESSAGE.TYPE.STATUS:
+      const id = msg.id;
+      let status = msg.status;
+      switch (status) {
+        case "afk":
+          IncomingChat.isTyping = false;
+          status = IncomingChat.status;
+          query(".indicator.typing")?.remove();
+          break;
+        case "typing":
+          IncomingChat.isTyping = true;
+          if (id === chatId) messages.add(Typing());
+          break;
+        case MESSAGE.STATUS.ONLINE || MESSAGE.STATUS.OFFLINE:
+          IncomingChat.status = status;
+          break;
+        default:
+          console.error("Invalid status", status);
+          return;
       }
-      const userStatus = document.querySelectorAll(
-        `.user.uid-${msg.id} .status`
-      );
+
+      const userStatus = document.querySelectorAll(`.user.uid-${id} .status`);
       if (!userStatus) return;
       userStatus.forEach((user) => {
-        user.className = `status ${msg.value}`;
-        user.textContent = msg.value;
+        user.className = `status ${status}`;
+        user.textContent = status;
       });
       break;
-    case "DM":
-      if (msg.sender !== users.myself.id && msg.sender !== id) {
+    case MESSAGE.TYPE.DM:
+      const { sender, chat } = msg;
+      if (sender !== users.myself.id && sender !== chatId) {
         query(".notification.message")?.remove();
         const notification = div("notification message").add(Message(msg));
         query("popup").append(notification);
@@ -52,20 +69,20 @@ const handleMessage = (e) => {
           notification.remove();
         }, 2000);
       }
-      if (msg.sender === id || msg.chat === id) {
+      if (sender === chatId || chat === chatId) {
         messages.prepend(Message(msg));
       }
-      users.get(id).lastMessage = msg; // useless
+      users.get(chatId).lastMessage = msg; // useless
       const userElem =
-        query(`.users .user.uid-${msg.chat}`) ||
-        query(`.users .user.uid-${msg.sender}`);
+        query(`.users .user.uid-${chat}`) ||
+        query(`.users .user.uid-${sender}`);
       query(".users .title").insertAdjacentElement("afterend", userElem);
       break;
-    case "user":
-      users.add(msg.value);
-      query(".users").add(UserCard(msg.value));
+    case MESSAGE.TYPE.NEW_USER:
+      users.add(msg);
+      query(".users").add(UserCard(msg));
       break;
-    case "logout":
+    case MESSAGE_TYPE.Action:
       location.reload();
       break;
     default:

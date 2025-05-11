@@ -17,13 +17,19 @@ type wsConnection struct {
 	chattingWith snowflake.SnowflakeID
 }
 
-func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
+func (conn *wsConnection) sendMessageTo(db *sql.DB, inMsg modules.IncomingDM) error {
 	mux.Lock()
 	defer mux.Unlock()
-	msg.Id = snowflake.Generate()
-	msg.CreationTime = time.Now()
+	msg := modules.OutgoingDM{
+		Id:           snowflake.Generate(),
+		Sender:       conn.User.Id,
+		Chat:         inMsg.Chat,
+		Content:      inMsg.Content,
+		CreationTime: time.Now(),
+	}
+
 	const query = "INSERT INTO message (id, receiver, sender, content, created_at) VALUES (?, ?, ?, ?, ?)"
-	_, err := db.Exec(query, msg.Id, msg.Chat, conn.User.Id, msg.Value, msg.CreationTime)
+	_, err := db.Exec(query, msg.Id, msg.Chat, conn.User.Id, msg.Content, msg.CreationTime)
 	if err != nil {
 		log.Error("Error inserting DM into database:", err)
 		return err
@@ -34,7 +40,7 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
 	}
 
 	for _, conn := range userConns {
-		err := conn.WriteJSON(msg)
+		err := conn.WriteJSON(modules.NewMessage(&msg))
 		if err != nil {
 			log.Error(err)
 		}
@@ -43,7 +49,7 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, msg modules.Message) error {
 	return nil
 }
 
-func Notify[T modules.Message | modules.MessageNewUser](msg T, shouldLock bool) {
+func Notify[T modules.OutgoingStatus | modules.User](msg modules.OutgoingMessage[T], shouldLock bool) {
 	if shouldLock {
 		mux.Lock()
 		defer mux.Unlock()
@@ -58,22 +64,20 @@ func Notify[T modules.Message | modules.MessageNewUser](msg T, shouldLock bool) 
 	}
 }
 
-func (ownConn *wsConnection) notifyTypingStatus(to snowflake.SnowflakeID, value string) {
-	msg := modules.Message{
-		Type:  WsMessageType_STATUS,
-		Id:    ownConn.User.Id,
-		Chat:  to,
-		Value: value,
+func (ownConn *wsConnection) notifyTypingStatus(to snowflake.SnowflakeID, status string) {
+	msg := modules.OutgoingStatus{
+		Id:     ownConn.User.Id,
+		Status: status,
 	}
 
 	mux.Lock()
 	defer mux.Unlock()
-	userConns := activeUsers[msg.Chat]
+	userConns := activeUsers[to]
 	for _, conn := range userConns {
 		if conn == ownConn {
 			continue
 		}
-		err := conn.WriteJSON(msg)
+		err := conn.WriteJSON(modules.NewMessage(&msg))
 		if err != nil {
 			log.Error(err)
 		}
@@ -81,11 +85,10 @@ func (ownConn *wsConnection) notifyTypingStatus(to snowflake.SnowflakeID, value 
 }
 
 func notifyStatusChange(userId snowflake.SnowflakeID, status string) {
-	msg := modules.Message{
-		Type:  "status",
-		Id:    userId,
-		Value: status,
+	msg := modules.OutgoingStatus{
+		Id:     userId,
+		Status: status,
 	}
 
-	Notify(msg, false)
+	Notify(modules.NewMessage(&msg), false)
 }
