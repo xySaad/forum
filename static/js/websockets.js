@@ -6,8 +6,13 @@ import users from "./context/users.js";
 import { Message } from "./pages/chat.js";
 import { GetParams } from "./router.js";
 import { Deferred } from "./utils/Deferred.js";
+export const MESSAGE_TYPE = {
+  DM: "DM",
+  STATUS: "STATUS",
+};
 
 const WS_API = "/api/ws";
+
 export let ws;
 const handleMessage = (e) => {
   const msg = JSON.parse(e.data);
@@ -20,7 +25,7 @@ const handleMessage = (e) => {
   const openChat = users.get(msg.id);
   const messages = query(".messages");
   switch (msg.type) {
-    case "status":
+    case MESSAGE_TYPE.STATUS:
       if (msg.value === "afk") {
         openChat.isTyping = false;
         msg.value = openChat.status;
@@ -43,7 +48,7 @@ const handleMessage = (e) => {
         user.textContent = msg.value;
       });
       break;
-    case "DM":
+    case MESSAGE_TYPE.DM:
       if (msg.sender !== users.myself.id && msg.sender !== id) {
         query(".notification.message")?.remove();
         const notification = div("notification message").add(Message(msg));

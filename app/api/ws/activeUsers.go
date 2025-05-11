@@ -35,7 +35,7 @@ func ExpireAll(userId snowflake.SnowflakeID) {
 	mux.Lock()
 	defer mux.Unlock()
 	for _, conn := range activeUsers[userId] {
-		conn.WriteJSON(modules.Message{Type: "logout"})
+		conn.WriteJSON(modules.NewMessage(&modules.LogoutMessage))
 		conn.Close()
 	}
 	delete(activeUsers, userId)

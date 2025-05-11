@@ -2,18 +2,13 @@ package ws
 
 import (
 	"database/sql"
+	"encoding/json"
 	"net"
 
 	"forum/app/modules"
-	"forum/app/modules/errors"
 	"forum/app/modules/log"
 
 	"github.com/gorilla/websocket"
-)
-
-const (
-	WsMessageType_DM     = "DM"
-	WsMessageType_STATUS = "status"
 )
 
 var upgrader = websocket.Upgrader{
@@ -35,6 +30,7 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	defer wsConn.Close()
 	defer deleteActiveUser(wsConn)
 	addActiveUser(wsConn)
+	// TODO: prevent user from sending custom status
 outer:
 	for {
 		var msg modules.Message
@@ -49,8 +45,12 @@ outer:
 		}
 		msg.Sender = conn.User.Id
 		switch msg.Type {
-		case WsMessageType_DM:
-			err = wsConn.sendMessageTo(forumDB, msg)
+		case modules.MessageType_DM:
+			temp := modules.OutgoingDM{
+				Chat:    msg.Chat,
+				Content: msg.Value,
+			}
+			err = wsConn.sendMessageTo(forumDB, temp)
 			if err != nil {
 				wsConn.WriteJSON(map[string]string{
 					"type":  "error",
@@ -58,50 +58,52 @@ outer:
 				})
 				log.Error(err)
 			}
-		case WsMessageType_STATUS:
+		case modules.MessageType_STATUS:
 			msg.Id = msg.Sender
 			wsConn.chattingWith = msg.Chat
 			wsConn.notifyTypingStatus(msg.Chat, msg.Value)
 		}
 	}
-}
 
-func FetchMessages(conn *modules.Connection, forumDB *sql.DB) {
-	if !conn.IsAuthenticated(forumDB) {
-		return
-	}
-	if len(conn.Path) < 3 {
-		conn.Error(errors.HttpNotFound)
-		return
-	}
-	chatId := conn.Path[2]
-	lastId := conn.Req.URL.Query().Get("lastId")
-	query := modules.QUERY_GET_MESSAGE
-	args := []any{conn.User.Id, chatId, chatId, conn.User.Id}
-	if lastId != "" {
-		query += "AND id < ? "
-		args = append(args, lastId)
-	}
-	query += "ORDER BY id DESC LIMIT 10"
-	rows, err := forumDB.Query(query, args...)
-	if err != nil {
-		conn.Error(errors.HttpInternalServerError)
-		log.Debug(err)
-		return
-	}
-	defer rows.Close()
-
-	var messages []modules.Message
-	for rows.Next() {
-		msg := modules.Message{
-			Type: WsMessageType_DM,
+	//duplicate proccess for debugging
+debug:
+	for {
+		var rawMsg modules.IncomingMessage
+		err := wsConn.ReadJSON(&rawMsg)
+		if err != nil {
+			switch err.(type) {
+			case *net.OpError, *websocket.CloseError:
+				break debug
+			default:
+				continue
+			}
 		}
-		if err := rows.Scan(&msg.Id, &msg.Sender, &msg.Chat, &msg.Value, &msg.CreationTime); err != nil {
-			log.Error(err)
+		msg, exist := modules.Incoming_Message_Types[rawMsg.Type]
+		if !exist {
 			continue
 		}
-		messages = append(messages, msg)
+		rawData, err := rawMsg.Data.MarshalJSON()
+		json.Unmarshal(rawData, &msg)
+
+		switch v := msg.(type) {
+		case modules.IncomingDM:
+			temp := modules.OutgoingDM{
+				Chat:    msg.Chat,
+				Content: msg.Value,
+			}
+			err = wsConn.sendMessageTo(forumDB, temp)
+			if err != nil {
+				wsConn.WriteJSON(map[string]string{
+					"type":  "error",
+					"value": err.Error(),
+				})
+				log.Error(err)
+			}
+		case modules.IncomingStatus:
+			msg.Id = conn.User.Id
+			wsConn.chattingWith = msg.Chat
+			wsConn.notifyTypingStatus(msg.Chat, msg.Value)
+		}
 	}
 
-	conn.Respond(messages)
 }

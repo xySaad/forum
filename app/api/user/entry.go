@@ -49,10 +49,10 @@ func GetAllUsers(conn *modules.Connection, db *sql.DB) {
 			user.Status = "offline"
 		}
 
-		var lastMessage modules.Message
+		var lastMessage modules.OutgoingDM
 		msgQuery := modules.QUERY_GET_MESSAGE + "ORDER BY id DESC"
 		row := db.QueryRow(msgQuery, conn.User.Id, user.Id, user.Id, conn.User.Id)
-		err = row.Scan(&lastMessage.Id, &lastMessage.Sender, &lastMessage.Chat, &lastMessage.Value, &lastMessage.CreationTime)
+		err = row.Scan(&lastMessage.Id, &lastMessage.Sender, &lastMessage.Chat, &lastMessage.Content, &lastMessage.CreationTime)
 		user.LastMessage = &lastMessage
 		if err == sql.ErrNoRows {
 			user.LastMessage = nil

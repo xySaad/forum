@@ -8,8 +8,7 @@ import { UserCard } from "../components/UserCard.js";
 import users from "../context/users.js";
 import { GetParams } from "../router.js";
 import { Fetch } from "../utils/fetch.js";
-import { ws } from "../websockets.js";
-const MESSAGE_TYPE_DM = "DM";
+import { MESSAGE_TYPE, ws } from "../websockets.js";
 const CONVERSATION_API = `${location.origin}/api/chat/`;
 let observer;
 
@@ -21,11 +20,11 @@ export const Message = (msg) => {
   const formatedDate = `${hours}:${minutes}`;
   const isFromMe = publisher.id === users.myself.id;
   const message = div("message");
-  message.style.marginLeft = isFromMe ? "auto" : "unset";
+  modules.style.marginLeft = isFromMe ? "auto" : "unset";
   const radius = isFromMe ? "end" : "start";
-  message.style[`border-start-${radius}-radius`] = 0;
+  modules.style[`border-start-${radius}-radius`] = 0;
 
-  return message.add(
+  return modules.add(
     div("publisher").add(
       img(publisher.profilePicture, "no-profile"),
       div("username", publisher.username),
@@ -51,7 +50,7 @@ const fetchNext = async (parentNode, url) => {
       parentNode.append(Message(msg));
     });
     const topMessage = parentNode.lastChild;
-    topMessage.id = json[json.length - 1].id;
+    topmodules.id = json[json.length - 1].id;
     observer.observe(topMessage);
   } catch (error) {
     console.error(error);
@@ -64,7 +63,7 @@ const observerArgs = (parentNode, url) => {
     if (e[0].isIntersecting) {
       observer.unobserve(e[0].target);
       const topMessage = parentNode.lastChild;
-      url.searchParams.set("lastId", topMessage.id);
+      url.searchParams.set("lastId", topmodules.id);
       fetchNext(parentNode, url);
     }
   };
@@ -94,7 +93,7 @@ export const Chat = () => {
 
   const sendMessage = ({ value }) => {
     const msg = {
-      type: MESSAGE_TYPE_DM,
+      type: MESSAGE_TYPE.DM,
       chat: id,
       value,
     };
