@@ -45,12 +45,12 @@ const handleMessage = (e) => {
       break;
     case "DM":
       if (msg.sender !== users.myself.id && msg.sender !== id) {
-        query(".notification.message")?.remove();
-        const notification = div("notification message").add(Message(msg));
-        query("popup").append(notification);
+        query(".notificatio.message.hh")?.remove();
+        const notification = div("notificatio message hh").add(Message(msg));
+        document.body.append(notification);
         setTimeout(() => {
           notification.remove();
-        }, 2000);
+        }, 1000);
       }
       if (msg.sender === id || msg.chat === id) {
         messages.prepend(Message(msg));

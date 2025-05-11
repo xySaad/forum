@@ -38,6 +38,26 @@
     transform: translate(-50%);
 }
 
+.notificatio {
+    position: absolute;
+    top: 0;
+    padding: 24px 32px;
+    box-Shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-Index: 1000;
+    font-Size: 16px;
+    font-Weight: bold;
+    top: 0;
+    left: 70%;
+    height: max-content;
+    gap: 0;
+    width: max-content;
+    overflow: hidden;
+    border-radius: 20px;
+    transform: translate(-50%);
+}
+
+
+
 .notificationError {
     background: rgb(224, 52, 52);
     color: white;
@@ -71,6 +91,7 @@
     justify-content: center;
     align-items: center;
 }
+
 .inputContainer {
     display: flex;
     gap: 8px;
