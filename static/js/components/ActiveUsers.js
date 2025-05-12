@@ -1,6 +1,5 @@
 import users from "../context/users.js";
 import { Fetch } from "../utils/fetch.js";
-import { updateStatus } from "../websockets.js";
 import div from "./native/div.js";
 import { UserCard } from "./UserCard.js";
 const USERS_API = "/api/users";
@@ -13,6 +12,9 @@ export const ActiveUsers = async () => {
       const json = await resp.json();
       json.users.forEach((user) => users.add(user));
       users.whoIsTyping = json.whoIsTyping;
+      users.whoIsTyping?.forEach((id) => {
+        users.get(id).isTyping = true;
+      });
     }
   }
 

@@ -38,10 +38,10 @@ const main = async () => {
     appendGuestHeader();
   }
   await InitWS();
-  go(window.location.pathname);
+  await go(window.location.pathname);
+  users.whoIsTyping?.forEach((id) => {
+    updateStatus(id, "typing");
+  });
 };
 
-await main();
-users.whoIsTyping?.forEach((id) => {
-  updateStatus(id, "typing");
-});
+main();

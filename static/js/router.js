@@ -85,7 +85,7 @@ const routeLookup = (route) => {
   }
 };
 
-export const go = (route, ...args) => {
+export const go = async(route, ...args) => {
   let { popup, page, params } = routeLookup(route);
   if (!page) ({ page } = routeLookup("404"));
   Params = params;
@@ -102,7 +102,7 @@ export const go = (route, ...args) => {
   document.querySelector("popup").innerHTML = "";
   const targetLayer = query(popup ? "popup" : "main");
   targetLayer.innerHTML = "";
-  targetLayer.add(page(...args));
+  targetLayer.append(await page(...args));
 };
 
 export const back = () => {

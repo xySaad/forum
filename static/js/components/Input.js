@@ -39,7 +39,7 @@ export const Input = (sendFunction) => {
     typingTimeout = setTimeout(() => {
       isTyping = false;
       sendTypingStatus(false, id);
-    }, 1000);
+    }, 10000);
   };
 
   const button = document.createElement("button");
