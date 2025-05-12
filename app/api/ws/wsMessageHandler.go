@@ -69,7 +69,6 @@ func (ownConn *wsConnection) notifyTypingStatus(to snowflake.SnowflakeID, status
 		Id:     ownConn.User.Id,
 		Status: status,
 	}
-
 	mux.Lock()
 	defer mux.Unlock()
 	userConns := activeUsers[to]

@@ -33,6 +33,10 @@ func addActiveUser(conn *wsConnection) {
 }
 func deleteActiveUser(conn *wsConnection) {
 	conn.notifyTypingStatus(conn.chattingWith, "afk")
+	updateTyping(&modules.IncomingStatus{
+		Status: "afk",
+		Chat:   conn.chattingWith,
+	}, conn.User.Id)
 
 	mux.Lock()
 	defer mux.Unlock()
