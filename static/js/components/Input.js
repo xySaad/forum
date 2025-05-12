@@ -4,7 +4,6 @@ import img from "./native/img.js";
 import { input } from "./native/input.js";
 import { ws } from "../websockets.js";
 import { GetParams } from "../router.js";
-
 export const Input = (sendFunction) => {
   const { id } = GetParams();
 
@@ -39,7 +38,7 @@ export const Input = (sendFunction) => {
     typingTimeout = setTimeout(() => {
       isTyping = false;
       sendTypingStatus(false, id);
-    }, 1000);
+    }, 10000);
   };
 
   const button = document.createElement("button");

@@ -2,8 +2,8 @@ package ws
 
 import (
 	"database/sql"
-	"fmt"
 	"net"
+	"slices"
 
 	"forum/app/modules"
 	"forum/app/modules/errors"
@@ -60,9 +60,17 @@ outer:
 				log.Error(err)
 			}
 		case WsMessageType_STATUS:
+
 			msg.Id = msg.Sender
-			wsConn.chattingWith = msg.Chat
-			fmt.Println("typing status from:", wsConn.chattingWith)
+			wsConn.chattingWith = msg.Chat // xkon li sift dak typing status
+			//fmt.Println("typing status from:", wsConn.chattingWith)
+			if msg.Value == "typing" {
+				modules.Typingto[msg.Chat] = append(modules.Typingto[msg.Chat], msg.Sender)
+
+			} else {
+				modules.Typingto[msg.Chat] = slices.Delete(modules.Typingto[msg.Chat], slices.Index(modules.Typingto[msg.Chat], msg.Sender), slices.Index(modules.Typingto[msg.Chat], msg.Sender)+1)
+			}
+
 			notifyTypingStatus(msg)
 		}
 	}
@@ -104,6 +112,5 @@ func FetchMessages(conn *modules.Connection, forumDB *sql.DB) {
 		}
 		messages = append(messages, msg)
 	}
-
 	conn.Respond(messages)
 }

@@ -4,6 +4,7 @@ import (
 	"forum/app/modules/snowflake"
 	"time"
 )
+var Typingto = map[snowflake.SnowflakeID][]snowflake.SnowflakeID{}
 
 type Message struct {
 	Type         string                `json:"type"`

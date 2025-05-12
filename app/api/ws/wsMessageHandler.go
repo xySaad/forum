@@ -2,6 +2,7 @@ package ws
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"forum/app/modules"
@@ -61,7 +62,9 @@ func Notify[T modules.Message | modules.MessageNewUser](msg T, shouldLock bool) 
 func notifyTypingStatus(msg modules.Message) {
 	mux.Lock()
 	defer mux.Unlock()
+	fmt.Println(modules.Typingto)
 	userConns := activeUsers[msg.Chat]
+
 	for _, conn := range userConns {
 		err := conn.WriteJSON(msg)
 		if err != nil {

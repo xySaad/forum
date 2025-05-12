@@ -1,12 +1,16 @@
 package ws
 
 import (
-	"fmt"
 	"forum/app/modules"
 	"forum/app/modules/snowflake"
 	"slices"
 	"sync"
 )
+
+type activeUser struct {
+	conns      []*wsConnection
+	typingFrom []snowflake.SnowflakeID
+}
 
 var activeUsers = map[snowflake.SnowflakeID][]*wsConnection{}
 var mux sync.Mutex
@@ -16,9 +20,17 @@ func addActiveUser(conn *wsConnection) {
 	defer mux.Unlock()
 	activeUsers[conn.User.Id] = append(activeUsers[conn.User.Id], conn)
 	notifyStatusChange(conn.User.Id, "online")
+	for _, chattingWith := range modules.Typingto[conn.User.Id] {
+		go notifyTypingStatus(modules.Message{
+			Type:  WsMessageType_STATUS,
+			Id:    chattingWith,
+			Chat:  conn.User.Id,
+			Value: "typing",
+		  })
+	
+}
 }
 func deleteActiveUser(conn *wsConnection) {
-	fmt.Println("deleting connection for user:", conn.User.Id, "which chatting with:", conn.chattingWith)
 	notifyTypingStatus(modules.Message{
 		Type:  WsMessageType_STATUS,
 		Id:    conn.User.Id,

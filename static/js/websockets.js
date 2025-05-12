@@ -5,8 +5,7 @@ import { UserCard } from "./components/UserCard.js";
 import users from "./context/users.js";
 import { Message } from "./pages/chat.js";
 import { GetParams } from "./router.js";
-import { Deferred } from "./utils/Deferred.js";
-
+import { Deferred } from "./utils/Deferred.js"
 const WS_API = "/api/ws";
 export let ws;
 const handleMessage = (e) => {
