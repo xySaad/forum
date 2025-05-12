@@ -17,7 +17,7 @@ type wsConnection struct {
 	chattingWith snowflake.SnowflakeID
 }
 
-func (conn *wsConnection) sendMessageTo(db *sql.DB, inMsg modules.IncomingDM) error {
+func (conn *wsConnection) sendMessageTo(db *sql.DB, inMsg *modules.IncomingDM) error {
 	mux.Lock()
 	defer mux.Unlock()
 	msg := modules.OutgoingDM{

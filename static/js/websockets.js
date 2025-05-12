@@ -10,16 +10,19 @@ const WS_API = "/api/ws";
 export const MESSAGE = {
   TYPE: {
     DM: "DM",
-    STATUS: "STATUS",
-    Action: "ACTION",
-    NEW_USER: "NEW_USER",
+    STATUS: "status",
+    Action: "action",
+    NEW_USER: "new_user",
   },
   STATUS: {
     ONLINE: "online",
     OFFLINE: "offline",
   },
   ACTION: {
-    LOGOUT: "LOGOUT",
+    LOGOUT: "logout",
+  },
+  LOGOUT_REASON: {
+    NEW_LOGIN: "new_login",
   },
 };
 
@@ -82,8 +85,16 @@ const handleMessage = (e) => {
       users.add(msg);
       query(".users").add(UserCard(msg));
       break;
-    case MESSAGE_TYPE.Action:
-      location.reload();
+    case MESSAGE.TYPE.Action:
+      const { action } = msg;
+      switch (action) {
+        case MESSAGE.ACTION.LOGOUT:
+          location.reload();
+          break;
+        default:
+          console.error("invalid action");
+          break;
+      }
       break;
     default:
       break;

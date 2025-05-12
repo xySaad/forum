@@ -12,9 +12,7 @@ import { MESSAGE, ws } from "../websockets.js";
 const CONVERSATION_API = `${location.origin}/api/chat/`;
 let observer;
 
-export const Message = (msg) => {
-  console.log(msg);
-  
+export const Message = (msg) => {  
   const publisher = users.get(msg.sender);
   const time = new Date(msg.creationTime);
   const minutes = time.getMinutes().toString().padStart(2, "0");
