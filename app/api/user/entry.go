@@ -7,7 +7,6 @@ import (
 	"forum/app/modules"
 	"forum/app/modules/errors"
 	"forum/app/modules/log"
-	"forum/app/modules/snowflake"
 )
 
 func Entry(conn *modules.Connection, db *sql.DB) {
@@ -21,11 +20,6 @@ func Entry(conn *modules.Connection, db *sql.DB) {
 	case "created":
 		GetUserCreatedPosts(conn, db)
 	}
-}
-
-type UsersStates struct {
-	Users       []modules.User          `json:"users"`
-	WhoIsTyping []snowflake.SnowflakeID `json:"whoIsTyping"`
 }
 
 func GetAllUsers(conn *modules.Connection, db *sql.DB) {
@@ -74,8 +68,5 @@ func GetAllUsers(conn *modules.Connection, db *sql.DB) {
 		return
 	}
 
-	conn.Respond(UsersStates{
-		Users:       users,
-		WhoIsTyping: ws.Typingto[conn.User.Id],
-	})
+	conn.Respond(users)
 }

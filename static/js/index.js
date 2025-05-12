@@ -10,7 +10,7 @@ import PostView from "./components/PostView.js";
 import { CreatedPosts, LikedPosts } from "./pages/user-posts.js";
 import { Chat } from "./pages/chat.js";
 import { ActiveUsers } from "./components/ActiveUsers.js";
-import { InitWS, updateStatus } from "./websockets.js";
+import { InitWS } from "./websockets.js";
 import users from "./context/users.js";
 AddRoute("/", Home);
 AddRoute("/create-post", CreatePost, true);
@@ -38,10 +38,7 @@ const main = async () => {
     appendGuestHeader();
   }
   await InitWS();
-  await go(window.location.pathname);
-  users.whoIsTyping?.forEach((id) => {
-    updateStatus(id, "typing");
-  });
+  go(window.location.pathname);
 };
 
 main();

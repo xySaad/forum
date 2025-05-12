@@ -7,32 +7,21 @@ import (
 	"sync"
 )
 
-var Typingto = map[snowflake.SnowflakeID][]snowflake.SnowflakeID{}
-var typingMux sync.Mutex
-
-func updateTyping(msg *modules.IncomingStatus, id snowflake.SnowflakeID) {
-	typingMux.Lock()
-	typingTo := Typingto[msg.Chat]
-	if msg.Status == "typing" {
-		Typingto[msg.Chat] = append(typingTo, id)
-	} else {
-		idIdx := slices.Index(typingTo, id)
-		Typingto[msg.Chat] = slices.Delete(typingTo, idIdx, idIdx+1)
-	}
-	typingMux.Unlock()
-}
-
 var activeUsers = map[snowflake.SnowflakeID][]*wsConnection{}
 var mux sync.Mutex
 
+func GetUser(id snowflake.SnowflakeID) []*wsConnection {
+	return activeUsers[id]
+}
 func addActiveUser(conn *wsConnection) {
 	mux.Lock()
 	defer mux.Unlock()
 	activeUsers[conn.User.Id] = append(activeUsers[conn.User.Id], conn)
 	notifyStatusChange(conn.User.Id, "online")
 }
+
 func deleteActiveUser(conn *wsConnection) {
-	conn.notifyTypingStatus(conn.chattingWith, "afk")
+	conn.notifyTypingStatus(conn.ChattingWith, "afk")
 
 	mux.Lock()
 	defer mux.Unlock()
@@ -47,6 +36,7 @@ func deleteActiveUser(conn *wsConnection) {
 		notifyStatusChange(conn.User.Id, "offline")
 	}
 }
+
 func ExpireAll(userId snowflake.SnowflakeID) {
 	mux.Lock()
 	defer mux.Unlock()

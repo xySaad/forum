@@ -14,7 +14,7 @@ import (
 type wsConnection struct {
 	*websocket.Conn
 	*modules.Connection
-	chattingWith snowflake.SnowflakeID
+	ChattingWith snowflake.SnowflakeID
 }
 
 func (conn *wsConnection) sendMessageTo(db *sql.DB, inMsg *modules.IncomingDM) error {

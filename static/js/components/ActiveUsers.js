@@ -10,11 +10,7 @@ export const ActiveUsers = async () => {
     const resp = await Fetch(USERS_API);
     if (resp.ok) {
       const json = await resp.json();
-      json.users.forEach((user) => users.add(user));
-      users.whoIsTyping = json.whoIsTyping;
-      users.whoIsTyping?.forEach((id) => {
-        users.get(id).isTyping = true;
-      });
+      json.forEach((user) => users.add(user));
     }
   }
 
