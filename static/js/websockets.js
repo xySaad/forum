@@ -26,6 +26,15 @@ export const MESSAGE = {
   },
 };
 
+export const updateStatus = (id, status) => {
+  const userStatus = document.querySelectorAll(`.user.uid-${id} .status`);
+  if (!userStatus) return;
+  userStatus.forEach((user) => {
+    user.className = `status ${status}`;
+    user.textContent = status;
+  });
+};
+
 export let ws;
 const handleMessage = (e) => {
   const json = JSON.parse(e.data);
@@ -54,13 +63,7 @@ const handleMessage = (e) => {
           console.error("Invalid status", status);
           return;
       }
-
-      const userStatus = document.querySelectorAll(`.user.uid-${id} .status`);
-      if (!userStatus) return;
-      userStatus.forEach((user) => {
-        user.className = `status ${status}`;
-        user.textContent = status;
-      });
+      updateStatus(id, status);
       break;
     case MESSAGE.TYPE.DM:
       const { sender, chat } = msg;

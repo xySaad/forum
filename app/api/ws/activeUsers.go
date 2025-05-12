@@ -7,6 +7,21 @@ import (
 	"sync"
 )
 
+var Typingto = map[snowflake.SnowflakeID][]snowflake.SnowflakeID{}
+var typingMux sync.Mutex
+
+func updateTyping(msg *modules.IncomingStatus, id snowflake.SnowflakeID) {
+	typingMux.Lock()
+	typingTo := Typingto[msg.Chat]
+	if msg.Status == "typing" {
+		Typingto[msg.Chat] = append(typingTo, id)
+	} else {
+		idIdx := slices.Index(typingTo, id)
+		Typingto[msg.Chat] = slices.Delete(typingTo, idIdx, idIdx+1)
+	}
+	typingMux.Unlock()
+}
+
 var activeUsers = map[snowflake.SnowflakeID][]*wsConnection{}
 var mux sync.Mutex
 
@@ -18,6 +33,7 @@ func addActiveUser(conn *wsConnection) {
 }
 func deleteActiveUser(conn *wsConnection) {
 	conn.notifyTypingStatus(conn.chattingWith, "afk")
+
 	mux.Lock()
 	defer mux.Unlock()
 	userConns, exist := activeUsers[conn.User.Id]

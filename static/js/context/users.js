@@ -23,6 +23,7 @@ const users = {
   get size() {
     return usersMap.size;
   },
+  whoIsTyping: null
 };
 
 export default users;
