@@ -51,7 +51,7 @@ const fetchNext = async (parentNode, url) => {
       parentNode.append(Message(msg));
     });
     const topMessage = parentNode.lastChild;
-    topMessage.id = json[json.length - 1].id;
+    topMessage.id = json[json.length - 1].data.id;
     observer.observe(topMessage);
   } catch (error) {
     console.error(error);
