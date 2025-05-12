@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"forum/app/api/auth"
+	"forum/app/api/chat"
 	"forum/app/api/posts"
 	"forum/app/api/profile"
 	"forum/app/api/reactions"
@@ -47,7 +48,7 @@ func Router(resp http.ResponseWriter, req *http.Request, forumDB *sql.DB) {
 	case "ws":
 		ws.Entry(conn, forumDB)
 	case "chat":
-		ws.FetchMessages(conn, forumDB)
+		chat.FetchMessages(conn, forumDB)
 	default:
 		conn.Error(errors.HttpNotFound)
 	}

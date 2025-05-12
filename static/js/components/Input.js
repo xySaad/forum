@@ -2,7 +2,7 @@ import { importSvg } from "../utils/index.js";
 import div from "./native/div.js";
 import img from "./native/img.js";
 import { input } from "./native/input.js";
-import { ws } from "../websockets.js";
+import { MESSAGE, ws } from "../websockets.js";
 import { GetParams } from "../router.js";
 
 export const Input = (sendFunction) => {
@@ -51,12 +51,14 @@ export const Input = (sendFunction) => {
 };
 
 function sendTypingStatus(isTyping, id) {
-  const value = isTyping ? "typing" : "afk";
+  const status = isTyping ? "typing" : "afk";
   ws.send(
     JSON.stringify({
-      type: "status",
-      chat: id,
-      value,
+      type: MESSAGE.TYPE.STATUS,
+      data: {
+        chat: id,
+        status,
+      }
     })
   );
 }

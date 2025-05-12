@@ -36,9 +36,6 @@ func Register(conn *modules.Connection, forumDB *sql.DB) {
 
 	conn.Resp.Write([]byte("Registration successful"))
 
-	msg := modules.MessageNewUser{
-		Type:  "user",
-		Value: user,
-	}
+	msg := modules.NewMessage(user)
 	ws.Notify(msg, true)
 }

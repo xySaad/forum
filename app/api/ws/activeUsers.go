@@ -34,8 +34,12 @@ func deleteActiveUser(conn *wsConnection) {
 func ExpireAll(userId snowflake.SnowflakeID) {
 	mux.Lock()
 	defer mux.Unlock()
+	logoutAction := modules.Action{
+		Action: modules.ACTION_LOGOUT,
+		Reason: modules.LOGOUT_REASON_NEW_LOGIN,
+	}
 	for _, conn := range activeUsers[userId] {
-		conn.WriteJSON(modules.Message{Type: "logout"})
+		conn.WriteJSON(modules.NewMessage(&logoutAction))
 		conn.Close()
 	}
 	delete(activeUsers, userId)

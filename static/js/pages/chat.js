@@ -8,12 +8,11 @@ import { UserCard } from "../components/UserCard.js";
 import users from "../context/users.js";
 import { GetParams } from "../router.js";
 import { Fetch } from "../utils/fetch.js";
-import { ws } from "../websockets.js";
-const MESSAGE_TYPE_DM = "DM";
+import { MESSAGE, ws } from "../websockets.js";
 const CONVERSATION_API = `${location.origin}/api/chat/`;
 let observer;
 
-export const Message = (msg) => {
+export const Message = (msg) => {  
   const publisher = users.get(msg.sender);
   const time = new Date(msg.creationTime);
   const minutes = time.getMinutes().toString().padStart(2, "0");
@@ -33,7 +32,7 @@ export const Message = (msg) => {
         div("full time", time.toDateString())
       )
     ),
-    div("text", msg.value)
+    div("text", msg.content)
   );
 };
 
@@ -41,13 +40,14 @@ const fetchNext = async (parentNode, url) => {
   try {
     const resp = await Fetch(url);
     const json = await resp.json();
+
     if (!json) {
       if (parentNode.children.length < 0) {
         parentNode.add(div("fallback", "it's empty here!"));
       }
       return;
     }
-    json.forEach((msg) => {
+    json.forEach(({ data: msg }) => {
       parentNode.append(Message(msg));
     });
     const topMessage = parentNode.lastChild;
@@ -94,9 +94,11 @@ export const Chat = () => {
 
   const sendMessage = ({ value }) => {
     const msg = {
-      type: MESSAGE_TYPE_DM,
-      chat: id,
-      value,
+      type: MESSAGE.TYPE.DM,
+      data: {
+        chat: id,
+        content: value,
+      },
     };
     ws.send(JSON.stringify(msg));
   };
