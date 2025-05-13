@@ -14,9 +14,7 @@
 }
 
 .users .title {
-  margin: auto;
-  border-bottom: gray 1px solid;
-  padding: 0 10px;
+  padding: 10px;
 }
 
 .users .fallback {
@@ -57,7 +55,7 @@
 }
 
 .status.typing::after {
-  content: '...';
+  content: "...";
 }
 
 .ConversationArea {
@@ -65,4 +63,27 @@
   left: 50%;
   top: 50vh;
   transform: translate(-50%, -50%);
+}
+.head {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  margin: auto;
+}
+.head .chevron-left {
+  position: absolute;
+  right: 10px;
+}
+.users.hide {
+  width: fit-content;
+}
+.users.hide .title {
+  display: none;
+}
+.users.hide .chevron-left {
+  display: none;
+}
+.users.hide .user {
+  display: none;
 }
