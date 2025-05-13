@@ -6,7 +6,7 @@ import { query } from "../components/native/index.js";
 import { Typing } from "../components/Typing.js";
 import { UserCard } from "../components/UserCard.js";
 import users from "../context/users.js";
-import { GetParams } from "../router.js";
+import { GetParams, go } from "../router.js";
 import { Fetch } from "../utils/fetch.js";
 import { MESSAGE, ws } from "../websockets.js";
 const CONVERSATION_API = `${location.origin}/api/chat/`;
@@ -77,6 +77,7 @@ const observerArgs = (parentNode, url) => {
 };
 
 export const Chat = () => {
+  if (!ws) return go("/");
   const { id } = GetParams();
   const user = users.get(id);
   if (!id || !user) {
