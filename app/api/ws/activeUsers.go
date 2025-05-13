@@ -10,9 +10,22 @@ import (
 var activeUsers = map[snowflake.SnowflakeID][]*wsConnection{}
 var mux sync.Mutex
 
-func GetUser(id snowflake.SnowflakeID) []*wsConnection {
-	return activeUsers[id]
+func NotifyIfTyping(typingUser, to snowflake.SnowflakeID) {
+	mux.Lock()
+	defer mux.Unlock()
+	for _, chatConn := range activeUsers[typingUser] {
+		if chatConn.ChattingWith == to {
+			for _, ownConn := range activeUsers[to] {
+				status := modules.OutgoingStatus{
+					Id:     typingUser,
+					Status: "typing",
+				}
+				ownConn.WriteJSON(modules.NewMessage(&status))
+			}
+		}
+	}
 }
+
 func addActiveUser(conn *wsConnection) {
 	mux.Lock()
 	defer mux.Unlock()

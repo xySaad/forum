@@ -52,18 +52,8 @@ func FetchMessages(conn *modules.Connection, forumDB *sql.DB) {
 	}
 
 	conn.Respond(messages)
-	snowChatID := snowflake.SnowflakeID(parsed)
-	ownConns := ws.GetUser(conn.User.Id)
-	chatConns := ws.GetUser(snowChatID)
-	for _, chatConn := range chatConns {
-		if chatConn.ChattingWith == conn.User.Id {
-			for _, ownConn := range ownConns {
-				status := modules.OutgoingStatus{
-					Id:     snowChatID,
-					Status: "typing",
-				}
-				ownConn.WriteJSON(modules.NewMessage(&status))
-			}
-		}
+	if lastId == "" {
+		snowChatID := snowflake.SnowflakeID(parsed)
+		ws.NotifyIfTyping(snowChatID, conn.User.Id)
 	}
 }

@@ -39,7 +39,7 @@ export const Input = (sendFunction) => {
     typingTimeout = setTimeout(() => {
       isTyping = false;
       sendTypingStatus(false, id);
-    }, 4000);
+    }, 5000);
   };
 
   const button = document.createElement("button");
@@ -50,7 +50,7 @@ export const Input = (sendFunction) => {
   return div("inputwrap").add(inputElm, button);
 };
 
-function sendTypingStatus(isTyping, id) {
+export function sendTypingStatus(isTyping, id) {
   const status = isTyping ? "typing" : "afk";
   ws.send(
     JSON.stringify({

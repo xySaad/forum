@@ -88,7 +88,6 @@ export const Chat = () => {
 
   const user = users.get(id);
   const messages = div("messages");
-  if (user.isTyping) messages.add(Typing());
   observer = new IntersectionObserver(...observerArgs(messages, url));
   fetchNext(messages, url);
 
