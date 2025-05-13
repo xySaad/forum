@@ -49,7 +49,12 @@ func (conn *wsConnection) sendMessageTo(db *sql.DB, inMsg *modules.IncomingDM) e
 	return nil
 }
 
-func Notify[T modules.OutgoingStatus | modules.User](msg modules.OutgoingMessage[T], shouldLock bool) {
+type Notifyable interface {
+	modules.Message
+	modules.OutgoingStatus | modules.User
+}
+
+func Notify[T Notifyable](msg modules.OutgoingMessage[T], shouldLock bool) {
 	if shouldLock {
 		mux.Lock()
 		defer mux.Unlock()

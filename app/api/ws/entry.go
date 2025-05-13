@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net"
-	"reflect"
 
 	"forum/app/modules"
 	"forum/app/modules/log"
@@ -32,14 +31,13 @@ func Entry(conn *modules.Connection, forumDB *sql.DB) {
 	defer deleteActiveUser(wsConn)
 	addActiveUser(wsConn)
 	// TODO: prevent user from sending custom status
-outer:
 	for {
 		var rawMsg modules.IncomingMessage
 		err := wsConn.ReadJSON(&rawMsg)
 		if err != nil {
 			switch err.(type) {
 			case *net.OpError, *websocket.CloseError:
-				break outer
+				return
 			default:
 				log.Error(err)
 				continue
@@ -64,7 +62,7 @@ outer:
 			}
 			wsConn.notifyTypingStatus(msg.Chat, msg.Status)
 		default:
-			fmt.Println("invalid asserted type", reflect.TypeOf(v))
+			fmt.Println("invalid message type", rawMsg.Type)
 		}
 	}
 }

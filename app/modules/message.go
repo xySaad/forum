@@ -4,14 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"forum/app/modules/snowflake"
-	"reflect"
 	"time"
 )
-
-func typeStr[T any]() string {
-	t := reflect.TypeFor[T]()
-	return t.String()
-}
 
 const QUERY_GET_MESSAGE = "SELECT id, sender, receiver, content, created_at FROM message WHERE ((sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?)) "
 const (
@@ -29,16 +23,9 @@ const (
 	MessageType_NEW_USER = "new_user"
 )
 
-type Action struct {
-	Action string `json:"action"`
-	Reason string `json:"reason"`
-}
-
-var Outgoing_Message_Types = map[string]string{
-	typeStr[OutgoingDM]():     MessageType_DM,
-	typeStr[OutgoingStatus](): MessageType_STATUS,
-	typeStr[User]():           MessageType_NEW_USER,
-	typeStr[Action]():         MessageType_Action,
+type Message interface {
+	OutgoingDM | OutgoingStatus | User | Action
+	MessageType() string
 }
 
 var incomingMessageConstructors = map[string]any{
@@ -82,11 +69,7 @@ func (im *IncomingMessage) Decode() (any, error) {
 	return target, nil
 }
 
-type OutgoingMessageData interface {
-	OutgoingDM | OutgoingStatus | User | Action
-}
-
-type OutgoingMessage[T OutgoingMessageData] struct {
+type OutgoingMessage[T Message] struct {
 	Type string `json:"type"`
 	Data *T     `json:"data"`
 }
@@ -99,14 +82,25 @@ type OutgoingDM struct {
 	CreationTime time.Time             `json:"creationTime"`
 }
 
+func (o OutgoingDM) MessageType() string { return MessageType_DM }
+
 type OutgoingStatus struct {
 	Id     snowflake.SnowflakeID `json:"id"`
 	Status string                `json:"status"`
 }
 
-func NewMessage[T OutgoingMessageData](data *T) OutgoingMessage[T] {
+func (o OutgoingStatus) MessageType() string { return MessageType_STATUS }
+
+type Action struct {
+	Action string `json:"action"`
+	Reason string `json:"reason"`
+}
+
+func (o Action) MessageType() string { return MessageType_Action }
+
+func NewMessage[T Message](data *T) OutgoingMessage[T] {
 	return OutgoingMessage[T]{
-		Type: Outgoing_Message_Types[typeStr[T]()],
+		Type: (*data).MessageType(),
 		Data: data,
 	}
 }
