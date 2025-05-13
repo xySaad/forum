@@ -49,7 +49,7 @@
   flex-wrap: wrap;
 }
 .time .full {
- white-space: nowrap;
+  white-space: nowrap;
 }
 
 .indicator.typing {
@@ -61,7 +61,6 @@
   gap: 8px;
   order: -1;
 }
-
 
 .indicator.typing .dot {
   width: 8px;
@@ -90,4 +89,11 @@
     opacity: 0.3;
     transform: scale(1);
   }
+}
+
+body:has(.users.hide) .chat {
+  margin-left: 20px;
+}
+body:has(.users.hide) .chat .user {
+  margin-left: 40px;
 }

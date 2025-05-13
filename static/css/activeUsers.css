@@ -1,3 +1,6 @@
+body {
+  --activeUsersWith: 280px
+}
 .users {
   position: absolute;
   margin-left: 10px;
@@ -9,7 +12,7 @@
   background-color: hsl(238, 22%, 10%);
   border-radius: 20px;
   z-index: 2;
-  width: 280px;
+  width: var(--activeUsersWith);
   box-sizing: border-box;
 }
 
@@ -76,14 +79,9 @@
   right: 10px;
 }
 .users.hide {
+  --activeUsersWith: 0px
   width: fit-content;
 }
-.users.hide .title {
-  display: none;
-}
-.users.hide .chevron-left {
-  display: none;
-}
-.users.hide .user {
+.users.hide :is(.chevron-left, .title, .user, .fallback) {
   display: none;
 }

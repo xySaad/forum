@@ -87,7 +87,7 @@ const handleMessage = (e) => {
       const userElem =
         query(`.users .user.uid-${chat}`) ||
         query(`.users .user.uid-${sender}`);
-      query(".users .title").insertAdjacentElement("afterend", userElem);
+      query(".users .head").insertAdjacentElement("afterend", userElem);
       break;
     case MESSAGE.TYPE.NEW_USER:
       users.add(msg);
