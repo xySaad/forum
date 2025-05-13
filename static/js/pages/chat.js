@@ -12,7 +12,7 @@ import { MESSAGE, ws } from "../websockets.js";
 const CONVERSATION_API = `${location.origin}/api/chat/`;
 let observer;
 
-export const Message = (msg) => {  
+export const Message = (msg) => {
   const publisher = users.get(msg.sender);
   const time = new Date(msg.creationTime);
   const minutes = time.getMinutes().toString().padStart(2, "0");
@@ -88,6 +88,8 @@ export const Chat = () => {
 
   const user = users.get(id);
   const messages = div("messages");
+  if (user.isTyping) messages.add(Typing());
+
   observer = new IntersectionObserver(...observerArgs(messages, url));
   fetchNext(messages, url);
 

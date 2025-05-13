@@ -53,14 +53,17 @@ const handleMessage = (e) => {
           query(".indicator.typing")?.remove();
           break;
         case "typing":
+          if (IncomingChat.isTyping) {
+            break;
+          }
           IncomingChat.isTyping = true;
           if (id === chatId) messages.add(Typing());
           break;
         case MESSAGE.STATUS.ONLINE:
-          case MESSAGE.STATUS.OFFLINE:
+        case MESSAGE.STATUS.OFFLINE:
           IncomingChat.status = status;
           console.log("updated status");
-          break;          
+          break;
         default:
           console.error("Invalid status", status);
           return;

@@ -57,7 +57,11 @@ outer:
 				log.Fatal(err)
 			}
 		case *modules.IncomingStatus:
-			wsConn.ChattingWith = msg.Chat
+			if msg.Status == "typing" {
+				wsConn.ChattingWith = msg.Chat
+			} else {
+				wsConn.ChattingWith = 0
+			}
 			wsConn.notifyTypingStatus(msg.Chat, msg.Status)
 		default:
 			fmt.Println("invalid asserted type", reflect.TypeOf(v))
