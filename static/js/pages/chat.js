@@ -78,7 +78,8 @@ const observerArgs = (parentNode, url) => {
 
 export const Chat = () => {
   const { id } = GetParams();
-  if (!id) {
+  const user = users.get(id);
+  if (!id || !user) {
     return div("chat").add(div("fallback", "no user is selected"));
   }
   const url = new URL(CONVERSATION_API + id);
@@ -86,7 +87,6 @@ export const Chat = () => {
   toggleIcon(".chat-bubble");
   chatBubble?.on("load", (svg) => svg.classList.add("active"));
 
-  const user = users.get(id);
   const messages = div("messages");
   if (user.isTyping) messages.add(Typing());
 
