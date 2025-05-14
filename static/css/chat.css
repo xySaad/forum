@@ -1,17 +1,16 @@
 .chat {
   margin-left: 300px;
   margin-right: 15px;
-  height: 100%;
-  border-radius: 10px 10px;
+  height: calc(100% - 40px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  --input-height: 50px;
+  border-radius: 16px 16px 12px 12px;
+  box-shadow: 3px 10px 15px 2px black;
 }
 
 .chat .inputwrap {
   margin-top: auto;
-  margin-bottom: 40px;
 }
 .chat .fallback {
   position: absolute;
@@ -91,9 +90,6 @@
   }
 }
 
-body:has(.users.hide) .chat {
-  margin-left: 20px;
-}
-body:has(.users.hide) .chat .user {
-  margin-left: 40px;
+.users.hide + main .chat {
+  margin-left: 60px;
 }
